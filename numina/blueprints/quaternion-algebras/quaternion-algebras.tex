@@ -17,6 +17,9 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{definition}[Quaternion algebra]
     \label{def:quaternion-algebra}
+    \lean{QuaternionAlgebra}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
+    \leanok
     For $a, b \in F^\times$, the \emph{quaternion algebra}
     $\left(\frac{a,b}{F}\right)$ is the $F$-algebra $\mathbb{H}[F, a, 0, b]$ with
     underlying $F$-vector space spanned by $1, i, j, k$ subject to
@@ -25,7 +28,10 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{definition}[Standard generators]
     \label{def:standard-generators}
+    \lean{QuaternionAlgebras.gi}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:quaternion-algebra}
+    \leanok
     The \emph{standard generators} of $\left(\frac{a,b}{F}\right)$ are the elements
     $i = (0,1,0,0)$ and $j = (0,0,1,0)$, together with the derived element
     $k = ij = (0,0,0,1)$. They satisfy $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k$.
@@ -33,6 +39,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Anticommutation of generators]
     \label{lem:ji-eq-neg-ij}
+    \lean{QuaternionAlgebras.gj_mul_gi}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators}
     In $\left(\frac{a,b}{F}\right)$ we have $ji = -ij$.
 \end{lemma}
@@ -45,6 +53,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Square of $k$]
     \label{lem:k-squared}
+    \lean{QuaternionAlgebras.gk_sq}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators, lem:ji-eq-neg-ij}
     With $k = ij$ we have $k^2 = -ab$.
 \end{lemma}
@@ -58,6 +68,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Mixed products]
     \label{lem:mul-table}
+    \lean{QuaternionAlgebras.mul_table}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators, lem:ji-eq-neg-ij}
     With $k = ij$ we have $ik = aj$, $ki = -aj$, $jk = -bi$, and $kj = bi$.
 \end{lemma}
@@ -71,7 +83,10 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{theorem}[Dimension four]
     \label{thm:dim-four}
+    \lean{QuaternionAlgebras.dim_four}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:quaternion-algebra}
+    \leanok
     $\left(\frac{a,b}{F}\right)$ has dimension $4$ as an $F$-vector space.
 \end{theorem}
 \begin{proof}
@@ -83,6 +98,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Standard basis]
     \label{lem:standard-basis}
+    \lean{QuaternionAlgebras.standard_basis_linearIndependent}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators, thm:dim-four}
     The elements $1, i, j, k$ form an $F$-basis of $\left(\frac{a,b}{F}\right)$.
     In particular they are $F$-linearly independent: if
@@ -98,6 +115,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Lifting generators to an algebra homomorphism]
     \label{lem:lifthom-construction}
+    \lean{QuaternionAlgebras.lifthom_construction}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators}
     Let $B$ be an $F$-algebra containing elements $i', j'$ with $(i')^2 = a$,
     $(j')^2 = b$, and $j'i' = -i'j'$. Then $(i', j', i'j')$ form a
@@ -118,6 +137,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Standard generators presentation]
     \label{lem:standard-generators-presentation}
+    \lean{QuaternionAlgebras.standard_generators_presentation}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators, lem:standard-basis, lem:lifthom-construction}
     If an $F$-algebra $B$ contains nonzero $i', j'$ generating $B$ with
     $(i')^2 = a$, $(j')^2 = b$, $i'j' = -j'i'$ for $a, b \in F^\times$, then
@@ -137,6 +158,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Commuting with $i$ kills the $j,k$ parts]
     \label{lem:central-commute-i}
+    \lean{QuaternionAlgebras.central_commute_i}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
     If $\alpha = t + xi + yj + zk$ satisfies $\alpha i = i\alpha$, then $y = z = 0$.
 \end{lemma}
@@ -152,6 +175,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Commuting with $j$ kills the $i$ part]
     \label{lem:central-commute-j}
+    \lean{QuaternionAlgebras.central_commute_j}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
     If $\alpha = t + xi + yj + zk$ satisfies $\alpha j = j\alpha$, then $x = 0$.
 \end{lemma}
@@ -167,6 +192,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{theorem}[Centrality]
     \label{thm:central}
+    \lean{QuaternionAlgebras.center_eq_bot}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:quaternion-algebra, lem:standard-basis, lem:central-commute-i, lem:central-commute-j, lem:ji-eq-neg-ij}
     $\left(\frac{a,b}{F}\right)$ is central over $F$: its center equals the image
     of $F$.
@@ -185,6 +212,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{definition}[Matrix basis over a splitting field]
     \label{def:matrix-basis}
+    \lean{QuaternionAlgebras.matI}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:quaternion-algebra}
     Let $K = F(\sqrt a)$ contain a root $s$ of $x^2 - a$. Define elements of
     $M_2(K)$ by
@@ -199,6 +228,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Matrix basis relations]
     \label{lem:matrix-basis-relations}
+    \lean{QuaternionAlgebras.matrix_basis_relations}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:matrix-basis}
     The matrices $I, J$ of \ref{def:matrix-basis} satisfy
     $I^2 = a\cdot 1$, $J^2 = b\cdot 1$, and $JI = -IJ$ in $M_2(K)$.
@@ -211,6 +242,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Matrix liftHom]
     \label{lem:matrix-lifthom}
+    \lean{QuaternionAlgebras.matrix_lifthom}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:matrix-basis, lem:matrix-basis-relations, lem:lifthom-construction}
     There is an $F$-algebra homomorphism
     $\lambda \colon \left(\frac{a,b}{F}\right) \to M_2(F(\sqrt a))$ with
@@ -226,6 +259,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{proposition}[Matrix embedding]
     \label{prop:matrix-embedding}
+    \lean{QuaternionAlgebras.matrix_embedding}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:matrix-basis, lem:matrix-lifthom, thm:dim-four, lem:standard-basis}
     The $F$-algebra homomorphism
     $\lambda \colon \left(\frac{a,b}{F}\right) \to M_2(F(\sqrt a))$ of
@@ -243,6 +278,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{corollary}[Split quaternion algebra is a matrix algebra]
     \label{cor:split-matrix}
+    \lean{QuaternionAlgebras.split_matrix}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{prop:matrix-embedding, thm:dim-four}
     There is an $F$-algebra isomorphism
     $\left(\frac{1,b}{F}\right) \xrightarrow{\sim} M_2(F)$, given by
@@ -266,7 +303,10 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{definition}[Standard involution]
     \label{def:conjugation}
+    \lean{QuaternionAlgebras.conj}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:quaternion-algebra}
+    \leanok
     The \emph{conjugation} (standard involution) on $\left(\frac{a,b}{F}\right)$ is
     the map $\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$,
     realized in Mathlib by the \texttt{star} operation.
@@ -274,6 +314,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Trace and norm via conjugation]
     \label{lem:trace-norm}
+    \lean{QuaternionAlgebras.trace_norm}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:conjugation, lem:standard-basis}
     For $\alpha = t + xi + yj + zk$ in the Hamiltonians
     $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
@@ -292,7 +334,10 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Multiplicativity of the norm]
     \label{lem:norm-mul}
+    \lean{QuaternionAlgebras.normSq_mul}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{lem:trace-norm}
+    \leanok
     For the squared norm $\lVert\alpha\rVert^2 = \operatorname{normSq}\alpha = \alpha\bar\alpha$
     on $\mathbb{H}$, we have
     $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2 \lVert\beta\rVert^2$.
@@ -306,6 +351,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{definition}[Pure (imaginary) quaternion]
     \label{def:pure}
+    \lean{QuaternionAlgebras.Hpure}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:conjugation}
     A quaternion $\alpha$ is \emph{pure} (imaginary) if its real part vanishes,
     equivalently $\bar\alpha = -\alpha$. The pure quaternions form the subspace
@@ -314,6 +361,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Square of a pure quaternion]
     \label{lem:pure-square}
+    \lean{QuaternionAlgebras.pure_square}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure}
     A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
     for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
@@ -326,6 +375,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Real part of a product of pure quaternions]
     \label{lem:pure-product-re}
+    \lean{QuaternionAlgebras.pure_product_re}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure, lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0$,
@@ -345,6 +396,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Imaginary part of a product of pure quaternions]
     \label{lem:pure-product-im}
+    \lean{QuaternionAlgebras.pure_product_im}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure, lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0$, the imaginary part of $vw$ is
@@ -365,6 +418,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Product of pure quaternions]
     \label{lem:pure-product}
+    \lean{QuaternionAlgebras.pure_product}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure, lem:standard-basis, lem:pure-product-re, lem:pure-product-im, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
@@ -383,6 +438,8 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 
 \begin{lemma}[Orthogonality criteria for pure quaternions]
     \label{lem:pure-orthogonal}
+    \lean{QuaternionAlgebras.pure_orthogonal}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{lem:pure-product}
     For pure quaternions $v, w$:
     (a) $vw$ is pure if and only if $v, w$ are orthogonal;
@@ -404,6 +461,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{definition}[Euclidean structure on the pure quaternions]
     \label{def:pure-euclidean}
+    \lean{QuaternionAlgebras.pureEuclid}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{def:pure, lem:trace-norm}
     Let $\mathbb{H}^0 \subseteq \mathbb{H}$ be the $\mathbb{R}$-submodule of pure
     quaternions. Equip it with the inner product
@@ -417,6 +476,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[A norm-preserving map gives a special orthogonal matrix]
     \label{lem:isometry-to-so}
+    \lean{QuaternionAlgebras.isometry_to_so}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{def:pure-euclidean}
     Let $\rho \colon \mathbb{H}^0 \to \mathbb{H}^0$ be an $\mathbb{R}$-linear map
     with $\lVert \rho(v)\rVert = \lVert v\rVert$ for all $v$ and $\det \rho = 1$.
@@ -438,6 +499,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Conjugation preserves purity]
     \label{lem:conj-preserves-pure}
+    \lean{QuaternionAlgebras.conj_preserves_pure}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{def:pure, lem:trace-norm}
     For $\alpha \in \mathbb{H}^\times$ and pure $v$, the element
     $\alpha v \alpha^{-1}$ is pure.
@@ -455,6 +518,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Conjugation preserves the norm]
     \label{lem:conj-preserves-norm}
+    \lean{QuaternionAlgebras.conj_preserves_norm}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:norm-mul}
     For $\alpha \in \mathbb{H}^1$ and any $v$,
     $\lVert \alpha v \alpha^{-1}\rVert^2 = \lVert v\rVert^2$.
@@ -471,6 +536,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Conjugation is linear on pure quaternions]
     \label{lem:conj-linear}
+    \lean{QuaternionAlgebras.rotLin}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-preserves-pure}
     For fixed $\alpha \in \mathbb{H}^1$, the map
     $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$,
@@ -486,6 +553,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[$\rho_\alpha$ is orthogonal]
     \label{lem:rotation-orthogonal}
+    \lean{QuaternionAlgebras.rotation_orthogonal}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-preserves-norm, lem:conj-linear, def:pure-euclidean}
     For $\alpha \in \mathbb{H}^1$, the map $\rho_\alpha$ of \ref{lem:conj-linear}
     preserves the norm on $\mathbb{H}^0$: $\lVert \rho_\alpha(v)\rVert = \lVert v\rVert$
@@ -500,6 +569,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[$\det \rho_\alpha = 1$]
     \label{lem:rotation-det-one}
+    \lean{QuaternionAlgebras.rotation_det}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-linear, def:pure-euclidean}
     For $\alpha \in \mathbb{H}^1$, the determinant of the $3\times 3$ matrix of
     $\rho_\alpha$ in the orthonormal basis $i, j, k$ equals
@@ -516,6 +587,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{proposition}[Conjugation acts by rotations]
     \label{prop:rotation}
+    \lean{QuaternionAlgebras.rotation_mem_so}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:rotation-orthogonal, lem:rotation-det-one, lem:isometry-to-so, lem:conj-linear}
     For $\alpha \in \mathbb{H}^1$, the linear map $\rho_\alpha$ of
     \ref{lem:conj-linear} on $\mathbb{H}^0 \cong \mathbb{R}^3$ lies in
@@ -531,6 +604,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Kernel of the rotation map]
     \label{lem:rotation-kernel}
+    \lean{QuaternionAlgebras.rotation_kernel}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{prop:rotation, lem:standard-basis, thm:central}
     If $\alpha \in \mathbb{H}^1$ satisfies $\alpha v \alpha^{-1} = v$ for all pure
     $v$, then $\alpha = \pm 1$.
@@ -545,6 +620,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Axis and angle of an $\mathrm{SO}(3)$ element]
     \label{lem:so3-axis-angle}
+    \lean{QuaternionAlgebras.so3_axis_angle}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{def:pure-euclidean}
     Every $A \in \mathrm{SO}(3)$ admits a unit axis $u$ with $Au = u$ and an angle
     $\varphi$ such that, on the orthogonal complement $u^\perp$ with respect to an
@@ -563,6 +640,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Conjugation fixes its axis]
     \label{lem:rotation-fixes-axis}
+    \lean{QuaternionAlgebras.rotation_fixes_axis}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-linear, lem:pure-square}
     For a unit pure quaternion $u$ and $\theta \in \mathbb{R}$, set
     $\alpha = \cos\theta + (\sin\theta)\,u \in \mathbb{H}^1$ (using $u^2 = -1$,
@@ -577,6 +656,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Conjugation rotates the orthogonal plane by $2\theta$]
     \label{lem:rotation-on-perp}
+    \lean{QuaternionAlgebras.rotation_on_perp}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-linear, lem:pure-square, lem:pure-orthogonal, lem:pure-product}
     With $u, \alpha$ as in \ref{lem:rotation-fixes-axis}, for any unit pure $w$
     orthogonal to $u$ the map $\rho_\alpha$ acts on the plane
@@ -595,6 +676,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{lemma}[Rotation map is surjective]
     \label{lem:rotation-surjective}
+    \lean{QuaternionAlgebras.rotation_surjective}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{prop:rotation, lem:so3-axis-angle, lem:rotation-fixes-axis, lem:rotation-on-perp, lem:pure-square, lem:pure-orthogonal}
     Every $A \in \mathrm{SO}(3)$ equals $\rho_\alpha$ for some
     $\alpha \in \mathbb{H}^1$.
@@ -611,6 +694,8 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
     \label{cor:cover}
+    \lean{QuaternionAlgebras.double_cover}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{prop:rotation, lem:rotation-kernel, lem:rotation-surjective}
     The map $\alpha \mapsto \rho_\alpha$ is a surjective group homomorphism
     $\mathbb{H}^1 \to \mathrm{SO}(3)$ with kernel $\{\pm 1\}$, giving the exact
