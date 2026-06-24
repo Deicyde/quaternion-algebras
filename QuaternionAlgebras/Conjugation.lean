@@ -36,9 +36,17 @@ lemma normSq_mul (α β : Quaternion ℝ) :
 i.e. those whose real part vanishes. -/
 def Hpure : Submodule ℝ (Quaternion ℝ) where
   carrier := {q | q.re = 0}
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  smul_mem' := by sorry
+  add_mem' := by
+    intro a b ha hb
+    simp only [Set.mem_setOf_eq] at ha hb ⊢
+    simp [ha, hb]
+  zero_mem' := by
+    simp only [Set.mem_setOf_eq]
+    simp
+  smul_mem' := by
+    intro c a ha
+    simp only [Set.mem_setOf_eq] at ha ⊢
+    simp [ha]
 
 /-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
 for pure `v` one has `v² = -normSq v ≤ 0`. -/
