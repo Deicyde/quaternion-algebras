@@ -41,7 +41,12 @@ lemma mul_table :
     gi a b * gk a b = a • gj a b ∧
     gk a b * gi a b = -(a • gj a b) ∧
     gj a b * gk a b = -(b • gi a b) ∧
-    gk a b * gj a b = b • gi a b := by sorry
+    gk a b * gj a b = b • gi a b := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · ext <;> simp [gi, gj, gk]
+  · ext <;> simp [gi, gj, gk]
+  · ext <;> simp [gi, gj, gk]
+  · ext <;> simp [gi, gj, gk]
 
 /-- `(a,b/F)` has dimension four as an `F`-vector space. -/
 theorem dim_four : Module.finrank F ℍ[F, a, 0, b] = 4 :=

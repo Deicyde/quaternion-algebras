@@ -56,7 +56,9 @@ lemma pure_square (v : Quaternion ℝ) :
 
 /-- Real part of a product of pure quaternions: minus the dot product. -/
 lemma pure_product_re (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
-    (v * w).re = -(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK) := by sorry
+    (v * w).re = -(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK) := by
+  rw [Quaternion.re_mul, hv, hw]
+  ring
 
 /-- Imaginary part of a product of pure quaternions: the cross product. -/
 lemma pure_product_im (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
