@@ -42,6 +42,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \lean{QuaternionAlgebras.gj_mul_gi}
     \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators}
+    \leanok
     In $\left(\frac{a,b}{F}\right)$ we have $ji = -ij$.
 \end{lemma}
 \begin{proof}
@@ -248,6 +249,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \lean{QuaternionAlgebras.matrix_lifthom}
     \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:matrix-basis, lem:matrix-basis-relations, lem:lifthom-construction}
+    \leanok
     There is an $F$-algebra homomorphism
     $\lambda \colon \left(\frac{a,b}{F}\right) \to M_2(F(\sqrt a))$ with
     $\lambda(i) = I$, $\lambda(j) = J$, $\lambda(k) = IJ$.
@@ -369,6 +371,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \lean{QuaternionAlgebras.pure_square}
     \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure}
+    \leanok
     A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
     for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
 \end{lemma}
@@ -527,6 +530,7 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
     \lean{QuaternionAlgebras.conj_preserves_norm}
     \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:norm-mul}
+    \leanok
     For $\alpha \in \mathbb{H}^1$ and any $v$,
     $\lVert \alpha v \alpha^{-1}\rVert^2 = \lVert v\rVert^2$.
 \end{lemma}

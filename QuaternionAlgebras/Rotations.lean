@@ -68,7 +68,18 @@ lemma conj_preserves_pure (α : Quaternion ℝ) (hα : α ≠ 0) (v : Quaternion
 `normSq (α v α⁻¹) = normSq v`. -/
 lemma conj_preserves_norm (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
     (v : Quaternion ℝ) : Quaternion.normSq (conjEndo α v) = Quaternion.normSq v := by
-  sorry
+  have hconj : conjEndo α v = α * v * α⁻¹ := by
+    simp [conjEndo, LinearMap.mulRight_apply, LinearMap.mulLeft_apply, mul_assoc]
+  rw [hconj]
+  calc
+    Quaternion.normSq (α * v * α⁻¹) = Quaternion.normSq (α * v) * Quaternion.normSq (α⁻¹) := by
+      rw [normSq_mul]
+    _ = (Quaternion.normSq α * Quaternion.normSq v) * Quaternion.normSq (α⁻¹) := by
+      rw [normSq_mul]
+    _ = (Quaternion.normSq α * Quaternion.normSq v) * (Quaternion.normSq α)⁻¹ := by
+      rw [Quaternion.normSq_inv]
+    _ = (1 * Quaternion.normSq v) * (1 : ℝ)⁻¹ := by rw [hα]
+    _ = Quaternion.normSq v := by norm_num
 
 /-- Conjugation is `ℝ`-linear on the pure quaternions: for `α ≠ 0`, the map
 `ρ_α : v ↦ α v α⁻¹` restricts to an `ℝ`-linear endomorphism of `ℍ⁰`. -/

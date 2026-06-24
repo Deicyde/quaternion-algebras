@@ -72,7 +72,32 @@ lemma matrix_lifthom {K : Type*} [Field K] [Algebra F K] (s : K)
     ∃ φ : ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K,
       φ (gi a b) = matI s ∧
       φ (gj a b) = matJ (algebraMap F K b) ∧
-      φ (gk a b) = matI s * matJ (algebraMap F K b) := by sorry
+      φ (gk a b) = matI s * matJ (algebraMap F K b) := by
+  have hrels := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
+  rcases hrels with ⟨hI, hJ, hJI⟩
+  let b' : QuaternionAlgebra.Basis (Matrix (Fin 2) (Fin 2) K) a 0 b :=
+    { i := matI s
+      j := matJ (algebraMap F K b)
+      k := matI s * matJ (algebraMap F K b)
+      i_mul_i := by
+        calc
+          matI s * matI s = (algebraMap F K a) • (1 : Matrix (Fin 2) (Fin 2) K) := hI
+          _ = a • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
+          _ = a • (1 : Matrix (Fin 2) (Fin 2) K) + (0 : F) • matI s := by simp
+      j_mul_j := by
+        calc
+          matJ (algebraMap F K b) * matJ (algebraMap F K b)
+              = (algebraMap F K b) • (1 : Matrix (Fin 2) (Fin 2) K) := hJ
+          _ = b • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
+      i_mul_j := rfl
+      j_mul_i := by
+        calc
+          matJ (algebraMap F K b) * matI s = -(matI s * matJ (algebraMap F K b)) := hJI
+          _ = (0 : F) • matJ (algebraMap F K b) - (matI s * matJ (algebraMap F K b)) := by simp
+    }
+  refine ⟨b'.liftHom, by simp [b', QuaternionAlgebra.Basis.lift, gi],
+    by simp [b', QuaternionAlgebra.Basis.lift, gj],
+    by simp [b', QuaternionAlgebra.Basis.lift, gk]⟩
 
 /-- Matrix embedding: any `F`-algebra homomorphism `(a,b/F) → M₂(K)` sending the
 standard generators to `I` and `J` is injective. -/

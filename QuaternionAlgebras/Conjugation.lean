@@ -51,7 +51,8 @@ def Hpure : Submodule ℝ (Quaternion ℝ) where
 /-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
 for pure `v` one has `v² = -normSq v ≤ 0`. -/
 lemma pure_square (v : Quaternion ℝ) :
-    v.re = 0 ↔ v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by sorry
+    v.re = 0 ↔ v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by
+  simpa using (Quaternion.sq_eq_neg_normSq (a := v)).symm
 
 /-- Real part of a product of pure quaternions: minus the dot product. -/
 lemma pure_product_re (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :

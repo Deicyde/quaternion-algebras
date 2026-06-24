@@ -28,7 +28,8 @@ def gk : ℍ[F, a, 0, b] := ⟨0, 0, 0, 1⟩
 lemma gk_eq_gi_mul_gj : gk a b = gi a b * gj a b := by sorry
 
 /-- Anticommutation of the standard generators: `ji = -ij`. -/
-lemma gj_mul_gi : gj a b * gi a b = -(gi a b * gj a b) := by sorry
+lemma gj_mul_gi : gj a b * gi a b = -(gi a b * gj a b) := by
+  ext <;> simp [gi, gj]
 
 /-- The square of `k = ij` is `-ab`. -/
 lemma gk_sq : gk a b * gk a b = (-(a * b)) • (1 : ℍ[F, a, 0, b]) := by
