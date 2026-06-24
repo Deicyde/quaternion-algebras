@@ -100,7 +100,8 @@ noncomputable def rotMatrix (α : Quaternion ℝ) : Matrix (Fin 3) (Fin 3) ℝ :
 /-- `ρ_α` is orthogonal: for `normSq α = 1` it preserves the norm on `ℍ⁰`. -/
 lemma rotation_orthogonal (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
     (v : Quaternion ℝ) (hv : v.re = 0) :
-    Quaternion.normSq (conjEndo α v) = Quaternion.normSq v := by sorry
+    Quaternion.normSq (conjEndo α v) = Quaternion.normSq v :=
+  conj_preserves_norm α hα v
 
 /-- The determinant of the matrix of `ρ_α` equals `(normSq α)³`; in particular it
 is `1` for `α ∈ ℍ¹`. -/
