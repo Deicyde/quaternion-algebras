@@ -21,7 +21,11 @@ def conj (q : Quaternion ℝ) : Quaternion ℝ := star q
 lemma trace_norm (α : Quaternion ℝ) :
     α + star α = ((2 * α.re : ℝ) : Quaternion ℝ) ∧
       α * star α = ((Quaternion.normSq α : ℝ) : Quaternion ℝ) ∧
-      star α * α = ((Quaternion.normSq α : ℝ) : Quaternion ℝ) := by sorry
+      star α * α = ((Quaternion.normSq α : ℝ) : Quaternion ℝ) := by
+  refine ⟨?_, ?_, ?_⟩
+  · simpa using Quaternion.self_add_star' α
+  · simpa using Quaternion.self_mul_star α
+  · simpa using Quaternion.star_mul_self α
 
 /-- Multiplicativity of the norm: `normSq (α β) = normSq α * normSq β`. -/
 lemma normSq_mul (α β : Quaternion ℝ) :

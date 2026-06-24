@@ -50,7 +50,63 @@ noncomputable def conjEndo (α : Quaternion ℝ) : Quaternion ℝ →ₗ[ℝ] Qu
 
 /-- Conjugation preserves purity: for `α ≠ 0` and pure `v`, `α v α⁻¹` is pure. -/
 lemma conj_preserves_pure (α : Quaternion ℝ) (hα : α ≠ 0) (v : Quaternion ℝ)
-    (hv : v.re = 0) : (conjEndo α v).re = 0 := by sorry
+    (hv : v.re = 0) : (conjEndo α v).re = 0 := by
+  unfold conjEndo
+  simp [LinearMap.mulRight_apply, LinearMap.mulLeft_apply, mul_assoc]
+  -- goal: (α * v * α⁻¹).re = 0
+  -- use star_eq_neg: star a = -a ↔ a.re = 0
+  have hstar : star (α * v * α⁻¹) = -(α * v * α⁻¹) := by
+    calc
+      star (α * v * α⁻¹) = star (α⁻¹) * star v * star α := by
+        simp [star_mul, mul_assoc]
+      _ = star (α⁻¹) * (-v) * star α := by
+        -- from v.re = 0, we have star v = -v:
+        -- prove directly using componentwise calculation
+        have hv_star : star v = -v := by
+          ext <;> simp [hv, star, add_comm, add_left_neg, mul_comm, add_assoc]
+        rw [hv_star]
+      _ = -(star (α⁻¹) * v * star α) := by ring
+      _ = -(α * v * α⁻¹) := by
+        -- key identity: star (α⁻¹) * v * star α = α * v * α⁻¹
+        have hstar_α_eq : star α = (Quaternion.normSq α : Quaternion ℝ) * α⁻¹ := by
+          calc
+            star α = ((α⁻¹ * α : Quaternion ℝ) : Quaternion ℝ) * star α := by field_simp [hα]
+            _ = α⁻¹ * (α * star α) := by ring
+            _ = α⁻¹ * (Quaternion.normSq α : Quaternion ℝ) := by rw [Quaternion.self_mul_star]
+            _ = (Quaternion.normSq α : Quaternion ℝ) * α⁻¹ := by ring
+        have hstar_α_inv_eq : star (α⁻¹) = (α : Quaternion ℝ) * ((Quaternion.normSq α)⁻¹ : ℝ) := by
+          calc
+            star (α⁻¹) = ((α * α⁻¹ : Quaternion ℝ) : Quaternion ℝ) * star (α⁻¹) := by field_simp [hα]
+            _ = α * (α⁻¹ * star (α⁻¹)) := by ring
+            _ = α * (Quaternion.normSq (α⁻¹) : Quaternion ℝ) := by rw [Quaternion.self_mul_star]
+            _ = α * (((Quaternion.normSq α)⁻¹ : ℝ) : Quaternion ℝ) := by
+              simp [Quaternion.normSq_inv]
+            _ = (α : Quaternion ℝ) * ((Quaternion.normSq α)⁻¹ : ℝ) := rfl
+        calc
+          star (α⁻¹) * v * star α
+              = ((α : Quaternion ℝ) * ((Quaternion.normSq α)⁻¹ : ℝ)) * v *
+                  ((Quaternion.normSq α : Quaternion ℝ) * α⁻¹) := by
+                rw [hstar_α_inv_eq, hstar_α_eq]
+          _ = (α : Quaternion ℝ) * (((Quaternion.normSq α)⁻¹ : ℝ) : Quaternion ℝ) * v *
+                ((Quaternion.normSq α : Quaternion ℝ) * α⁻¹) := rfl
+          _ = α * (((Quaternion.normSq α)⁻¹ : ℝ) : Quaternion ℝ) * v *
+                (Quaternion.normSq α : Quaternion ℝ) * α⁻¹ := by ring
+          _ = α * v * (((Quaternion.normSq α)⁻¹ : ℝ) : Quaternion ℝ) *
+                (Quaternion.normSq α : Quaternion ℝ) * α⁻¹ := by
+            -- scalars commute: ((normSq α)⁻¹ : ℝ) * v = v * ((normSq α)⁻¹ : ℝ)
+            simp [Algebra.commutes]
+          _ = α * v * ((((Quaternion.normSq α)⁻¹ : ℝ) : Quaternion ℝ) *
+                (Quaternion.normSq α : Quaternion ℝ)) * α⁻¹ := by ring
+          _ = α * v * (1 : Quaternion ℝ) * α⁻¹ := by
+            have hnorm : (Quaternion.normSq α : Quaternion ℝ) ≠ 0 := by
+              simpa using (Quaternion.normSq_ne_zero.mpr hα)
+            simp [hnorm]
+          _ = α * v * α⁻¹ := by simp
+  -- now from star (α * v * α⁻¹) = -(α * v * α⁻¹), deduce (α * v * α⁻¹).re = 0
+  have h_re : (α * v * α⁻¹).re = 0 := by
+    have helper : ℍ[ℝ, (-1 : ℝ), 0, (-1 : ℝ)] := α * v * α⁻¹
+    sorry
+  exact h_re
 
 /-- Conjugation preserves the norm: for `α` with `normSq α = 1` and any `v`,
 `normSq (α v α⁻¹) = normSq v`. -/

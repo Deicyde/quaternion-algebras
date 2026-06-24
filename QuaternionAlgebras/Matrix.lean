@@ -27,7 +27,42 @@ def matJ {K : Type*} [Ring K] (b : K) : Matrix (Fin 2) (Fin 2) K :=
 lemma matrix_basis_relations {K : Type*} [CommRing K] (s a b : K) (hs : s * s = a) :
     matI s * matI s = a • (1 : Matrix (Fin 2) (Fin 2) K) ∧
       matJ b * matJ b = b • (1 : Matrix (Fin 2) (Fin 2) K) ∧
-      matJ b * matI s = -(matI s * matJ b) := by sorry
+      matJ b * matI s = -(matI s * matJ b) := by
+  have hI : matI s * matI s = a • (1 : Matrix (Fin 2) (Fin 2) K) := by
+    calc
+      matI s * matI s = !![s, 0; 0, -s] * !![s, 0; 0, -s] := rfl
+      _ = !![s*s + 0*0, s*0 + 0*(-s); 0*s + (-s)*0, 0*0 + (-s)*(-s)] := by
+        rw [Matrix.mul_fin_two]
+      _ = !![s*s, 0; 0, s*s] := by
+        simp
+      _ = !![a, 0; 0, a] := by rw [hs]
+      _ = a • !![1, 0; 0, 1] := by
+        ext i j; fin_cases i <;> fin_cases j <;> simp
+      _ = a • (1 : Matrix (Fin 2) (Fin 2) K) := by rw [Matrix.one_fin_two]
+  have hJ : matJ b * matJ b = b • (1 : Matrix (Fin 2) (Fin 2) K) := by
+    calc
+      matJ b * matJ b = !![0, b; 1, 0] * !![0, b; 1, 0] := rfl
+      _ = !![0*0 + b*1, 0*b + b*0; 1*0 + 0*1, 1*b + 0*0] := by
+        rw [Matrix.mul_fin_two]
+      _ = !![b, 0; 0, b] := by
+        simp
+      _ = b • !![1, 0; 0, 1] := by
+        ext i j; fin_cases i <;> fin_cases j <;> simp
+      _ = b • (1 : Matrix (Fin 2) (Fin 2) K) := by rw [Matrix.one_fin_two]
+  have hJI : matJ b * matI s = -(matI s * matJ b) := by
+    calc
+      matJ b * matI s = !![0, b; 1, 0] * !![s, 0; 0, -s] := rfl
+      _ = !![0*s + b*0, 0*0 + b*(-s); 1*s + 0*0, 1*0 + 0*(-s)] := by
+        rw [Matrix.mul_fin_two]
+      _ = !![0, -(b * s); s, 0] := by
+        simp
+      _ = -(!![0, s*b; -s, 0]) := by
+        ext i j; fin_cases i <;> fin_cases j <;> simp [mul_comm b s]
+      _ = -(!![s, 0; 0, -s] * !![0, b; 1, 0]) := by
+        rw [Matrix.mul_fin_two]
+        simp
+      _ = -(matI s * matJ b) := rfl
+  exact ⟨hI, hJ, hJI⟩
 
 /-- Matrix `liftHom`: over a field extension `K/F` containing a square root `s`
 of `a`, there is an `F`-algebra homomorphism `(a,b/F) → M₂(K)` sending

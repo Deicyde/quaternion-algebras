@@ -31,7 +31,8 @@ lemma gk_eq_gi_mul_gj : gk a b = gi a b * gj a b := by sorry
 lemma gj_mul_gi : gj a b * gi a b = -(gi a b * gj a b) := by sorry
 
 /-- The square of `k = ij` is `-ab`. -/
-lemma gk_sq : gk a b * gk a b = (-(a * b)) • (1 : ℍ[F, a, 0, b]) := by sorry
+lemma gk_sq : gk a b * gk a b = (-(a * b)) • (1 : ℍ[F, a, 0, b]) := by
+  ext <;> simp [gk]
 
 /-- The mixed products of the standard generators:
 `ik = aj`, `ki = -aj`, `jk = -bi`, `kj = bi`. -/
