@@ -57,7 +57,12 @@ theorem dim_four : Module.finrank F ℍ[F, a, 0, b] = 4 :=
 form a basis, since the algebra has dimension four.) -/
 lemma standard_basis_linearIndependent (t x y z : F)
     (h : t • (1 : ℍ[F, a, 0, b]) + x • gi a b + y • gj a b + z • gk a b = 0) :
-    t = 0 ∧ x = 0 ∧ y = 0 ∧ z = 0 := by sorry
+    t = 0 ∧ x = 0 ∧ y = 0 ∧ z = 0 := by
+  have h' := congrArg (QuaternionAlgebra.linearEquivTuple a 0 b) h
+  simp [LinearEquiv.map_add, LinearEquiv.map_zero,
+    QuaternionAlgebra.coe_linearEquivTuple, QuaternionAlgebra.equivTuple_apply,
+    gi, gj, gk] at h'
+  exact h'
 
 /-- Lifting generators to an algebra homomorphism: if an `F`-algebra `B` contains
 `i', j'` with `(i')² = a`, `(j')² = b` and `j' i' = -i' j'`, then there is an

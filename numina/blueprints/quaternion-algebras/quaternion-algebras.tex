@@ -104,6 +104,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \lean{QuaternionAlgebras.standard_basis_linearIndependent}
     \leanfile{QuaternionAlgebras/Beginnings.lean}
     \uses{def:standard-generators, thm:dim-four}
+    \leanok
     The elements $1, i, j, k$ form an $F$-basis of $\left(\frac{a,b}{F}\right)$.
     In particular they are $F$-linearly independent: if
     $t + xi + yj + zk = 0$ with $t,x,y,z \in F$, then $t = x = y = z = 0$.
@@ -409,6 +410,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \lean{QuaternionAlgebras.pure_product_im}
     \leanfile{QuaternionAlgebras/Conjugation.lean}
     \uses{def:pure, lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
+    \leanok
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0$, the imaginary part of $vw$ is
     the cross product:
@@ -569,6 +571,7 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
     \lean{QuaternionAlgebras.rotation_orthogonal}
     \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:conj-preserves-norm, lem:conj-linear, def:pure-euclidean}
+    \leanok
     For $\alpha \in \mathbb{H}^1$, the map $\rho_\alpha$ of \ref{lem:conj-linear}
     preserves the norm on $\mathbb{H}^0$: $\lVert \rho_\alpha(v)\rVert = \lVert v\rVert$
     for all pure $v$.

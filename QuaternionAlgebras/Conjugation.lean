@@ -64,7 +64,17 @@ lemma pure_product_re (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
 lemma pure_product_im (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
     (v * w).imI = v.imJ * w.imK - v.imK * w.imJ ∧
       (v * w).imJ = v.imK * w.imI - v.imI * w.imK ∧
-      (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by sorry
+      (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+  have hI : (v * w).imI = v.imJ * w.imK - v.imK * w.imJ := by
+    rw [Quaternion.imI_mul, hv, hw]
+    ring
+  have hJ : (v * w).imJ = v.imK * w.imI - v.imI * w.imK := by
+    rw [Quaternion.imJ_mul, hv, hw]
+    ring
+  have hK : (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+    rw [Quaternion.imK_mul, hv, hw]
+    ring
+  exact ⟨hI, hJ, hK⟩
 
 /-- Product of pure quaternions: `vw = -(v·w) + (v×w)`, with the dot product as
 the real part and the cross product as the (pure) imaginary part. -/
