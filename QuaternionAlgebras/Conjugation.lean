@@ -82,7 +82,10 @@ lemma pure_product (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
     v * w =
       (⟨-(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK),
         v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
-        v.imI * w.imJ - v.imJ * w.imI⟩ : Quaternion ℝ) := by sorry
+        v.imI * w.imJ - v.imJ * w.imI⟩ : Quaternion ℝ) := by
+  have hre := pure_product_re v w hv hw
+  have ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
+  ext <;> simp [hre, hI, hJ, hK]
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
