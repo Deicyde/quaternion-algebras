@@ -109,19 +109,297 @@ over an at most quadratic extension of $F$.
 
 \begin{definition}[Left regular representation]
     \label{def:left-regular-rep}
-    \lean{QuaternionAlgebras.leftRegRep}
+    \lean{QuaternionAlgebras.leftRegRepK}
     \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:quaternion-algebra}
     \leanok
-    The \emph{left regular representation} of $B = \left(\frac{a,b}{F}\right)$ is the
-    $F$-algebra homomorphism $\lambda \colon B \to \operatorname{End}_F(B)$,
-    $\alpha \mapsto \lambda_\alpha$, where $\lambda_\alpha(\beta) = \alpha\beta$
-    (Voight~(2.3.9), here taken over $F$).
+    Let $K = F[i] \cong F[x]/(x^2 - a)$, and regard $B = \left(\frac{a,b}{F}\right)$
+    as a right $K$-module via $\beta \cdot k = \beta\,\iota(k)$ (well defined since
+    $K$ is commutative). The \emph{left regular representation} of $B$ (Voight~(2.3.9))
+    is the ring homomorphism $\lambda \colon B \to \operatorname{End}_K(B)$,
+    $\alpha \mapsto \lambda_\alpha$, where $\lambda_\alpha(\beta) = \alpha\beta$; each
+    $\lambda_\alpha$ is $K$-linear because left and right multiplication commute.
 \end{definition}
 
 \begin{lemma}[The left regular representation is faithful]
     \label{lem:left-regular-faithful}
-    \lean{QuaternionAlgebras.leftRegRep_faithful}
+    \lean{QuaternionAlgebras.leftRegRepK_faithful}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:left-regular-rep}
+    \leanok
+    The left regular representation $\lambda$ is injective (a \emph{faithful}
+    representation).
+\end{lemma}
+\begin{proof}
+    \uses{def:left-regular-rep}
+    If $\lambda_\alpha = 0$ then $\alpha = \alpha\cdot 1 = \lambda_\alpha(1) = 0$.
+\end{proof}
+
+\subsection{Rotations}
+
+We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
+the unit group $\mathbb{H}^1 = \{\alpha : \lVert\alpha\rVert^2 = 1\}$, and
+$\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions. Following Voight~2.4, we
+set up conjugation, the norm, and the pure quaternions, and then use unit
+quaternions to model rotations of $\mathbb{R}^3$.
+
+\begin{definition}[Standard involution]
+    \label{def:conjugation}
+    \lean{QuaternionAlgebras.conj}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \uses{def:quaternion-algebra}
+    \leanok
+    The \emph{conjugation} (standard involution) on $\left(\frac{a,b}{F}\right)$ is
+    the map $\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$,
+    realized in Mathlib by the \texttt{star} operation.
+\end{definition}
+
+One computes $\alpha + \bar\alpha = 2t$ and the norm
+$\alpha\bar\alpha = \bar\alpha\alpha = t^2 + x^2 + y^2 + z^2 =: \lVert\alpha\rVert^2$,
+which agrees with the Euclidean square norm on $\mathbb{H} \cong \mathbb{R}^4$ and
+is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\rVert^2$.
+
+\begin{definition}[Pure (imaginary) quaternion]
+    \label{def:pure}
+    \lean{QuaternionAlgebras.Hpure}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \uses{def:conjugation}
+    \leanok
+    A quaternion $\alpha$ is \emph{pure} (imaginary) if its real part vanishes,
+    equivalently $\bar\alpha = -\alpha$. The pure quaternions form the subspace
+    $\mathbb{H}^0 = \mathbb{R}i + \mathbb{R}j + \mathbb{R}k \cong \mathbb{R}^3$.
+\end{definition}
+
+\begin{lemma}[Square of a pure quaternion]
+    \label{lem:pure-square}
+    \lean{QuaternionAlgebras.pure_square}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \uses{def:pure}
+    \leanok
+    A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
+    for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
+\end{lemma}
+\begin{proof}
+    \uses{def:pure}
+    This is Mathlib's \texttt{Quaternion.sq\_eq\_neg\_normSq}:
+    $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
+\end{proof}
+
+\begin{lemma}[Product of pure quaternions]
+    \label{lem:pure-product}
+    \lean{QuaternionAlgebras.pure_product}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \uses{def:pure}
+    \leanok
+    For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
+    $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
+    \[
+      vw = -(v \cdot w) + (v \times w),
+    \]
+    where $v\cdot w$ is the dot product and $v \times w$ the cross product (a pure
+    quaternion).
+\end{lemma}
+\begin{proof}
+    \uses{def:pure}
+    Expand $vw$ over the basis $i, j, k$ using $i^2 = j^2 = k^2 = -1$,
+    $ij = k = -ji$, $jk = i = -kj$, $ki = j = -ik$. The diagonal terms contribute
+    the real part $-(v_1 w_1 + v_2 w_2 + v_3 w_3) = -(v\cdot w)$, and the
+    off-diagonal terms collect to
+    $(v_2 w_3 - v_3 w_2)i + (v_3 w_1 - v_1 w_3)j + (v_1 w_2 - v_2 w_1)k = v\times w$.
+\end{proof}
+
+\begin{lemma}[Orthogonality criteria for pure quaternions]
+    \label{lem:pure-orthogonal}
+    \lean{QuaternionAlgebras.pure_orthogonal}
+    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \uses{lem:pure-product}
+    For pure quaternions $v, w$:
+    (a) $vw$ is pure if and only if $v, w$ are orthogonal;
+    (b) $wv = -vw$ if and only if $v, w$ are orthogonal.
+\end{lemma}
+\begin{proof}
+    \uses{lem:pure-product}
+    By \ref{lem:pure-product}, $vw = -(v\cdot w) + v\times w$ and
+    $wv = -(v\cdot w) - v\times w$ (the cross product is antisymmetric). Thus the
+    real part of $vw$ is $-(v\cdot w)$, vanishing iff $v\cdot w = 0$, giving (a); and
+    $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (b).
+\end{proof}
+
+\begin{proposition}[Conjugation acts by rotations]
+    \label{prop:rotation}
+    \lean{QuaternionAlgebras.rotation_mem_so}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    For $\alpha \in \mathbb{H}^1$, the conjugation map
+    $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$, $v \mapsto \alpha v\alpha^{-1}$,
+    is a well-defined $\mathbb{R}$-linear map lying in $\mathrm{SO}(3)$; writing
+    $\alpha = \cos\theta + (\sin\theta)u$ with $u$ a unit pure quaternion,
+    $\rho_\alpha$ is the rotation by $2\theta$ about the axis $u$.
+\end{proposition}
+\begin{proof}
+    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    Conjugation is $\mathbb{R}$-linear and preserves $\mathbb{H}^0$ (it preserves
+    the real part) and the norm, since
+    $\lVert\alpha v\alpha^{-1}\rVert^2 = \lVert v\rVert^2$ for $\alpha \in \mathbb{H}^1$;
+    thus its matrix in the orthonormal basis $i, j, k$ is orthogonal. Writing
+    $\alpha = \cos\theta + (\sin\theta)u$ with $u^2 = -1$ (\ref{lem:pure-square}) and
+    choosing a unit pure $w \perp u$ (so $uw = u\times w$ and $wu = -uw$ by
+    \ref{lem:pure-orthogonal}), the double-angle formulas give $\rho_\alpha(u) = u$
+    and $\rho_\alpha(w) = (\cos 2\theta)w + (\sin 2\theta)(u\times w)$, the rotation
+    by $2\theta$ about $u$. In particular $\det\rho_\alpha = 1$, so
+    $\rho_\alpha \in \mathrm{SO}(3)$.
+\end{proof}
+
+\begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
+    \label{cor:cover}
+    \lean{QuaternionAlgebras.double_cover}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{prop:rotation}
+    The map $\alpha \mapsto \rho_\alpha$ is a surjective group homomorphism
+    $\mathbb{H}^1 \to \mathrm{SO}(3)$ with kernel $\{\pm 1\}$, giving the exact
+    sequence
+    \[
+      1 \to \{\pm 1\} \to \mathbb{H}^1 \to \mathrm{SO}(3) \to 1.
+    \]
+\end{corollary}
+\begin{proof}
+    \uses{prop:rotation}
+    The assignment is a homomorphism since
+    $\rho_{\alpha\beta} = \rho_\alpha \circ \rho_\beta$, and it lands in
+    $\mathrm{SO}(3)$ by \ref{prop:rotation}. It is surjective because every element
+    of $\mathrm{SO}(3)$ is a rotation about some axis, realized by
+    $\alpha = \cos\theta + (\sin\theta)u$. If $\alpha$ is in the kernel it commutes
+    with every pure quaternion, hence is central, hence real with
+    $\lVert\alpha\rVert^2 = \alpha^2 = 1$, i.e. $\alpha = \pm 1$.
+\end{proof}
+
+\end{document}
+% Blueprint: Quaternion Algebras
+% Created by Numina
+
+\begin{document}
+
+\section{Beginnings}
+
+Throughout, $F$ is a commutative field with $\operatorname{char} F \neq 2$, and
+$a, b \in F^\times$. We follow Voight, \emph{Quaternion Algebras}, Chapter~2.
+
+In Mathlib the quaternion algebra is $\mathbb{H}[R, c_1, c_2, c_3]$ with relations
+$i^2 = c_1 + c_2 i$, $j^2 = c_3$, $ij = k$ and $ji = c_2 j - k$. Voight's
+$\left(\frac{a,b}{F}\right)$ is the special case $c_2 = 0$, i.e.
+$\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -ij$.
+
+\subsection{Quaternion algebras}
+
+\begin{definition}[Quaternion algebra]
+    \label{def:quaternion-algebra}
+    \lean{QuaternionAlgebra}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
+    \leanok
+    For $a, b \in F^\times$, the \emph{quaternion algebra}
+    $\left(\frac{a,b}{F}\right)$ is the $F$-algebra $\mathbb{H}[F, a, 0, b]$ with
+    underlying $F$-vector space spanned by $1, i, j, k$ subject to
+    $i^2 = a$, $j^2 = b$, $ji = -ij$, and $k := ij$.
+\end{definition}
+
+The relations $i^2 = a$, $j^2 = b$, $ji = -ij$ together with $k := ij$ determine
+the entire multiplication table by linearity and associativity: for instance
+$k^2 = (ij)(ij) = i(ji)j = -i^2 j^2 = -ab$, and $ik = aj$, $jk = -bi$. In
+particular $\dim_F \left(\frac{a,b}{F}\right) = 4$, with $F$-basis $1, i, j, k$.
+
+\begin{lemma}[Standard generators presentation]
+    \label{lem:standard-generators-presentation}
+    \lean{QuaternionAlgebras.standard_generators_presentation}
+    \leanfile{QuaternionAlgebras/Beginnings.lean}
+    \uses{def:quaternion-algebra}
+    \leanok
+    An $F$-algebra $B$ is a quaternion algebra if and only if there exist nonzero
+    $i', j' \in B$ that generate $B$ as an $F$-algebra and satisfy
+    $(i')^2 = a$, $(j')^2 = b$, and $i'j' = -j'i'$ for some $a, b \in F^\times$.
+    In that case $1, i', j', i'j'$ is automatically an $F$-basis of $B$, so
+    $B \cong \left(\frac{a,b}{F}\right)$.
+\end{lemma}
+\begin{proof}
+    \uses{def:quaternion-algebra}
+    It suffices to prove that $1, i', j', i'j'$ are linearly independent. Suppose
+    $\alpha = t + xi' + yj' + zi'j' = 0$ with $t,x,y,z \in F$. Using the relations,
+    $0 = i'(\alpha i' + i'\alpha) = 2a(t + xi')$, and since
+    $\operatorname{char} F \neq 2$ and $a \neq 0$ we get $t + xi' = 0$; repeating
+    with $j'$ and $i'j'$ gives $t + yj' = t + zi'j' = 0$. Subtracting these from
+    $\alpha$ yields $-2t = 0$, so $t = 0$ (as $B \neq 0$), whence
+    $xi' = yj' = zi'j' = 0$; since $i', j'$ are nonzero and $a, b \neq 0$, also
+    $x = y = z = 0$.
+\end{proof}
+
+\subsection{Matrix representations}
+
+Every quaternion algebra can be realized as a subalgebra of $2 \times 2$ matrices
+over an at most quadratic extension of $F$.
+
+\begin{proposition}[Matrix embedding]
+    \label{prop:matrix-embedding}
+    \lean{QuaternionAlgebras.matrixHom_injective}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:quaternion-algebra}
+    \leanok
+    Let $B = \left(\frac{a,b}{F}\right)$ and let $F(\sqrt a)$ be a splitting field
+    over $F$ for $x^2 - a$, with root $\sqrt a$. The $F$-linear map
+    $\lambda \colon B \to M_2(F(\sqrt a))$ determined by
+    \[
+      i \mapsto \begin{pmatrix} \sqrt a & 0 \\ 0 & -\sqrt a \end{pmatrix}, \qquad
+      j \mapsto \begin{pmatrix} 0 & b \\ 1 & 0 \end{pmatrix}, \qquad
+      t + xi + yj + zk \mapsto
+      \begin{pmatrix} t + x\sqrt a & b(y + z\sqrt a) \\ y - z\sqrt a & t - x\sqrt a \end{pmatrix}
+    \]
+    is an injective $F$-algebra homomorphism and an isomorphism onto its image.
+\end{proposition}
+\begin{proof}
+    \uses{def:quaternion-algebra}
+    The matrices $\lambda(i), \lambda(j)$ satisfy $\lambda(i)^2 = a$,
+    $\lambda(j)^2 = b$ and $\lambda(j)\lambda(i) = -\lambda(i)\lambda(j)$, so by the
+    defining relations $\lambda$ is an $F$-algebra homomorphism. For injectivity,
+    $\lambda(t + xi + yj + zk) = 0$ forces every matrix entry to vanish, and using
+    the linear independence of $1, \sqrt a$ over $F$ this gives
+    $t = x = y = z = 0$.
+\end{proof}
+
+\begin{corollary}[Split quaternion algebra is a matrix algebra]
+    \label{cor:split-matrix}
+    \lean{QuaternionAlgebras.split_matrix}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{prop:matrix-embedding}
+    \leanok
+    There is an $F$-algebra isomorphism
+    $\left(\frac{1,b}{F}\right) \xrightarrow{\sim} M_2(F)$, given by
+    $i \mapsto \left(\begin{smallmatrix}1 & 0\\ 0 & -1\end{smallmatrix}\right)$,
+    $j \mapsto \left(\begin{smallmatrix}0 & b\\ 1 & 0\end{smallmatrix}\right)$.
+    In particular $\left(\frac{1,1}{F}\right) \cong M_2(F)$.
+\end{corollary}
+\begin{proof}
+    \uses{prop:matrix-embedding}
+    Specialize \ref{prop:matrix-embedding} with $a = 1$, so $\sqrt a = 1 \in F$ and
+    $\lambda$ lands in $M_2(F)$. It is an injective $F$-algebra homomorphism between
+    $F$-spaces of equal dimension $4 = \dim_F M_2(F)$, hence surjective, hence an
+    $F$-algebra isomorphism.
+\end{proof}
+
+\begin{definition}[Left regular representation]
+    \label{def:left-regular-rep}
+    \lean{QuaternionAlgebras.leftRegRepK}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:quaternion-algebra}
+    \leanok
+    Let $K = F[i] \cong F[x]/(x^2 - a)$, and regard $B = \left(\frac{a,b}{F}\right)$
+    as a right $K$-module via $\beta \cdot k = \beta\,\iota(k)$ (well defined since
+    $K$ is commutative). The \emph{left regular representation} of $B$ (Voight~(2.3.9))
+    is the ring homomorphism $\lambda \colon B \to \operatorname{End}_K(B)$,
+    $\alpha \mapsto \lambda_\alpha$, where $\lambda_\alpha(\beta) = \alpha\beta$; each
+    $\lambda_\alpha$ is $K$-linear because left and right multiplication commute.
+\end{definition}
+
+\begin{lemma}[The left regular representation is faithful]
+    \label{lem:left-regular-faithful}
+    \lean{QuaternionAlgebras.leftRegRepK_faithful}
     \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:left-regular-rep}
     \leanok
