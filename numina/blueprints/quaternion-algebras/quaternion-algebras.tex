@@ -26,269 +26,87 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     $i^2 = a$, $j^2 = b$, $ji = -ij$, and $k := ij$.
 \end{definition}
 
-\begin{definition}[Standard generators]
-    \label{def:standard-generators}
-    \lean{QuaternionAlgebras.gi}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:quaternion-algebra}
-    \leanok
-    The \emph{standard generators} of $\left(\frac{a,b}{F}\right)$ are the elements
-    $i = (0,1,0,0)$ and $j = (0,0,1,0)$, together with the derived element
-    $k = ij = (0,0,0,1)$. They satisfy $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k$.
-\end{definition}
-
-\begin{lemma}[Anticommutation of generators]
-    \label{lem:ji-eq-neg-ij}
-    \lean{QuaternionAlgebras.gj_mul_gi}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators}
-    \leanok
-    In $\left(\frac{a,b}{F}\right)$ we have $ji = -ij$.
-\end{lemma}
-\begin{proof}
-    \uses{def:standard-generators}
-    Immediate from the defining relation $ji = c_2 j - k$ with $c_2 = 0$ and
-    $ij = k$, i.e. the Mathlib basis relation \texttt{j\_mul\_i} specialized to
-    $c_2 = 0$.
-\end{proof}
-
-\begin{lemma}[Square of $k$]
-    \label{lem:k-squared}
-    \lean{QuaternionAlgebras.gk_sq}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators, lem:ji-eq-neg-ij}
-    \leanok
-    With $k = ij$ we have $k^2 = -ab$.
-\end{lemma}
-\begin{proof}
-    \uses{def:standard-generators, lem:ji-eq-neg-ij}
-    Compute $(ij)(ij) = i(ji)j = i(-ij)j = -(i^2)(j^2) = -ab$, using
-    associativity, $ji = -ij$ (\ref{lem:ji-eq-neg-ij}), and $i^2 = a$,
-    $j^2 = b$. Each rewrite is an instance of the Mathlib multiplication lemmas
-    for $\mathbb{H}[F,a,0,b]$ (\texttt{imK\_mul}, \texttt{imI\_mul}).
-\end{proof}
-
-\begin{lemma}[Mixed products]
-    \label{lem:mul-table}
-    \lean{QuaternionAlgebras.mul_table}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators, lem:ji-eq-neg-ij}
-    \leanok
-    With $k = ij$ we have $ik = aj$, $ki = -aj$, $jk = -bi$, and $kj = bi$.
-\end{lemma}
-\begin{proof}
-    \uses{def:standard-generators, lem:ji-eq-neg-ij}
-    For example $j k = j(ij) = (ji)j = (-ij)j = -i(j^2) = -bi$, using
-    \ref{lem:ji-eq-neg-ij} and $j^2 = b$; the others are analogous and reduce to
-    the Mathlib basis product lemmas \texttt{i\_mul\_k}, \texttt{k\_mul\_i},
-    \texttt{j\_mul\_k}, \texttt{k\_mul\_j} with $c_2 = 0$.
-\end{proof}
-
-\begin{theorem}[Dimension four]
-    \label{thm:dim-four}
-    \lean{QuaternionAlgebras.dim_four}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:quaternion-algebra}
-    \leanok
-    $\left(\frac{a,b}{F}\right)$ has dimension $4$ as an $F$-vector space.
-\end{theorem}
-\begin{proof}
-    \uses{def:quaternion-algebra}
-    This is Mathlib's \texttt{QuaternionAlgebra.finrank\_eq\_four}: the linear
-    equivalence with $F^4$ (sending a quaternion to its four coordinates) shows the
-    algebra is free of rank $4$.
-\end{proof}
-
-\begin{lemma}[Standard basis]
-    \label{lem:standard-basis}
-    \lean{QuaternionAlgebras.standard_basis_linearIndependent}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators, thm:dim-four}
-    \leanok
-    The elements $1, i, j, k$ form an $F$-basis of $\left(\frac{a,b}{F}\right)$.
-    In particular they are $F$-linearly independent: if
-    $t + xi + yj + zk = 0$ with $t,x,y,z \in F$, then $t = x = y = z = 0$.
-\end{lemma}
-\begin{proof}
-    \uses{thm:dim-four}
-    Under the coordinate linear equivalence
-    $\mathbb{H}[F,a,0,b] \simeq F^4$ (Mathlib \texttt{linearEquivTuple}) the
-    elements $1,i,j,k$ map to the standard basis $e_0, e_1, e_2, e_3$ of $F^4$,
-    which is linearly independent and spanning; transport along the equivalence.
-\end{proof}
-
-\begin{lemma}[Lifting generators to an algebra homomorphism]
-    \label{lem:lifthom-construction}
-    \lean{QuaternionAlgebras.lifthom_construction}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators}
-    \leanok
-    Let $B$ be an $F$-algebra containing elements $i', j'$ with $(i')^2 = a$,
-    $(j')^2 = b$, and $j'i' = -i'j'$. Then $(i', j', i'j')$ form a
-    \texttt{QuaternionAlgebra.Basis} for $B$ with parameters $(a, 0, b)$, and
-    \texttt{QuaternionAlgebra.Basis.liftHom} produces an $F$-algebra homomorphism
-    $\varphi \colon \left(\frac{a,b}{F}\right) \to B$ with $\varphi(i) = i'$,
-    $\varphi(j) = j'$, and $\varphi(k) = i'j'$.
-\end{lemma}
-\begin{proof}
-    \uses{def:standard-generators}
-    The three relations $(i')^2 = a = c_1$, $(j')^2 = b = c_3$, and
-    $j'i' = -i'j' = c_2 j' - i'j'$ with $c_2 = 0$ are exactly the data of a
-    \texttt{QuaternionAlgebra.Basis} with parameters $(a,0,b)$. Its universal
-    property \texttt{QuaternionAlgebra.Basis.liftHom} returns the asserted
-    $F$-algebra homomorphism, with the images of $i, j, k$ read off from
-    \texttt{QuaternionAlgebra.Basis.liftHom\_apply}.
-\end{proof}
+The relations $i^2 = a$, $j^2 = b$, $ji = -ij$ together with $k := ij$ determine
+the entire multiplication table by linearity and associativity: for instance
+$k^2 = (ij)(ij) = i(ji)j = -i^2 j^2 = -ab$, and $ik = aj$, $jk = -bi$. In
+particular $\dim_F \left(\frac{a,b}{F}\right) = 4$, with $F$-basis $1, i, j, k$.
 
 \begin{lemma}[Standard generators presentation]
     \label{lem:standard-generators-presentation}
     \lean{QuaternionAlgebras.standard_generators_presentation}
     \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:standard-generators, lem:standard-basis, lem:lifthom-construction}
-    If an $F$-algebra $B$ contains nonzero $i', j'$ generating $B$ with
-    $(i')^2 = a$, $(j')^2 = b$, $i'j' = -j'i'$ for $a, b \in F^\times$, then
-    $1, i', j', i'j'$ is an $F$-basis of $B$, so $B \cong \left(\frac{a,b}{F}\right)$.
+    \uses{def:quaternion-algebra}
+    An $F$-algebra $B$ is a quaternion algebra if and only if there exist nonzero
+    $i', j' \in B$ that generate $B$ as an $F$-algebra and satisfy
+    $(i')^2 = a$, $(j')^2 = b$, and $i'j' = -j'i'$ for some $a, b \in F^\times$.
+    In that case $1, i', j', i'j'$ is automatically an $F$-basis of $B$, so
+    $B \cong \left(\frac{a,b}{F}\right)$.
 \end{lemma}
 \begin{proof}
-    \uses{lem:standard-basis, lem:lifthom-construction, thm:dim-four}
-    By \ref{lem:lifthom-construction} the relations give an $F$-algebra
-    homomorphism $\varphi \colon \left(\frac{a,b}{F}\right) \to B$, surjective
-    because $i', j'$ generate $B$ (\texttt{QuaternionAlgebra.Basis.range\_liftHom}).
-    Its source and target both have dimension $4$ (\ref{thm:dim-four},
-    \ref{lem:standard-basis}), so by
-    \texttt{LinearMap.injective\_iff\_surjective\_of\_finrank\_eq\_finrank} the
-    surjection $\varphi$ is also injective, hence an isomorphism. Linear
-    independence of $1, i', j', i'j'$ follows by transporting \ref{lem:standard-basis}.
-\end{proof}
-
-\begin{lemma}[Commuting with $i$ kills the $j,k$ parts]
-    \label{lem:central-commute-i}
-    \lean{QuaternionAlgebras.central_commute_i}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
-    If $\alpha = t + xi + yj + zk$ satisfies $\alpha i = i\alpha$, then $y = z = 0$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
-    Using $i^2 = a$, $ji = -k$ and $ki = -aj$ (\ref{lem:ji-eq-neg-ij},
-    \ref{lem:mul-table}) one gets $\alpha i = xa + ti - zaj - yk$, while
-    $ij = k$, $ik = aj$ give $i\alpha = xa + ti + zaj + yk$. Hence
-    $\alpha i - i\alpha = -2za\,j - 2y\,k = 0$. Comparing the $j$- and
-    $k$-coordinates via \ref{lem:standard-basis} and using $a \neq 0$,
-    $\operatorname{char} F \neq 2$ yields $z = 0$ and $y = 0$.
-\end{proof}
-
-\begin{lemma}[Commuting with $j$ kills the $i$ part]
-    \label{lem:central-commute-j}
-    \lean{QuaternionAlgebras.central_commute_j}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
-    If $\alpha = t + xi + yj + zk$ satisfies $\alpha j = j\alpha$, then $x = 0$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:standard-basis, lem:mul-table, lem:ji-eq-neg-ij}
-    Using $j^2 = b$, $ij = k$ and $kj = bi$ (\ref{lem:ji-eq-neg-ij},
-    \ref{lem:mul-table}) one gets $\alpha j = yb + zb\,i + tj + x\,k$, while
-    $ji = -k$, $jk = -bi$ give $j\alpha = yb - zb\,i + tj - x\,k$. Hence
-    $\alpha j - j\alpha = 2zb\,i + 2x\,k = 0$, and comparing the $i$-coordinate
-    via \ref{lem:standard-basis} with $b \neq 0$, $\operatorname{char} F \neq 2$
-    gives $x = 0$.
+    \uses{def:quaternion-algebra}
+    It suffices to prove that $1, i', j', i'j'$ are linearly independent. Suppose
+    $\alpha = t + xi' + yj' + zi'j' = 0$ with $t,x,y,z \in F$. Using the relations,
+    $0 = i'(\alpha i' + i'\alpha) = 2a(t + xi')$, and since
+    $\operatorname{char} F \neq 2$ and $a \neq 0$ we get $t + xi' = 0$; repeating
+    with $j'$ and $i'j'$ gives $t + yj' = t + zi'j' = 0$. Subtracting these from
+    $\alpha$ yields $-2t = 0$, so $t = 0$ (as $B \neq 0$), whence
+    $xi' = yj' = zi'j' = 0$; since $i', j'$ are nonzero and $a, b \neq 0$, also
+    $x = y = z = 0$.
 \end{proof}
 
 \begin{theorem}[Centrality]
     \label{thm:central}
     \lean{QuaternionAlgebras.center_eq_bot}
     \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:quaternion-algebra, lem:standard-basis, lem:central-commute-i, lem:central-commute-j, lem:ji-eq-neg-ij}
+    \uses{def:quaternion-algebra}
     $\left(\frac{a,b}{F}\right)$ is central over $F$: its center equals the image
     of $F$.
 \end{theorem}
 \begin{proof}
-    \uses{lem:standard-basis, lem:central-commute-i, lem:central-commute-j}
-    By \texttt{Algebra.IsCentral.mem\_center\_iff} it suffices to show every
-    central $\alpha$ lies in the image of $F$. Write
-    $\alpha = t + xi + yj + zk$ (\ref{lem:standard-basis}). Centrality gives
-    $\alpha i = i\alpha$, so $y = z = 0$ (\ref{lem:central-commute-i}), and
-    $\alpha j = j\alpha$, so $x = 0$ (\ref{lem:central-commute-j}). Hence
-    $\alpha = t \in F$.
+    \uses{def:quaternion-algebra}
+    Let $\alpha = t + xi + yj + zk$ be central. From $\alpha i = i\alpha$ one
+    computes $\alpha i - i\alpha = -2za\,j - 2y\,k$, so $y = z = 0$ (using
+    $a \neq 0$ and $\operatorname{char} F \neq 2$); from $\alpha j = j\alpha$ one
+    gets $\alpha j - j\alpha = 2zb\,i + 2x\,k$, so $x = 0$. Hence $\alpha = t$ lies
+    in the image of $F$, and conversely every element of $F$ is central.
 \end{proof}
 
 \subsection{Matrix representations}
 
-\begin{definition}[Matrix basis over a splitting field]
-    \label{def:matrix-basis}
-    \lean{QuaternionAlgebras.matI}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
-    \uses{def:quaternion-algebra}
-    \leanok
-    Let $K = F(\sqrt a)$ contain a root $s$ of $x^2 - a$. Define elements of
-    $M_2(K)$ by
-    \[
-      I = \begin{pmatrix} s & 0 \\ 0 & -s \end{pmatrix}, \qquad
-      J = \begin{pmatrix} 0 & b \\ 1 & 0 \end{pmatrix}, \qquad K_0 = IJ .
-    \]
-    These satisfy $I^2 = a\cdot 1$, $J^2 = b \cdot 1$, $IJ = K_0$,
-    $JI = -K_0$, forming a \texttt{QuaternionAlgebra.Basis} with parameters
-    $(a, 0, b)$.
-\end{definition}
-
-\begin{lemma}[Matrix basis relations]
-    \label{lem:matrix-basis-relations}
-    \lean{QuaternionAlgebras.matrix_basis_relations}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
-    \uses{def:matrix-basis}
-    \leanok
-    The matrices $I, J$ of \ref{def:matrix-basis} satisfy
-    $I^2 = a\cdot 1$, $J^2 = b\cdot 1$, and $JI = -IJ$ in $M_2(K)$.
-\end{lemma}
-\begin{proof}
-    \uses{def:matrix-basis}
-    Direct $2\times 2$ matrix multiplication using $s^2 = a$; each entry equality
-    is checked by \texttt{Matrix} simp lemmas (\texttt{Matrix.mul\_fin\_two}).
-\end{proof}
-
-\begin{lemma}[Matrix liftHom]
-    \label{lem:matrix-lifthom}
-    \lean{QuaternionAlgebras.matrix_lifthom}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
-    \uses{def:matrix-basis, lem:matrix-basis-relations, lem:lifthom-construction}
-    \leanok
-    There is an $F$-algebra homomorphism
-    $\lambda \colon \left(\frac{a,b}{F}\right) \to M_2(F(\sqrt a))$ with
-    $\lambda(i) = I$, $\lambda(j) = J$, $\lambda(k) = IJ$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:matrix-basis-relations, lem:lifthom-construction}
-    By \ref{lem:matrix-basis-relations} the matrices $I, J$ satisfy
-    $I^2 = a$, $J^2 = b$, $JI = -IJ$ in $M_2(K)$, which are the hypotheses of
-    \ref{lem:lifthom-construction} with $B = M_2(F(\sqrt a))$. Applying it gives
-    the $F$-algebra homomorphism $\lambda$ with the stated images.
-\end{proof}
+Every quaternion algebra can be realized as a subalgebra of $2 \times 2$ matrices
+over an at most quadratic extension of $F$.
 
 \begin{proposition}[Matrix embedding]
     \label{prop:matrix-embedding}
     \lean{QuaternionAlgebras.matrix_embedding}
     \leanfile{QuaternionAlgebras/Matrix.lean}
-    \uses{def:matrix-basis, lem:matrix-lifthom, thm:dim-four, lem:standard-basis}
-    The $F$-algebra homomorphism
-    $\lambda \colon \left(\frac{a,b}{F}\right) \to M_2(F(\sqrt a))$ of
-    \ref{lem:matrix-lifthom} is injective and an isomorphism onto its image.
+    \uses{def:quaternion-algebra}
+    Let $B = \left(\frac{a,b}{F}\right)$ and let $F(\sqrt a)$ be a splitting field
+    over $F$ for $x^2 - a$, with root $\sqrt a$. The $F$-linear map
+    $\lambda \colon B \to M_2(F(\sqrt a))$ determined by
+    \[
+      i \mapsto \begin{pmatrix} \sqrt a & 0 \\ 0 & -\sqrt a \end{pmatrix}, \qquad
+      j \mapsto \begin{pmatrix} 0 & b \\ 1 & 0 \end{pmatrix}, \qquad
+      t + xi + yj + zk \mapsto
+      \begin{pmatrix} t + x\sqrt a & b(y + z\sqrt a) \\ y - z\sqrt a & t - x\sqrt a \end{pmatrix}
+    \]
+    is an injective $F$-algebra homomorphism and an isomorphism onto its image.
 \end{proposition}
 \begin{proof}
-    \uses{lem:matrix-lifthom, lem:standard-basis}
-    By \ref{lem:matrix-lifthom} we have the $F$-algebra homomorphism $\lambda$.
-    For injectivity: if $\lambda(t + xi + yj + zk) = 0$ then the matrix
-    $\left(\begin{smallmatrix} t + xs & b(y+zs) \\ y - zs & t - xs\end{smallmatrix}\right) = 0$;
-    reading off entries and using linear independence of $1, s$ over $F$ (as $K/F$
-    is a field extension, or $s \in F$) gives $t = x = y = z = 0$, so by
-    \ref{lem:standard-basis} the kernel is trivial.
+    \uses{def:quaternion-algebra}
+    The matrices $\lambda(i), \lambda(j)$ satisfy $\lambda(i)^2 = a$,
+    $\lambda(j)^2 = b$ and $\lambda(j)\lambda(i) = -\lambda(i)\lambda(j)$, so by the
+    defining relations $\lambda$ is an $F$-algebra homomorphism. For injectivity,
+    $\lambda(t + xi + yj + zk) = 0$ forces every matrix entry to vanish, and using
+    the linear independence of $1, \sqrt a$ over $F$ this gives
+    $t = x = y = z = 0$.
 \end{proof}
 
 \begin{corollary}[Split quaternion algebra is a matrix algebra]
     \label{cor:split-matrix}
     \lean{QuaternionAlgebras.split_matrix}
     \leanfile{QuaternionAlgebras/Matrix.lean}
-    \uses{prop:matrix-embedding, thm:dim-four}
+    \uses{prop:matrix-embedding}
     There is an $F$-algebra isomorphism
     $\left(\frac{1,b}{F}\right) \xrightarrow{\sim} M_2(F)$, given by
     $i \mapsto \left(\begin{smallmatrix}1 & 0\\ 0 & -1\end{smallmatrix}\right)$,
@@ -296,22 +114,18 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     In particular $\left(\frac{1,1}{F}\right) \cong M_2(F)$.
 \end{corollary}
 \begin{proof}
-    \uses{prop:matrix-embedding, thm:dim-four}
-    Specialize \ref{prop:matrix-embedding} with $a = 1$, $\sqrt a = 1 \in F$, so
-    $K = F$ and $\lambda$ lands in $M_2(F)$. It is an injective $F$-algebra
-    homomorphism between spaces of equal dimension
-    $\dim_F \left(\frac{1,b}{F}\right) = 4 = \dim_F M_2(F)$
-    (\ref{thm:dim-four}), hence surjective by
-    \texttt{LinearMap.injective\_iff\_surjective\_of\_finrank\_eq\_finrank}, hence
-    bijective; promote to an $F$-algebra isomorphism via
-    \texttt{AlgEquiv.ofBijective}.
+    \uses{prop:matrix-embedding}
+    Specialize \ref{prop:matrix-embedding} with $a = 1$, so $\sqrt a = 1 \in F$ and
+    $\lambda$ lands in $M_2(F)$. It is an injective $F$-algebra homomorphism between
+    $F$-spaces of equal dimension $4 = \dim_F M_2(F)$, hence surjective, hence an
+    $F$-algebra isomorphism.
 \end{proof}
 
 \subsection{Rotations}
 
 We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
 the unit group $\mathbb{H}^1 = \{\alpha : \lVert\alpha\rVert^2 = 1\}$, and
-$\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions. Following Voight~2.4, we first
+$\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions. Following Voight~2.4, we
 set up conjugation, the norm, and the pure quaternions, and then use unit
 quaternions to model rotations of $\mathbb{R}^3$.
 
@@ -326,43 +140,10 @@ quaternions to model rotations of $\mathbb{R}^3$.
     realized in Mathlib by the \texttt{star} operation.
 \end{definition}
 
-\begin{lemma}[Trace and norm via conjugation]
-    \label{lem:trace-norm}
-    \lean{QuaternionAlgebras.trace_norm}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:conjugation, lem:standard-basis}
-    \leanok
-    For $\alpha = t + xi + yj + zk$ in the Hamiltonians
-    $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
-    \[
-      \alpha + \bar\alpha = 2t, \qquad
-      \alpha \bar\alpha = \bar\alpha \alpha = t^2 + x^2 + y^2 + z^2 \in \mathbb{R}.
-    \]
-\end{lemma}
-\begin{proof}
-    \uses{def:conjugation}
-    The first identity is \texttt{Quaternion.add\_star}. The second is
-    \texttt{Quaternion.self\_mul\_star} / \texttt{star\_mul\_self}, which equal the
-    coercion of $\operatorname{normSq}\alpha = t^2 + x^2 + y^2 + z^2$
-    (\texttt{normSq\_def}).
-\end{proof}
-
-\begin{lemma}[Multiplicativity of the norm]
-    \label{lem:norm-mul}
-    \lean{QuaternionAlgebras.normSq_mul}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{lem:trace-norm}
-    \leanok
-    For the squared norm $\lVert\alpha\rVert^2 = \operatorname{normSq}\alpha = \alpha\bar\alpha$
-    on $\mathbb{H}$, we have
-    $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2 \lVert\beta\rVert^2$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:trace-norm}
-    $\operatorname{normSq}$ is the monoid-with-zero homomorphism
-    $\texttt{Quaternion.normSq} \colon \mathbb{H} \to^{*}_{0} \mathbb{R}$, so
-    multiplicativity is \texttt{map\_mul}.
-\end{proof}
+One computes $\alpha + \bar\alpha = 2t$ and the norm
+$\alpha\bar\alpha = \bar\alpha\alpha = t^2 + x^2 + y^2 + z^2 =: \lVert\alpha\rVert^2$,
+which agrees with the Euclidean square norm on $\mathbb{H} \cong \mathbb{R}^4$ and
+is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\rVert^2$.
 
 \begin{definition}[Pure (imaginary) quaternion]
     \label{def:pure}
@@ -390,56 +171,11 @@ quaternions to model rotations of $\mathbb{R}^3$.
     $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
 \end{proof}
 
-\begin{lemma}[Real part of a product of pure quaternions]
-    \label{lem:pure-product-re}
-    \lean{QuaternionAlgebras.pure_product_re}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:pure, lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
-    \leanok
-    For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
-    $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0$,
-    \[
-      \operatorname{re}(vw) = -(v_1 w_1 + v_2 w_2 + v_3 w_3) = -(v \cdot w).
-    \]
-\end{lemma}
-\begin{proof}
-    \uses{lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
-    Expand $vw$ by bilinearity over the basis $i, j, k$ and apply the
-    multiplication table (\ref{lem:ji-eq-neg-ij}, \ref{lem:k-squared},
-    \ref{lem:mul-table}, with $a = b = -1$): the real contributions come only from
-    $i^2 = j^2 = k^2 = -1$, giving real part
-    $-(v_1 w_1 + v_2 w_2 + v_3 w_3)$. The mixed terms are pure and do not
-    contribute to $\operatorname{re}$ (\ref{lem:standard-basis}).
-\end{proof}
-
-\begin{lemma}[Imaginary part of a product of pure quaternions]
-    \label{lem:pure-product-im}
-    \lean{QuaternionAlgebras.pure_product_im}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:pure, lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
-    \leanok
-    For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
-    $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0$, the imaginary part of $vw$ is
-    the cross product:
-    \[
-      \operatorname{im}(vw) = v \times w
-      = (v_2 w_3 - v_3 w_2)\,i + (v_3 w_1 - v_1 w_3)\,j + (v_1 w_2 - v_2 w_1)\,k.
-    \]
-\end{lemma}
-\begin{proof}
-    \uses{lem:standard-basis, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
-    Expanding $vw$ over the basis (\ref{lem:ji-eq-neg-ij}, \ref{lem:k-squared},
-    \ref{lem:mul-table}, $a=b=-1$), the off-diagonal terms $ij = k$, $jk = i$,
-    $ki = j$ and their anticommuted partners collect the $i,j,k$ coordinates to
-    exactly the entries of \texttt{crossProduct} $v\,w$ (\texttt{cross\_apply});
-    compare coordinates via \ref{lem:standard-basis}.
-\end{proof}
-
 \begin{lemma}[Product of pure quaternions]
     \label{lem:pure-product}
     \lean{QuaternionAlgebras.pure_product}
     \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:pure, lem:standard-basis, lem:pure-product-re, lem:pure-product-im, lem:ji-eq-neg-ij, lem:k-squared, lem:mul-table}
+    \uses{def:pure}
     \leanok
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
@@ -450,10 +186,12 @@ quaternions to model rotations of $\mathbb{R}^3$.
     quaternion).
 \end{lemma}
 \begin{proof}
-    \uses{lem:pure-product-re, lem:pure-product-im}
-    Split $vw$ into its real and imaginary parts. The real part is $-(v\cdot w)$
-    by \ref{lem:pure-product-re} and the imaginary part is $v\times w$ by
-    \ref{lem:pure-product-im}; adding them gives the claim.
+    \uses{def:pure}
+    Expand $vw$ over the basis $i, j, k$ using $i^2 = j^2 = k^2 = -1$,
+    $ij = k = -ji$, $jk = i = -kj$, $ki = j = -ik$. The diagonal terms contribute
+    the real part $-(v_1 w_1 + v_2 w_2 + v_3 w_3) = -(v\cdot w)$, and the
+    off-diagonal terms collect to
+    $(v_2 w_3 - v_3 w_2)i + (v_3 w_1 - v_1 w_3)j + (v_1 w_2 - v_2 w_1)k = v\times w$.
 \end{proof}
 
 \begin{lemma}[Orthogonality criteria for pure quaternions]
@@ -473,248 +211,36 @@ quaternions to model rotations of $\mathbb{R}^3$.
     $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (b).
 \end{proof}
 
-\begin{definition}[Euclidean structure on the pure quaternions]
-    \label{def:pure-euclidean}
-    \lean{QuaternionAlgebras.pureEuclid}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{def:pure, lem:trace-norm}
-    Let $\mathbb{H}^0 \subseteq \mathbb{H}$ be the $\mathbb{R}$-submodule of pure
-    quaternions. Equip it with the inner product
-    $\langle v, w\rangle = \tfrac12(\bar v w + \bar w v) \in \mathbb{R}$ inherited
-    from $\operatorname{normSq}$ (\ref{lem:trace-norm}), for which $i, j, k$ is an
-    orthonormal basis. The resulting map
-    $e \colon \mathbb{H}^0 \xrightarrow{\sim} \mathrm{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\,3)$
-    sending $v_1 i + v_2 j + v_3 k \mapsto (v_1, v_2, v_3)$ is a linear isometric
-    equivalence (\texttt{OrthonormalBasis}, \texttt{LinearEquiv.isometryOfOrthonormal}).
-\end{definition}
-
-\begin{lemma}[A norm-preserving map gives a special orthogonal matrix]
-    \label{lem:isometry-to-so}
-    \lean{QuaternionAlgebras.isometry_to_so}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{def:pure-euclidean}
-    Let $\rho \colon \mathbb{H}^0 \to \mathbb{H}^0$ be an $\mathbb{R}$-linear map
-    with $\lVert \rho(v)\rVert = \lVert v\rVert$ for all $v$ and $\det \rho = 1$.
-    Then, transported across the isometry $e$ of \ref{def:pure-euclidean}, the
-    matrix of $\rho$ in the orthonormal basis $i, j, k$ lies in
-    $\mathrm{SO}(3) = \texttt{Matrix.specialOrthogonalGroup}\ (\mathrm{Fin}\,3)\ \mathbb{R}$.
-\end{lemma}
-\begin{proof}
-    \uses{def:pure-euclidean}
-    A norm-preserving $\mathbb{R}$-linear endomorphism of a finite-dimensional
-    inner product space is a linear isometry, hence (transported by $e$) a linear
-    isometry of $\mathrm{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\,3)$; its matrix
-    is orthogonal by \texttt{EuclideanGroup.linearIsometryEquivToOrthogonal}, so it
-    satisfies $A^\top A = 1$ (\texttt{Matrix.mem\_orthogonalGroup\_iff}). Together
-    with $\det A = \det\rho = 1$, the criterion
-    \texttt{Matrix.mem\_specialOrthogonalGroup\_iff} places $A$ in
-    $\mathrm{SO}(3)$.
-\end{proof}
-
-\begin{lemma}[Conjugation preserves purity]
-    \label{lem:conj-preserves-pure}
-    \lean{QuaternionAlgebras.conj_preserves_pure}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{def:pure, lem:trace-norm}
-    \leanok
-    For $\alpha \in \mathbb{H}^\times$ and pure $v$, the element
-    $\alpha v \alpha^{-1}$ is pure.
-\end{lemma}
-\begin{proof}
-    \uses{def:pure, lem:trace-norm}
-    $v$ is pure iff $v + \bar v = 0$ (\ref{def:pure}). Since conjugation is an
-    anti-automorphism with
-    $\overline{\alpha v \alpha^{-1}} = \overline{\alpha^{-1}}\,\bar v\,\bar\alpha$
-    and $\bar v = -v$, one computes
-    $\alpha v \alpha^{-1} + \overline{\alpha v \alpha^{-1}} = 0$ using
-    $\bar\alpha = \lVert\alpha\rVert^2 \alpha^{-1}$ (\ref{lem:trace-norm}). Hence the
-    real part vanishes.
-\end{proof}
-
-\begin{lemma}[Conjugation preserves the norm]
-    \label{lem:conj-preserves-norm}
-    \lean{QuaternionAlgebras.conj_preserves_norm}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:norm-mul}
-    \leanok
-    For $\alpha \in \mathbb{H}^1$ and any $v$,
-    $\lVert \alpha v \alpha^{-1}\rVert^2 = \lVert v\rVert^2$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:norm-mul}
-    By multiplicativity (\ref{lem:norm-mul}),
-    $\lVert\alpha v \alpha^{-1}\rVert^2
-    = \lVert\alpha\rVert^2 \lVert v\rVert^2 \lVert\alpha^{-1}\rVert^2$, and
-    $\lVert\alpha\rVert^2 = 1$ with
-    $\lVert\alpha^{-1}\rVert^2 = \lVert\alpha\rVert^{-2} = 1$ for
-    $\alpha \in \mathbb{H}^1$.
-\end{proof}
-
-\begin{lemma}[Conjugation is linear on pure quaternions]
-    \label{lem:conj-linear}
-    \lean{QuaternionAlgebras.rotLin}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:conj-preserves-pure}
-    \leanok
-    For fixed $\alpha \in \mathbb{H}^1$, the map
-    $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$,
-    $v \mapsto \alpha v \alpha^{-1}$, is $\mathbb{R}$-linear (well defined into
-    $\mathbb{H}^0$ by \ref{lem:conj-preserves-pure}).
-\end{lemma}
-\begin{proof}
-    \uses{lem:conj-preserves-pure}
-    Left and right multiplication in the algebra $\mathbb{H}$ are
-    $\mathbb{R}$-linear, so $v \mapsto \alpha v \alpha^{-1}$ is $\mathbb{R}$-linear;
-    \ref{lem:conj-preserves-pure} ensures the codomain is $\mathbb{H}^0$.
-\end{proof}
-
-\begin{lemma}[$\rho_\alpha$ is orthogonal]
-    \label{lem:rotation-orthogonal}
-    \lean{QuaternionAlgebras.rotation_orthogonal}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:conj-preserves-norm, lem:conj-linear, def:pure-euclidean}
-    \leanok
-    For $\alpha \in \mathbb{H}^1$, the map $\rho_\alpha$ of \ref{lem:conj-linear}
-    preserves the norm on $\mathbb{H}^0$: $\lVert \rho_\alpha(v)\rVert = \lVert v\rVert$
-    for all pure $v$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:conj-preserves-norm}
-    This is exactly \ref{lem:conj-preserves-norm} read for the squared norm
-    $\lVert\alpha v\alpha^{-1}\rVert^2 = \lVert v\rVert^2$, taking square roots
-    (both norms are nonnegative).
-\end{proof}
-
-\begin{lemma}[$\det \rho_\alpha = 1$]
-    \label{lem:rotation-det-one}
-    \lean{QuaternionAlgebras.rotation_det}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:conj-linear, def:pure-euclidean}
-    For $\alpha \in \mathbb{H}^1$, the determinant of the $3\times 3$ matrix of
-    $\rho_\alpha$ in the orthonormal basis $i, j, k$ equals
-    $(\operatorname{normSq}\alpha)^3 = 1$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:conj-linear}
-    Write $\alpha = t + xi + yj + zk$ and compute $\rho_\alpha(v) = \alpha v\bar\alpha/\operatorname{normSq}\alpha$
-    on each basis vector; the resulting explicit $3\times 3$ matrix is the standard
-    quaternion rotation matrix whose determinant is $(\operatorname{normSq}\alpha)^3$
-    by a direct determinant computation. Since $\alpha \in \mathbb{H}^1$ means
-    $\operatorname{normSq}\alpha = 1$, the determinant is $1$.
-\end{proof}
-
 \begin{proposition}[Conjugation acts by rotations]
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:rotation-orthogonal, lem:rotation-det-one, lem:isometry-to-so, lem:conj-linear}
-    For $\alpha \in \mathbb{H}^1$, the linear map $\rho_\alpha$ of
-    \ref{lem:conj-linear} on $\mathbb{H}^0 \cong \mathbb{R}^3$ lies in
-    $\mathrm{SO}(3)$.
+    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    For $\alpha \in \mathbb{H}^1$, the conjugation map
+    $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$, $v \mapsto \alpha v\alpha^{-1}$,
+    is a well-defined $\mathbb{R}$-linear map lying in $\mathrm{SO}(3)$; writing
+    $\alpha = \cos\theta + (\sin\theta)u$ with $u$ a unit pure quaternion,
+    $\rho_\alpha$ is the rotation by $2\theta$ about the axis $u$.
 \end{proposition}
 \begin{proof}
-    \uses{lem:rotation-orthogonal, lem:rotation-det-one, lem:isometry-to-so}
-    By \ref{lem:rotation-orthogonal} the map $\rho_\alpha$ preserves the norm and
-    by \ref{lem:rotation-det-one} its determinant is $1$. The bridge
-    \ref{lem:isometry-to-so} then places its matrix in
-    $\mathrm{SO}(3) = \texttt{Matrix.specialOrthogonalGroup}\ (\mathrm{Fin}\,3)\ \mathbb{R}$.
-\end{proof}
-
-\begin{lemma}[Kernel of the rotation map]
-    \label{lem:rotation-kernel}
-    \lean{QuaternionAlgebras.rotation_kernel}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{prop:rotation, lem:standard-basis, thm:central}
-    If $\alpha \in \mathbb{H}^1$ satisfies $\alpha v \alpha^{-1} = v$ for all pure
-    $v$, then $\alpha = \pm 1$.
-\end{lemma}
-\begin{proof}
-    \uses{prop:rotation, lem:standard-basis, lem:pure-orthogonal, thm:central}
-    The hypothesis says $\alpha$ commutes with every pure quaternion, hence with all
-    of $\mathbb{H}$, so $\alpha$ is central; by centrality (the real analogue of
-    \ref{thm:central}) $\alpha \in \mathbb{R}$. Then
-    $\lVert\alpha\rVert^2 = \alpha^2 = 1$ gives $\alpha = \pm 1$.
-\end{proof}
-
-\begin{lemma}[Axis and angle of an $\mathrm{SO}(3)$ element]
-    \label{lem:so3-axis-angle}
-    \lean{QuaternionAlgebras.so3_axis_angle}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{def:pure-euclidean}
-    Every $A \in \mathrm{SO}(3)$ admits a unit axis $u$ with $Au = u$ and an angle
-    $\varphi$ such that, on the orthogonal complement $u^\perp$ with respect to an
-    orthonormal frame $\{u, w, u\times w\}$, $A$ acts as the planar rotation by
-    $\varphi$. Writing $\varphi = 2\theta$, the data is a unit axis $u$ together
-    with $\theta$.
-\end{lemma}
-\begin{proof}
-    \uses{def:pure-euclidean}
-    By \texttt{GroupTheory.SO3.exists\_stationary\_vec} there is a unit vector $u$
-    with $Au = u$. Since $A$ is orthogonal it preserves $u^\perp$, and its
-    restriction to the $2$-dimensional space $u^\perp$ is an element of
-    $\mathrm{SO}(2)$, hence a planar rotation by a unique angle $\varphi$; set
-    $\theta = \varphi/2$.
-\end{proof}
-
-\begin{lemma}[Conjugation fixes its axis]
-    \label{lem:rotation-fixes-axis}
-    \lean{QuaternionAlgebras.rotation_fixes_axis}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:conj-linear, lem:pure-square}
-    For a unit pure quaternion $u$ and $\theta \in \mathbb{R}$, set
-    $\alpha = \cos\theta + (\sin\theta)\,u \in \mathbb{H}^1$ (using $u^2 = -1$,
-    \ref{lem:pure-square}). Then $\rho_\alpha(u) = u$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:pure-square}
-    Since $u^2 = -1$ (\ref{lem:pure-square}), $u$ commutes with
-    $\alpha = \cos\theta + (\sin\theta) u$ (a polynomial in $u$), so
-    $\alpha u = u\alpha$ and hence $\rho_\alpha(u) = \alpha u\alpha^{-1} = u$.
-\end{proof}
-
-\begin{lemma}[Conjugation rotates the orthogonal plane by $2\theta$]
-    \label{lem:rotation-on-perp}
-    \lean{QuaternionAlgebras.rotation_on_perp}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:conj-linear, lem:pure-square, lem:pure-orthogonal, lem:pure-product}
-    With $u, \alpha$ as in \ref{lem:rotation-fixes-axis}, for any unit pure $w$
-    orthogonal to $u$ the map $\rho_\alpha$ acts on the plane
-    $\operatorname{span}\{w, u\times w\}$ as the rotation by angle $2\theta$:
-    $\rho_\alpha(w) = (\cos 2\theta)\,w + (\sin 2\theta)\,(u\times w)$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:pure-square, lem:pure-orthogonal, lem:pure-product}
-    Since $u\perp w$ we have $uw = u\times w$ and $wu = -uw$
-    (\ref{lem:pure-orthogonal}, \ref{lem:pure-product}). Expanding
-    $\rho_\alpha(w) = \alpha w\bar\alpha$ with $\alpha = \cos\theta + (\sin\theta)u$
-    and using $u^2 = -1$ (\ref{lem:pure-square}) gives, by the double-angle
-    formulas, $(\cos^2\theta - \sin^2\theta)w + 2\sin\theta\cos\theta\,(u\times w)
-    = (\cos 2\theta)w + (\sin 2\theta)(u\times w)$.
-\end{proof}
-
-\begin{lemma}[Rotation map is surjective]
-    \label{lem:rotation-surjective}
-    \lean{QuaternionAlgebras.rotation_surjective}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{prop:rotation, lem:so3-axis-angle, lem:rotation-fixes-axis, lem:rotation-on-perp, lem:pure-square, lem:pure-orthogonal}
-    Every $A \in \mathrm{SO}(3)$ equals $\rho_\alpha$ for some
-    $\alpha \in \mathbb{H}^1$.
-\end{lemma}
-\begin{proof}
-    \uses{lem:so3-axis-angle, lem:rotation-fixes-axis, lem:rotation-on-perp, lem:pure-square, lem:pure-orthogonal}
-    By \ref{lem:so3-axis-angle}, $A$ has a unit axis $u$ and acts on $u^\perp$ as
-    rotation by $2\theta$. Set $\alpha = \cos\theta + (\sin\theta)u \in \mathbb{H}^1$.
-    Then $\rho_\alpha(u) = u = Au$ (\ref{lem:rotation-fixes-axis}) and on $u^\perp$
-    both $\rho_\alpha$ and $A$ are the rotation by $2\theta$
-    (\ref{lem:rotation-on-perp}). As $\rho_\alpha$ and $A$ agree on the basis
-    $\{u, w, u\times w\}$, they are equal.
+    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    Conjugation is $\mathbb{R}$-linear and preserves $\mathbb{H}^0$ (it preserves
+    the real part) and the norm, since
+    $\lVert\alpha v\alpha^{-1}\rVert^2 = \lVert v\rVert^2$ for $\alpha \in \mathbb{H}^1$;
+    thus its matrix in the orthonormal basis $i, j, k$ is orthogonal. Writing
+    $\alpha = \cos\theta + (\sin\theta)u$ with $u^2 = -1$ (\ref{lem:pure-square}) and
+    choosing a unit pure $w \perp u$ (so $uw = u\times w$ and $wu = -uw$ by
+    \ref{lem:pure-orthogonal}), the double-angle formulas give $\rho_\alpha(u) = u$
+    and $\rho_\alpha(w) = (\cos 2\theta)w + (\sin 2\theta)(u\times w)$, the rotation
+    by $2\theta$ about $u$. In particular $\det\rho_\alpha = 1$, so
+    $\rho_\alpha \in \mathrm{SO}(3)$.
 \end{proof}
 
 \begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
     \label{cor:cover}
     \lean{QuaternionAlgebras.double_cover}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{prop:rotation, lem:rotation-kernel, lem:rotation-surjective}
+    \uses{prop:rotation}
     The map $\alpha \mapsto \rho_\alpha$ is a surjective group homomorphism
     $\mathbb{H}^1 \to \mathrm{SO}(3)$ with kernel $\{\pm 1\}$, giving the exact
     sequence
@@ -723,13 +249,14 @@ quaternions to model rotations of $\mathbb{R}^3$.
     \]
 \end{corollary}
 \begin{proof}
-    \uses{prop:rotation, lem:rotation-kernel, lem:rotation-surjective}
+    \uses{prop:rotation}
     The assignment is a homomorphism since
-    $\rho_{\alpha\beta}(v) = (\alpha\beta) v (\alpha\beta)^{-1}
-    = \alpha(\beta v \beta^{-1})\alpha^{-1} = (\rho_\alpha \circ \rho_\beta)(v)$,
-    and lands in $\mathrm{SO}(3)$ by \ref{prop:rotation}. Surjectivity is
-    \ref{lem:rotation-surjective} and the kernel is $\{\pm 1\}$ by
-    \ref{lem:rotation-kernel}.
+    $\rho_{\alpha\beta} = \rho_\alpha \circ \rho_\beta$, and it lands in
+    $\mathrm{SO}(3)$ by \ref{prop:rotation}. It is surjective because every element
+    of $\mathrm{SO}(3)$ is a rotation about some axis, realized by
+    $\alpha = \cos\theta + (\sin\theta)u$. If $\alpha$ is in the kernel it commutes
+    with every pure quaternion, hence is central, hence real with
+    $\lVert\alpha\rVert^2 = \alpha^2 = 1$, i.e. $\alpha = \pm 1$.
 \end{proof}
 
 \end{document}
