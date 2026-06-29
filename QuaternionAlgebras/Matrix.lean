@@ -238,19 +238,77 @@ noncomputable def split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
       (f := qb.liftHom.toLinearMap) hfin).mp hinj
   exact AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩
 
-/-- The left regular representation of `(a,b/F)` (Voight (2.3.9), here over `F`):
-the `F`-algebra homomorphism `λ : B → End_F B`, `α ↦ (β ↦ α β)`. -/
-def leftRegRep : ℍ[F, a, 0, b] →ₐ[F] Module.End F ℍ[F, a, 0, b] :=
-  Algebra.lmul F ℍ[F, a, 0, b]
+/-! ### The left regular representation over `K = F[i]`
 
-@[simp] lemma leftRegRep_apply (α β : ℍ[F, a, 0, b]) :
-    leftRegRep a b α β = α * β := rfl
+Following Voight 2.3.8–2.3.9, we view `B = (a,b/F)` as a (right) module over the
+commutative `F`-algebra `K = F[i] ≅ F[X]/(X²-a)` and realize the left regular
+representation inside `End_K B`. -/
 
-/-- The left regular representation is faithful: if `λ_α = 0` then
-`α = λ_α 1 = 0`. -/
-lemma leftRegRep_faithful : Function.Injective (leftRegRep a b) := by
+/-- `i² = a` in `(a,b/F)`. -/
+lemma gi_mul_gi : gi a b * gi a b = algebraMap F ℍ[F, a, 0, b] a := by
+  rw [Algebra.algebraMap_eq_smul_one]; ext <;> simp [gi]
+
+/-- `K = F[i]`, modeled as `F[X]/(X²-a)`. -/
+abbrev RootField := AdjoinRoot (X ^ 2 - C a)
+
+/-- Evaluation `F[X] → B` at `i` (its image is the commutative subring `F[i]`). -/
+noncomputable def evalGi : Polynomial F →+* ℍ[F, a, 0, b] :=
+  Polynomial.eval₂RingHom' (algebraMap F _) (gi a b)
+    (fun c => Algebra.commute_algebraMap_left c (gi a b))
+
+lemma evalGi_root : evalGi a b (X ^ 2 - C a) = 0 := by
+  simp only [evalGi, Polynomial.eval₂RingHom'_apply, eval₂_sub, eval₂_X_pow, eval₂_C]
+  rw [pow_two, gi_mul_gi, sub_self]
+
+/-- The embedding `ι : K = F[i] → B`. -/
+noncomputable def rootι : RootField a →+* ℍ[F, a, 0, b] :=
+  Ideal.Quotient.lift _ (evalGi a b) <| by
+    intro x hx
+    obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hx
+    rw [map_mul, evalGi_root, mul_zero]
+
+/-- `B = (a,b/F)` is a (right) `K`-module, `k • β := β · ι(k)`.  This is a module
+because `K` is commutative, so its image `ι(K) = F[i]` is a commutative subring. -/
+noncomputable instance : Module (RootField a) ℍ[F, a, 0, b] where
+  smul k β := β * rootι a b k
+  one_smul β := by show β * rootι a b 1 = β; rw [map_one, mul_one]
+  mul_smul k₁ k₂ β := by
+    show β * rootι a b (k₁ * k₂) = β * rootι a b k₂ * rootι a b k₁
+    rw [mul_comm k₁ k₂, map_mul, mul_assoc]
+  smul_zero k := by show (0 : ℍ[F, a, 0, b]) * rootι a b k = 0; rw [zero_mul]
+  smul_add k β₁ β₂ := by
+    show (β₁ + β₂) * rootι a b k = β₁ * rootι a b k + β₂ * rootι a b k; rw [add_mul]
+  add_smul k₁ k₂ β := by
+    show β * rootι a b (k₁ + k₂) = β * rootι a b k₁ + β * rootι a b k₂; rw [map_add, mul_add]
+  zero_smul β := by show β * rootι a b 0 = 0; rw [map_zero, mul_zero]
+
+lemma rootField_smul_def (k : RootField a) (β : ℍ[F, a, 0, b]) :
+    k • β = β * rootι a b k := rfl
+
+/-- The left regular representation over `K = F[i]` (Voight (2.3.9)): the ring
+homomorphism `λ : B → End_K B`, `α ↦ (β ↦ α β)`, each `λ_α` being `K`-linear
+because left and right multiplication commute. -/
+noncomputable def leftRegRepK :
+    ℍ[F, a, 0, b] →+* Module.End (RootField a) ℍ[F, a, 0, b] where
+  toFun α :=
+    { toFun := fun β => α * β
+      map_add' := fun β₁ β₂ => mul_add α β₁ β₂
+      map_smul' := fun k β => by
+        simp only [RingHom.id_apply, rootField_smul_def, ← mul_assoc] }
+  map_one' := LinearMap.ext fun β => by show (1 : ℍ[F, a, 0, b]) * β = β; rw [one_mul]
+  map_mul' α α' := LinearMap.ext fun β => by
+    show (α * α') * β = α * (α' * β); rw [mul_assoc]
+  map_zero' := LinearMap.ext fun β => by show (0 : ℍ[F, a, 0, b]) * β = 0; rw [zero_mul]
+  map_add' α α' := LinearMap.ext fun β => by
+    show (α + α') * β = α * β + α' * β; rw [add_mul]
+
+@[simp] lemma leftRegRepK_apply (α β : ℍ[F, a, 0, b]) :
+    leftRegRepK a b α β = α * β := rfl
+
+/-- The left regular representation over `K` is faithful (injective). -/
+lemma leftRegRepK_faithful : Function.Injective (leftRegRepK a b) := by
   refine (injective_iff_map_eq_zero _).2 fun α h => ?_
-  have hα : leftRegRep a b α 1 = 0 := by rw [h]; rfl
+  have hα : leftRegRepK a b α 1 = 0 := by rw [h]; rfl
   simpa using hα
 
 end QuaternionAlgebras
