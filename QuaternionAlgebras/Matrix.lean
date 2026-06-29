@@ -311,4 +311,38 @@ lemma leftRegRepK_faithful : Function.Injective (leftRegRepK a b) := by
   have hα : leftRegRepK a b α 1 = 0 := by rw [h]; rfl
   simpa using hα
 
+/-! ### The Hamiltonians inside `M₂(ℂ)` -/
+
+/-- The embedding (Voight (2.4.1)) of the real Hamiltonians `ℍ = (-1,-1/ℝ)` into
+`M₂(ℂ)`, `i ↦ !![I,0;0,-I]`, `j ↦ !![0,-1;1,0]`; explicitly
+`t + xi + yj + zk ↦ !![t+xI, -y-zI; y-zI, t-xI]`.  This is the matrix embedding
+with `a = b = -1` and `√(-1) = I ∈ ℂ`. -/
+noncomputable def hamiltonToComplex :
+    ℍ[ℝ, -1, 0, -1] →ₐ[ℝ] Matrix (Fin 2) (Fin 2) ℂ :=
+  QuaternionAlgebra.Basis.liftHom
+    { i := matI Complex.I
+      j := matJ (-1 : ℂ)
+      k := matI Complex.I * matJ (-1 : ℂ)
+      i_mul_i := by
+        rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).1,
+          zero_smul, add_zero, ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]
+        simp
+      j_mul_j := by
+        rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).2.1,
+          ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]
+        simp
+      i_mul_j := rfl
+      j_mul_i := by
+        rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).2.2,
+          zero_smul, zero_sub] }
+
+/-- The Hamiltonian embedding into `M₂(ℂ)` is injective. -/
+lemma hamiltonToComplex_injective : Function.Injective hamiltonToComplex :=
+  matI_matJ_injective (-1) (-1) (by norm_num) (by norm_num) (by norm_num)
+    Complex.I (by rw [Complex.I_mul_I]; simp) hamiltonToComplex
+    (by simp [hamiltonToComplex, QuaternionAlgebra.Basis.liftHom_apply,
+      QuaternionAlgebra.Basis.lift, gi])
+    (by simp [hamiltonToComplex, QuaternionAlgebra.Basis.liftHom_apply,
+      QuaternionAlgebra.Basis.lift, gj])
+
 end QuaternionAlgebras
