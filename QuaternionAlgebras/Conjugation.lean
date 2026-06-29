@@ -12,6 +12,10 @@ namespace QuaternionAlgebras
 
 open scoped Quaternion
 
+/-- The real scalar action commutes with conjugation, making `Quaternion ℝ` a
+star module over `ℝ`. -/
+instance : StarModule ℝ (Quaternion ℝ) := ⟨fun r x => by ext <;> simp⟩
+
 /-- Trace and norm via conjugation: `α + ᾱ = 2 t` and
 `α ᾱ = ᾱ α = t² + x² + y² + z² = normSq α`. -/
 lemma trace_norm (α : Quaternion ℝ) :
