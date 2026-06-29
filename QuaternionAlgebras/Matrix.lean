@@ -137,19 +137,15 @@ noncomputable def matrixHom :
       = matI (sqrtA a) * matJ (algebraMap F (X ^ 2 - C a).SplittingField b) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gk]
 
-/-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, the matrix
-homomorphism `matrixHom` is injective, hence an isomorphism onto its image. -/
-lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
-    Function.Injective (matrixHom a b) := by
-  refine (injective_iff_map_eq_zero _).2 fun α hα => ?_
-  have hdecomp : α = α.re • (1 : ℍ[F, a, 0, b]) + α.imI • gi a b
-      + α.imJ • gj a b + α.imK • gk a b := by
-    apply QuaternionAlgebra.ext <;> simp [gi, gj, gk]
-  rw [hdecomp] at hα
-  simp only [map_add, map_smul, map_one, matrixHom_gi, matrixHom_gj, matrixHom_gk] at hα
-  set K := (X ^ 2 - C a).SplittingField
-  set s := sqrtA a
-  have hs : s * s = algebraMap F K a := sqrtA_mul_self a
+/-- The key injectivity argument: over any field extension `K/F` with a square
+root `s` of `a` (and `a, b ≠ 0`, `char F ≠ 2`), an `F`-algebra map
+`(a,b/F) → M₂(K)` sending the generators to `I` and `J` is injective. -/
+lemma matI_matJ_injective {K : Type*} [Field K] [Algebra F K]
+    (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (s : K)
+    (hs : s * s = algebraMap F K a)
+    (φ : ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K)
+    (h1 : φ (gi a b) = matI s) (h2 : φ (gj a b) = matJ (algebraMap F K b)) :
+    Function.Injective φ := by
   have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
   have hsne : s ≠ 0 := fun h => ha (ρinj (by rw [map_zero, ← hs, h, mul_zero]))
   have hbne : algebraMap F K b ≠ 0 := by simpa using ρinj.ne hb
@@ -158,6 +154,14 @@ lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
     apply htwo
     apply ρinj
     rw [map_ofNat, map_zero]; exact h
+  refine (injective_iff_map_eq_zero φ).2 fun α hα => ?_
+  have hk : φ (gk a b) = matI s * matJ (algebraMap F K b) := by
+    rw [gk_eq_gi_mul_gj, map_mul, h1, h2]
+  have hdecomp : α = α.re • (1 : ℍ[F, a, 0, b]) + α.imI • gi a b
+      + α.imJ • gj a b + α.imK • gk a b := by
+    apply QuaternionAlgebra.ext <;> simp [gi, gj, gk]
+  rw [hdecomp] at hα
+  simp only [map_add, map_smul, map_one, h1, h2, hk] at hα
   have h00 := congrFun (congrFun hα 0) 0
   have h01 := congrFun (congrFun hα 0) 1
   have h10 := congrFun (congrFun hα 1) 0
@@ -194,9 +198,43 @@ lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
   have e4 : α.imK = 0 := ρinj (by rw [map_zero]; exact himK)
   apply QuaternionAlgebra.ext <;> simp [e1, e2, e3, e4]
 
+/-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, the matrix
+homomorphism `matrixHom` into `M₂(F(√a))` is injective, hence an isomorphism onto
+its image. -/
+lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
+    Function.Injective (matrixHom a b) :=
+  matI_matJ_injective a b ha hb htwo (sqrtA a) (sqrtA_mul_self a) (matrixHom a b)
+    (matrixHom_gi a b) (matrixHom_gj a b)
+
 /-- The split quaternion algebra `(1,b/F)` is isomorphic to `M₂(F)`.  In
 particular `(1,1/F) ≅ M₂(F)`. -/
-theorem split_matrix (b : F) :
-    Nonempty (ℍ[F, 1, 0, b] ≃ₐ[F] Matrix (Fin 2) (Fin 2) F) := by sorry
+theorem split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
+    Nonempty (ℍ[F, 1, 0, b] ≃ₐ[F] Matrix (Fin 2) (Fin 2) F) := by
+  obtain ⟨hI, hJ, hJI⟩ := matrix_basis_relations (1 : F) (1 : F) b (by ring)
+  let qb : QuaternionAlgebra.Basis (Matrix (Fin 2) (Fin 2) F) 1 0 b :=
+    { i := matI 1
+      j := matJ b
+      k := matI 1 * matJ b
+      i_mul_i := by
+        calc matI 1 * matI 1 = (1 : F) • (1 : Matrix (Fin 2) (Fin 2) F) := hI
+          _ = (1 : F) • (1 : Matrix (Fin 2) (Fin 2) F) + (0 : F) • matI 1 := by simp
+      j_mul_j := hJ
+      i_mul_j := rfl
+      j_mul_i := by
+        calc matJ b * matI 1 = -(matI 1 * matJ b) := hJI
+          _ = (0 : F) • matJ b - matI 1 * matJ b := by simp }
+  have h1 : qb.liftHom (gi 1 b) = matI 1 := by
+    simp [qb, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gi]
+  have h2 : qb.liftHom (gj 1 b) = matJ (algebraMap F F b) := by
+    simp [qb, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gj]
+  have hinj : Function.Injective qb.liftHom :=
+    matI_matJ_injective (1 : F) b one_ne_zero hb htwo (1 : F) (by simp) qb.liftHom h1 h2
+  have hfin : Module.finrank F ℍ[F, 1, 0, b]
+      = Module.finrank F (Matrix (Fin 2) (Fin 2) F) := by
+    rw [dim_four, Module.finrank_matrix]; simp
+  have hsurj : Function.Surjective qb.liftHom :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
+      (f := qb.liftHom.toLinearMap) hfin).mp hinj
+  exact ⟨AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩⟩
 
 end QuaternionAlgebras
