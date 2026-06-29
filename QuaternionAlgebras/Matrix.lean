@@ -238,4 +238,19 @@ noncomputable def split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
       (f := qb.liftHom.toLinearMap) hfin).mp hinj
   exact AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩
 
+/-- The left regular representation of `(a,b/F)` (Voight (2.3.9), here over `F`):
+the `F`-algebra homomorphism `λ : B → End_F B`, `α ↦ (β ↦ α β)`. -/
+def leftRegRep : ℍ[F, a, 0, b] →ₐ[F] Module.End F ℍ[F, a, 0, b] :=
+  Algebra.lmul F ℍ[F, a, 0, b]
+
+@[simp] lemma leftRegRep_apply (α β : ℍ[F, a, 0, b]) :
+    leftRegRep a b α β = α * β := rfl
+
+/-- The left regular representation is faithful: if `λ_α = 0` then
+`α = λ_α 1 = 0`. -/
+lemma leftRegRep_faithful : Function.Injective (leftRegRep a b) := by
+  refine (injective_iff_map_eq_zero _).2 fun α h => ?_
+  have hα : leftRegRep a b α 1 = 0 := by rw [h]; rfl
+  simpa using hα
+
 end QuaternionAlgebras

@@ -107,6 +107,32 @@ over an at most quadratic extension of $F$.
     $F$-algebra isomorphism.
 \end{proof}
 
+\begin{definition}[Left regular representation]
+    \label{def:left-regular-rep}
+    \lean{QuaternionAlgebras.leftRegRep}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:quaternion-algebra}
+    \leanok
+    The \emph{left regular representation} of $B = \left(\frac{a,b}{F}\right)$ is the
+    $F$-algebra homomorphism $\lambda \colon B \to \operatorname{End}_F(B)$,
+    $\alpha \mapsto \lambda_\alpha$, where $\lambda_\alpha(\beta) = \alpha\beta$
+    (Voight~(2.3.9), here taken over $F$).
+\end{definition}
+
+\begin{lemma}[The left regular representation is faithful]
+    \label{lem:left-regular-faithful}
+    \lean{QuaternionAlgebras.leftRegRep_faithful}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:left-regular-rep}
+    \leanok
+    The left regular representation $\lambda$ is injective (a \emph{faithful}
+    representation).
+\end{lemma}
+\begin{proof}
+    \uses{def:left-regular-rep}
+    If $\lambda_\alpha = 0$ then $\alpha = \alpha\cdot 1 = \lambda_\alpha(1) = 0$.
+\end{proof}
+
 \subsection{Rotations}
 
 We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
