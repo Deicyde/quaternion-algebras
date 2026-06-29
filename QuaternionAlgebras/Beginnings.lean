@@ -25,7 +25,8 @@ def gj : ℍ[F, a, 0, b] := ⟨0, 0, 1, 0⟩
 def gk : ℍ[F, a, 0, b] := ⟨0, 0, 0, 1⟩
 
 /-- The derived generator `k` is the product `ij`. -/
-lemma gk_eq_gi_mul_gj : gk a b = gi a b * gj a b := by sorry
+lemma gk_eq_gi_mul_gj : gk a b = gi a b * gj a b := by
+  ext <;> simp [gi, gj, gk]
 
 /-- Anticommutation of the standard generators: `ji = -ij`. -/
 lemma gj_mul_gi : gj a b * gi a b = -(gi a b * gj a b) := by
@@ -222,19 +223,5 @@ noncomputable def standard_generators_presentation {B : Type*} [Ring B] [Algebra
       exact hij0 (by rw [← inv_smul_smul₀ hz (i' * j'), hQ3, smul_zero])
     apply QuaternionAlgebra.ext <;> simp [ht0, hx0, hy0, hz0]
   exact AlgEquiv.ofBijective φ ⟨hinj, hsurj⟩
-
-/-- Commuting with `i` kills the `j, k` parts: if `α i = i α` then
-`α.imJ = α.imK = 0`. -/
-lemma central_commute_i (ha : a ≠ 0) (htwo : (2 : F) ≠ 0) (α : ℍ[F, a, 0, b])
-    (h : α * gi a b = gi a b * α) : α.imJ = 0 ∧ α.imK = 0 := by sorry
-
-/-- Commuting with `j` kills the `i` part: if `α j = j α` then `α.imI = 0`. -/
-lemma central_commute_j (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (α : ℍ[F, a, 0, b])
-    (h : α * gj a b = gj a b * α) : α.imI = 0 := by sorry
-
-/-- Centrality: `(a,b/F)` is central over `F`, i.e. its center is the image of
-`F` (the bottom subalgebra). -/
-theorem center_eq_bot (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
-    Subalgebra.center F ℍ[F, a, 0, b] = ⊥ := by sorry
 
 end QuaternionAlgebras

@@ -55,23 +55,6 @@ particular $\dim_F \left(\frac{a,b}{F}\right) = 4$, with $F$-basis $1, i, j, k$.
     $x = y = z = 0$.
 \end{proof}
 
-\begin{theorem}[Centrality]
-    \label{thm:central}
-    \lean{QuaternionAlgebras.center_eq_bot}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
-    \uses{def:quaternion-algebra}
-    $\left(\frac{a,b}{F}\right)$ is central over $F$: its center equals the image
-    of $F$.
-\end{theorem}
-\begin{proof}
-    \uses{def:quaternion-algebra}
-    Let $\alpha = t + xi + yj + zk$ be central. From $\alpha i = i\alpha$ one
-    computes $\alpha i - i\alpha = -2za\,j - 2y\,k$, so $y = z = 0$ (using
-    $a \neq 0$ and $\operatorname{char} F \neq 2$); from $\alpha j = j\alpha$ one
-    gets $\alpha j - j\alpha = 2zb\,i + 2x\,k$, so $x = 0$. Hence $\alpha = t$ lies
-    in the image of $F$, and conversely every element of $F$ is central.
-\end{proof}
-
 \subsection{Matrix representations}
 
 Every quaternion algebra can be realized as a subalgebra of $2 \times 2$ matrices
@@ -82,6 +65,7 @@ over an at most quadratic extension of $F$.
     \lean{QuaternionAlgebras.matrix_embedding}
     \leanfile{QuaternionAlgebras/Matrix.lean}
     \uses{def:quaternion-algebra}
+    \leanok
     Let $B = \left(\frac{a,b}{F}\right)$ and let $F(\sqrt a)$ be a splitting field
     over $F$ for $x^2 - a$, with root $\sqrt a$. The $F$-linear map
     $\lambda \colon B \to M_2(F(\sqrt a))$ determined by

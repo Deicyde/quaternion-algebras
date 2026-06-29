@@ -99,13 +99,68 @@ lemma matrix_lifthom {K : Type*} [Field K] [Algebra F K] (s : K)
     by simp [b', QuaternionAlgebra.Basis.lift, gj],
     by simp [b', QuaternionAlgebra.Basis.lift, gk]⟩
 
-/-- Matrix embedding: any `F`-algebra homomorphism `(a,b/F) → M₂(K)` sending the
-standard generators to `I` and `J` is injective. -/
-lemma matrix_embedding {K : Type*} [Field K] [Algebra F K] (s : K)
+/-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, any
+`F`-algebra homomorphism `(a,b/F) → M₂(K)` sending the standard generators to
+`I` and `J` (with `s² = a`) is injective, hence an isomorphism onto its image. -/
+lemma matrix_embedding {K : Type*} [Field K] [Algebra F K]
+    (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (s : K)
     (hs : s * s = algebraMap F K a)
     (φ : ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K)
     (h1 : φ (gi a b) = matI s) (h2 : φ (gj a b) = matJ (algebraMap F K b)) :
-    Function.Injective φ := by sorry
+    Function.Injective φ := by
+  have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
+  have hsne : s ≠ 0 := by
+    intro h
+    exact ha (ρinj (by rw [map_zero, ← hs, h, mul_zero]))
+  have hbne : algebraMap F K b ≠ 0 := by simpa using ρinj.ne hb
+  have h2K : (2 : K) ≠ 0 := by
+    intro h
+    apply htwo
+    apply ρinj
+    rw [map_ofNat, map_zero]; exact h
+  refine (injective_iff_map_eq_zero φ).2 fun α hα => ?_
+  have hk : φ (gk a b) = matI s * matJ (algebraMap F K b) := by
+    rw [gk_eq_gi_mul_gj, map_mul, h1, h2]
+  have hdecomp : α = α.re • (1 : ℍ[F, a, 0, b]) + α.imI • gi a b
+      + α.imJ • gj a b + α.imK • gk a b := by
+    apply QuaternionAlgebra.ext <;> simp [gi, gj, gk]
+  rw [hdecomp] at hα
+  simp only [map_add, map_smul, map_one, h1, h2, hk] at hα
+  have h00 := congrFun (congrFun hα 0) 0
+  have h01 := congrFun (congrFun hα 0) 1
+  have h10 := congrFun (congrFun hα 1) 0
+  have h11 := congrFun (congrFun hα 1) 1
+  simp only [matI, matJ, Matrix.one_fin_two, Matrix.add_apply, Matrix.smul_apply,
+    Matrix.mul_apply, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.of_apply, Matrix.cons_val', Matrix.empty_val',
+    Matrix.cons_val_fin_one, Matrix.zero_apply, smul_zero,
+    mul_zero, mul_one, zero_mul, add_zero, zero_add] at h00 h01 h10 h11
+  simp only [Algebra.smul_def, mul_one, mul_neg] at h00 h01 h10 h11
+  -- h00 : ρre + ρimI*s = 0 ; h11 : ρre - ρimI*s = 0
+  -- h10 : ρimJ - ρimK*s = 0 ; h01 : ρimJ*ρb + ρimK*(s*ρb) = 0
+  have hre : algebraMap F K α.re = 0 := by
+    have e : (2 : K) * algebraMap F K α.re = 0 := by linear_combination h00 + h11
+    exact (mul_eq_zero.mp e).resolve_left h2K
+  have himI : algebraMap F K α.imI = 0 := by
+    have e : (2 : K) * (algebraMap F K α.imI * s) = 0 := by linear_combination h00 - h11
+    have e' : algebraMap F K α.imI * s = 0 := (mul_eq_zero.mp e).resolve_left h2K
+    exact (mul_eq_zero.mp e').resolve_right hsne
+  have hsum : algebraMap F K α.imJ + algebraMap F K α.imK * s = 0 := by
+    have e : algebraMap F K b * (algebraMap F K α.imJ + algebraMap F K α.imK * s) = 0 := by
+      linear_combination h01
+    exact (mul_eq_zero.mp e).resolve_left hbne
+  have himJ : algebraMap F K α.imJ = 0 := by
+    have e : (2 : K) * algebraMap F K α.imJ = 0 := by linear_combination hsum + h10
+    exact (mul_eq_zero.mp e).resolve_left h2K
+  have himK : algebraMap F K α.imK = 0 := by
+    have e : (2 : K) * (algebraMap F K α.imK * s) = 0 := by linear_combination hsum - h10
+    have e' : algebraMap F K α.imK * s = 0 := (mul_eq_zero.mp e).resolve_left h2K
+    exact (mul_eq_zero.mp e').resolve_right hsne
+  have e1 : α.re = 0 := ρinj (by rw [map_zero]; exact hre)
+  have e2 : α.imI = 0 := ρinj (by rw [map_zero]; exact himI)
+  have e3 : α.imJ = 0 := ρinj (by rw [map_zero]; exact himJ)
+  have e4 : α.imK = 0 := ρinj (by rw [map_zero]; exact himK)
+  apply QuaternionAlgebra.ext <;> simp [e1, e2, e3, e4]
 
 /-- The split quaternion algebra `(1,b/F)` is isomorphic to `M₂(F)`.  In
 particular `(1,1/F) ≅ M₂(F)`. -/
