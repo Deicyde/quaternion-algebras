@@ -3,7 +3,7 @@
 
 \begin{document}
 
-\section{Quaternion algebras: beginnings}
+\section{Beginnings}
 
 Throughout, $F$ is a commutative field with $\operatorname{char} F \neq 2$, and
 $a, b \in F^\times$. We follow Voight, \emph{Quaternion Algebras}, Chapter~2.
@@ -13,7 +13,7 @@ $i^2 = c_1 + c_2 i$, $j^2 = c_3$, $ij = k$ and $ji = c_2 j - k$. Voight's
 $\left(\frac{a,b}{F}\right)$ is the special case $c_2 = 0$, i.e.
 $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -ij$.
 
-\subsection{The algebra and its multiplication}
+\subsection{Quaternion algebras}
 
 \begin{definition}[Quaternion algebra]
     \label{def:quaternion-algebra}
@@ -307,7 +307,13 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     \texttt{AlgEquiv.ofBijective}.
 \end{proof}
 
-\subsection{Conjugation, norm, and pure quaternions}
+\subsection{Rotations}
+
+We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
+the unit group $\mathbb{H}^1 = \{\alpha : \lVert\alpha\rVert^2 = 1\}$, and
+$\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions. Following Voight~2.4, we first
+set up conjugation, the norm, and the pure quaternions, and then use unit
+quaternions to model rotations of $\mathbb{R}^3$.
 
 \begin{definition}[Standard involution]
     \label{def:conjugation}
@@ -466,12 +472,6 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
     real part of $vw$ is $-(v\cdot w)$, vanishing iff $v\cdot w = 0$, giving (a); and
     $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (b).
 \end{proof}
-
-\subsection{Rotations}
-
-We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
-the unit group $\mathbb{H}^1 = \{\alpha : \lVert\alpha\rVert^2 = 1\}$, and
-$\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions.
 
 \begin{definition}[Euclidean structure on the pure quaternions]
     \label{def:pure-euclidean}
