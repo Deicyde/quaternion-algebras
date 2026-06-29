@@ -177,13 +177,13 @@ quaternions to model rotations of $\mathbb{R}^3$.
 
 \begin{definition}[Standard involution]
     \label{def:conjugation}
-    \lean{QuaternionAlgebras.conj}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \lean{QuaternionAlgebra.star_mk}
+    \leanfile{Mathlib/Algebra/Quaternion.lean}
     \uses{def:quaternion-algebra}
     \leanok
     The \emph{conjugation} (standard involution) on $\left(\frac{a,b}{F}\right)$ is
-    the map $\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$,
-    realized in Mathlib by the \texttt{star} operation.
+    Mathlib's \texttt{star} operation,
+    $\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$.
 \end{definition}
 
 One computes $\alpha + \bar\alpha = 2t$ and the norm

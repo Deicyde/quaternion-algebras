@@ -12,10 +12,6 @@ namespace QuaternionAlgebras
 
 open scoped Quaternion
 
-/-- The standard involution (conjugation) `α = t + xi + yj + zk ↦ t - xi - yj - zk`
-on the Hamiltonians, realized by `star`. -/
-def conj (q : Quaternion ℝ) : Quaternion ℝ := star q
-
 /-- Trace and norm via conjugation: `α + ᾱ = 2 t` and
 `α ᾱ = ᾱ α = t² + x² + y² + z² = normSq α`. -/
 lemma trace_norm (α : Quaternion ℝ) :
