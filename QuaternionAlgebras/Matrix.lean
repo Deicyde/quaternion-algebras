@@ -11,8 +11,34 @@ in `F` (e.g. `a = 1`) the embedding is an isomorphism onto `M₂(F)`.
 namespace QuaternionAlgebras
 
 open scoped Quaternion
+open Polynomial
 
 variable {F : Type*} [Field F] (a b : F)
+
+/-- A square root of `a` exists in the splitting field of `X² - a`. -/
+theorem exists_sqrt (a : F) :
+    ∃ s : (X ^ 2 - C a).SplittingField,
+      s * s = algebraMap F (X ^ 2 - C a).SplittingField a := by
+  have hsplit : ((X ^ 2 - C a).map
+      (algebraMap F (X ^ 2 - C a).SplittingField)).Splits :=
+    IsSplittingField.splits (X ^ 2 - C a).SplittingField (X ^ 2 - C a)
+  have hdeg : ((X ^ 2 - C a).map
+      (algebraMap F (X ^ 2 - C a).SplittingField)).degree ≠ 0 := by
+    rw [degree_map_eq_of_injective (algebraMap F _).injective,
+      degree_X_pow_sub_C (by norm_num) a]
+    norm_num
+  obtain ⟨s, hs⟩ := hsplit.exists_eval_eq_zero hdeg
+  refine ⟨s, ?_⟩
+  have h0 : s ^ 2 - algebraMap F (X ^ 2 - C a).SplittingField a = 0 := by
+    simpa [eval_map, eval₂_sub, eval₂_X_pow, eval₂_C] using hs
+  linear_combination sub_eq_zero.mp h0
+
+/-- A chosen square root of `a` in the splitting field of `X² - a`. -/
+noncomputable def sqrtA : (X ^ 2 - C a).SplittingField := (exists_sqrt a).choose
+
+lemma sqrtA_mul_self :
+    sqrtA a * sqrtA a = algebraMap F (X ^ 2 - C a).SplittingField a :=
+  (exists_sqrt a).choose_spec
 
 /-- The matrix `I = !![s, 0; 0, -s]` over a ring `K`. -/
 def matI {K : Type*} [Ring K] (s : K) : Matrix (Fin 2) (Fin 2) K :=
@@ -68,68 +94,70 @@ lemma matrix_basis_relations {K : Type*} [CommRing K] (s a b : K) (hs : s * s = 
 extension `K/F` containing a square root `s` of `a`, the explicit `F`-algebra
 homomorphism `(a,b/F) → M₂(K)` sending `i ↦ I`, `j ↦ J`, `k ↦ IJ`, built as the
 lift of the quaternion basis `(I, J, IJ)`. -/
-noncomputable def matrixHom {K : Type*} [Field K] [Algebra F K] (s : K)
-    (hs : s * s = algebraMap F K a) :
-    ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K :=
+noncomputable def matrixHom :
+    ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) (X ^ 2 - C a).SplittingField :=
   QuaternionAlgebra.Basis.liftHom
-    { i := matI s
-      j := matJ (algebraMap F K b)
-      k := matI s * matJ (algebraMap F K b)
+    { i := matI (sqrtA a)
+      j := matJ (algebraMap F _ b)
+      k := matI (sqrtA a) * matJ (algebraMap F _ b)
       i_mul_i := by
-        obtain ⟨hI, _, _⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
+        obtain ⟨hI, _, _⟩ := matrix_basis_relations (sqrtA a)
+          (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
         calc
-          matI s * matI s = (algebraMap F K a) • (1 : Matrix (Fin 2) (Fin 2) K) := hI
-          _ = a • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
-          _ = a • (1 : Matrix (Fin 2) (Fin 2) K) + (0 : F) • matI s := by simp
+          matI (sqrtA a) * matI (sqrtA a)
+              = (algebraMap F _ a) • (1 : Matrix (Fin 2) (Fin 2) _) := hI
+          _ = a • (1 : Matrix (Fin 2) (Fin 2) _) := by simp
+          _ = a • (1 : Matrix (Fin 2) (Fin 2) _) + (0 : F) • matI (sqrtA a) := by simp
       j_mul_j := by
-        obtain ⟨_, hJ, _⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
+        obtain ⟨_, hJ, _⟩ := matrix_basis_relations (sqrtA a)
+          (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
         calc
-          matJ (algebraMap F K b) * matJ (algebraMap F K b)
-              = (algebraMap F K b) • (1 : Matrix (Fin 2) (Fin 2) K) := hJ
-          _ = b • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
+          matJ (algebraMap F _ b) * matJ (algebraMap F _ b)
+              = (algebraMap F _ b) • (1 : Matrix (Fin 2) (Fin 2) _) := hJ
+          _ = b • (1 : Matrix (Fin 2) (Fin 2) _) := by simp
       i_mul_j := rfl
       j_mul_i := by
-        obtain ⟨_, _, hJI⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
+        obtain ⟨_, _, hJI⟩ := matrix_basis_relations (sqrtA a)
+          (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
         calc
-          matJ (algebraMap F K b) * matI s = -(matI s * matJ (algebraMap F K b)) := hJI
-          _ = (0 : F) • matJ (algebraMap F K b) - (matI s * matJ (algebraMap F K b)) := by simp }
+          matJ (algebraMap F _ b) * matI (sqrtA a)
+              = -(matI (sqrtA a) * matJ (algebraMap F _ b)) := hJI
+          _ = (0 : F) • matJ (algebraMap F _ b)
+              - (matI (sqrtA a) * matJ (algebraMap F _ b)) := by simp }
 
-@[simp] lemma matrixHom_gi {K : Type*} [Field K] [Algebra F K] (s : K)
-    (hs : s * s = algebraMap F K a) : matrixHom a b s hs (gi a b) = matI s := by
+@[simp] lemma matrixHom_gi : matrixHom a b (gi a b) = matI (sqrtA a) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gi]
 
-@[simp] lemma matrixHom_gj {K : Type*} [Field K] [Algebra F K] (s : K)
-    (hs : s * s = algebraMap F K a) :
-    matrixHom a b s hs (gj a b) = matJ (algebraMap F K b) := by
+@[simp] lemma matrixHom_gj :
+    matrixHom a b (gj a b) = matJ (algebraMap F (X ^ 2 - C a).SplittingField b) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gj]
 
-@[simp] lemma matrixHom_gk {K : Type*} [Field K] [Algebra F K] (s : K)
-    (hs : s * s = algebraMap F K a) :
-    matrixHom a b s hs (gk a b) = matI s * matJ (algebraMap F K b) := by
+@[simp] lemma matrixHom_gk :
+    matrixHom a b (gk a b)
+      = matI (sqrtA a) * matJ (algebraMap F (X ^ 2 - C a).SplittingField b) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gk]
 
 /-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, the matrix
 homomorphism `matrixHom` is injective, hence an isomorphism onto its image. -/
-lemma matrixHom_injective {K : Type*} [Field K] [Algebra F K]
-    (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (s : K)
-    (hs : s * s = algebraMap F K a) :
-    Function.Injective (matrixHom a b s hs) := by
-  have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
-  have hsne : s ≠ 0 := by
-    intro h
-    exact ha (ρinj (by rw [map_zero, ← hs, h, mul_zero]))
-  have hbne : algebraMap F K b ≠ 0 := by simpa using ρinj.ne hb
-  have h2K : (2 : K) ≠ 0 := by
-    intro h
-    apply htwo
-    apply ρinj
-    rw [map_ofNat, map_zero]; exact h
+lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
+    Function.Injective (matrixHom a b) := by
   refine (injective_iff_map_eq_zero _).2 fun α hα => ?_
   have hdecomp : α = α.re • (1 : ℍ[F, a, 0, b]) + α.imI • gi a b
       + α.imJ • gj a b + α.imK • gk a b := by
     apply QuaternionAlgebra.ext <;> simp [gi, gj, gk]
   rw [hdecomp] at hα
   simp only [map_add, map_smul, map_one, matrixHom_gi, matrixHom_gj, matrixHom_gk] at hα
+  set K := (X ^ 2 - C a).SplittingField
+  set s := sqrtA a
+  have hs : s * s = algebraMap F K a := sqrtA_mul_self a
+  have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
+  have hsne : s ≠ 0 := fun h => ha (ρinj (by rw [map_zero, ← hs, h, mul_zero]))
+  have hbne : algebraMap F K b ≠ 0 := by simpa using ρinj.ne hb
+  have h2K : (2 : K) ≠ 0 := by
+    intro h
+    apply htwo
+    apply ρinj
+    rw [map_ofNat, map_zero]; exact h
   have h00 := congrFun (congrFun hα 0) 0
   have h01 := congrFun (congrFun hα 0) 1
   have h10 := congrFun (congrFun hα 1) 0
