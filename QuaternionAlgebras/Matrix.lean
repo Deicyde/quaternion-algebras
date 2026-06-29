@@ -206,10 +206,11 @@ lemma matrixHom_injective (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
   matI_matJ_injective a b ha hb htwo (sqrtA a) (sqrtA_mul_self a) (matrixHom a b)
     (matrixHom_gi a b) (matrixHom_gj a b)
 
-/-- The split quaternion algebra `(1,b/F)` is isomorphic to `M₂(F)`.  In
-particular `(1,1/F) ≅ M₂(F)`. -/
-theorem split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
-    Nonempty (ℍ[F, 1, 0, b] ≃ₐ[F] Matrix (Fin 2) (Fin 2) F) := by
+/-- The split quaternion algebra `(1,b/F)` is isomorphic to `M₂(F)`, given
+explicitly by `i ↦ !![1,0;0,-1]`, `j ↦ !![0,b;1,0]`.  In particular
+`(1,1/F) ≅ M₂(F)`. -/
+noncomputable def split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
+    ℍ[F, 1, 0, b] ≃ₐ[F] Matrix (Fin 2) (Fin 2) F := by
   obtain ⟨hI, hJ, hJI⟩ := matrix_basis_relations (1 : F) (1 : F) b (by ring)
   let qb : QuaternionAlgebra.Basis (Matrix (Fin 2) (Fin 2) F) 1 0 b :=
     { i := matI 1
@@ -235,6 +236,6 @@ theorem split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
   have hsurj : Function.Surjective qb.liftHom :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
       (f := qb.liftHom.toLinearMap) hfin).mp hinj
-  exact ⟨AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩⟩
+  exact AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩
 
 end QuaternionAlgebras
