@@ -64,50 +64,56 @@ lemma matrix_basis_relations {K : Type*} [CommRing K] (s a b : K) (hs : s * s = 
       _ = -(matI s * matJ b) := rfl
   exact ⟨hI, hJ, hJI⟩
 
-/-- Matrix `liftHom`: over a field extension `K/F` containing a square root `s`
-of `a`, there is an `F`-algebra homomorphism `(a,b/F) → M₂(K)` sending
-`i ↦ I`, `j ↦ J`, `k ↦ IJ`. -/
-lemma matrix_lifthom {K : Type*} [Field K] [Algebra F K] (s : K)
+/-- The matrix embedding (Voight 2.3.1), stated constructively: over a field
+extension `K/F` containing a square root `s` of `a`, the explicit `F`-algebra
+homomorphism `(a,b/F) → M₂(K)` sending `i ↦ I`, `j ↦ J`, `k ↦ IJ`, built as the
+lift of the quaternion basis `(I, J, IJ)`. -/
+noncomputable def matrixHom {K : Type*} [Field K] [Algebra F K] (s : K)
     (hs : s * s = algebraMap F K a) :
-    ∃ φ : ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K,
-      φ (gi a b) = matI s ∧
-      φ (gj a b) = matJ (algebraMap F K b) ∧
-      φ (gk a b) = matI s * matJ (algebraMap F K b) := by
-  have hrels := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
-  rcases hrels with ⟨hI, hJ, hJI⟩
-  let b' : QuaternionAlgebra.Basis (Matrix (Fin 2) (Fin 2) K) a 0 b :=
+    ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K :=
+  QuaternionAlgebra.Basis.liftHom
     { i := matI s
       j := matJ (algebraMap F K b)
       k := matI s * matJ (algebraMap F K b)
       i_mul_i := by
+        obtain ⟨hI, _, _⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
         calc
           matI s * matI s = (algebraMap F K a) • (1 : Matrix (Fin 2) (Fin 2) K) := hI
           _ = a • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
           _ = a • (1 : Matrix (Fin 2) (Fin 2) K) + (0 : F) • matI s := by simp
       j_mul_j := by
+        obtain ⟨_, hJ, _⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
         calc
           matJ (algebraMap F K b) * matJ (algebraMap F K b)
               = (algebraMap F K b) • (1 : Matrix (Fin 2) (Fin 2) K) := hJ
           _ = b • (1 : Matrix (Fin 2) (Fin 2) K) := by simp
       i_mul_j := rfl
       j_mul_i := by
+        obtain ⟨_, _, hJI⟩ := matrix_basis_relations s (algebraMap F K a) (algebraMap F K b) hs
         calc
           matJ (algebraMap F K b) * matI s = -(matI s * matJ (algebraMap F K b)) := hJI
-          _ = (0 : F) • matJ (algebraMap F K b) - (matI s * matJ (algebraMap F K b)) := by simp
-    }
-  refine ⟨b'.liftHom, by simp [b', QuaternionAlgebra.Basis.lift, gi],
-    by simp [b', QuaternionAlgebra.Basis.lift, gj],
-    by simp [b', QuaternionAlgebra.Basis.lift, gk]⟩
+          _ = (0 : F) • matJ (algebraMap F K b) - (matI s * matJ (algebraMap F K b)) := by simp }
 
-/-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, any
-`F`-algebra homomorphism `(a,b/F) → M₂(K)` sending the standard generators to
-`I` and `J` (with `s² = a`) is injective, hence an isomorphism onto its image. -/
-lemma matrix_embedding {K : Type*} [Field K] [Algebra F K]
+@[simp] lemma matrixHom_gi {K : Type*} [Field K] [Algebra F K] (s : K)
+    (hs : s * s = algebraMap F K a) : matrixHom a b s hs (gi a b) = matI s := by
+  simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gi]
+
+@[simp] lemma matrixHom_gj {K : Type*} [Field K] [Algebra F K] (s : K)
+    (hs : s * s = algebraMap F K a) :
+    matrixHom a b s hs (gj a b) = matJ (algebraMap F K b) := by
+  simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gj]
+
+@[simp] lemma matrixHom_gk {K : Type*} [Field K] [Algebra F K] (s : K)
+    (hs : s * s = algebraMap F K a) :
+    matrixHom a b s hs (gk a b) = matI s * matJ (algebraMap F K b) := by
+  simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gk]
+
+/-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, the matrix
+homomorphism `matrixHom` is injective, hence an isomorphism onto its image. -/
+lemma matrixHom_injective {K : Type*} [Field K] [Algebra F K]
     (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (s : K)
-    (hs : s * s = algebraMap F K a)
-    (φ : ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) K)
-    (h1 : φ (gi a b) = matI s) (h2 : φ (gj a b) = matJ (algebraMap F K b)) :
-    Function.Injective φ := by
+    (hs : s * s = algebraMap F K a) :
+    Function.Injective (matrixHom a b s hs) := by
   have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
   have hsne : s ≠ 0 := by
     intro h
@@ -118,14 +124,12 @@ lemma matrix_embedding {K : Type*} [Field K] [Algebra F K]
     apply htwo
     apply ρinj
     rw [map_ofNat, map_zero]; exact h
-  refine (injective_iff_map_eq_zero φ).2 fun α hα => ?_
-  have hk : φ (gk a b) = matI s * matJ (algebraMap F K b) := by
-    rw [gk_eq_gi_mul_gj, map_mul, h1, h2]
+  refine (injective_iff_map_eq_zero _).2 fun α hα => ?_
   have hdecomp : α = α.re • (1 : ℍ[F, a, 0, b]) + α.imI • gi a b
       + α.imJ • gj a b + α.imK • gk a b := by
     apply QuaternionAlgebra.ext <;> simp [gi, gj, gk]
   rw [hdecomp] at hα
-  simp only [map_add, map_smul, map_one, h1, h2, hk] at hα
+  simp only [map_add, map_smul, map_one, matrixHom_gi, matrixHom_gj, matrixHom_gk] at hα
   have h00 := congrFun (congrFun hα 0) 0
   have h01 := congrFun (congrFun hα 0) 1
   have h10 := congrFun (congrFun hα 1) 0
