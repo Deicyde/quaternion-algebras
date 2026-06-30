@@ -195,19 +195,6 @@ $\mathbb{H}^0 = \operatorname{skewAdjoint}(\mathbb{H})
 $\operatorname{selfAdjoint}(\mathbb{H}) = \mathbb{R} \cong \mathbb{R}$ (those with
 $\bar\alpha = \alpha$).
 
-\begin{lemma}[Square of a pure quaternion]
-    \label{lem:pure-square}
-    \lean{QuaternionAlgebras.pure_square}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
-    \leanok
-    A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
-    for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
-\end{lemma}
-\begin{proof}
-    This is Mathlib's \texttt{Quaternion.sq\_eq\_neg\_normSq}:
-    $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
-\end{proof}
-
 \begin{lemma}[Product of pure quaternions]
     \label{lem:pure-product}
     \lean{QuaternionAlgebras.pure_product}
@@ -227,6 +214,19 @@ $\bar\alpha = \alpha$).
     the real part $-(v_1 w_1 + v_2 w_2 + v_3 w_3) = -(v\cdot w)$, and the
     off-diagonal terms collect to
     $(v_2 w_3 - v_3 w_2)i + (v_3 w_1 - v_1 w_3)j + (v_1 w_2 - v_2 w_1)k = v\times w$.
+\end{proof}
+
+\begin{lemma}[Square of a pure quaternion]
+    \label{lem:pure-square}
+    \lean{QuaternionAlgebras.pure_square}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanok
+    A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
+    for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
+\end{lemma}
+\begin{proof}
+    This is Mathlib's \texttt{Quaternion.sq\_eq\_neg\_normSq}:
+    $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
 \end{proof}
 
 \begin{lemma}[Orthogonality criteria for pure quaternions]
