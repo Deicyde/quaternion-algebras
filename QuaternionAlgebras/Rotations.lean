@@ -17,7 +17,7 @@ not available in Mathlib, so the corresponding statements
 
 namespace QuaternionAlgebras
 
-open scoped Quaternion
+open scoped Quaternion Matrix
 
 /-- The real scalar action commutes with conjugation, making `Quaternion ℝ` a
 star module over `ℝ`. -/
@@ -62,11 +62,16 @@ lemma pure_product_re (v w : Quaternion ℝ)
   rw [Quaternion.re_mul, hv, hw]
   ring
 
-/-- The cross product `v × w` of two quaternions, packaged as a pure quaternion
-(real part zero) built from their imaginary parts. -/
+/-- The imaginary part of a quaternion as a vector in `ℝ³`. -/
+def imVec (v : Quaternion ℝ) : Fin 3 → ℝ := ![v.imI, v.imJ, v.imK]
+
+/-- The pure quaternion whose imaginary part is a given vector of `ℝ³`. -/
+def ofImVec (u : Fin 3 → ℝ) : Quaternion ℝ := ⟨0, u 0, u 1, u 2⟩
+
+/-- The cross product `v × w` of two quaternions, packaged as a pure quaternion,
+reusing Mathlib's `crossProduct` on their imaginary parts. -/
 def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
-  ⟨0, v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
-    v.imI * w.imJ - v.imJ * w.imI⟩
+  ofImVec (imVec v ⨯₃ imVec w)
 
 /-- Imaginary part of a product of pure quaternions: the cross product. -/
 lemma pure_product_im (v w : Quaternion ℝ)
@@ -93,11 +98,12 @@ lemma pure_product (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
     v * w =
-      -((v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK : ℝ) : Quaternion ℝ)
-        + crossQuat v w := by
+      -((imVec v ⬝ᵥ imVec w : ℝ) : Quaternion ℝ) + crossQuat v w := by
   have hre := pure_product_re v w hv hw
   obtain ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
-  ext <;> simp [crossQuat, hre, hI, hJ, hK]
+  ext <;>
+    simp [crossQuat, ofImVec, imVec, cross_apply, dotProduct, Fin.sum_univ_three,
+      hre, hI, hJ, hK]
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
