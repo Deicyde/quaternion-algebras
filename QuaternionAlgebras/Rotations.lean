@@ -201,6 +201,15 @@ noncomputable def rotLin (α : Quaternion ℝ) (hα : α ≠ 0) :
     rw [mem_skewAdjoint_submodule_iff] at hv ⊢
     exact conj_preserves_pure α hα v ((isSkewAdjoint_iff_re v).mpr hv))
 
+/-- The *adjoint representation* (Voight (2.4.13)): a unit quaternion `α ∈ ℍ¹`
+acts on the pure quaternions `ℍ⁰` by conjugation, `v ↦ α v α⁻¹`, yielding the
+`ℝ`-linear endomorphism `ρ_α = adjoint α` of `ℍ⁰`.  The assignment
+`α ↦ adjoint α` is the representation; that it lands in `SO(3)` and is a group
+homomorphism is `rotation_mem_so` and `double_cover`. -/
+noncomputable def adjoint (α : Quaternion ℝ) (hα : α ≠ 0) :
+    skewAdjoint.submodule ℝ (Quaternion ℝ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ) :=
+  rotLin α hα
+
 /-- The standard pure-quaternion frame `i, j, k`. -/
 def frame : Fin 3 → Quaternion ℝ :=
   ![⟨0, 1, 0, 0⟩, ⟨0, 0, 1, 0⟩, ⟨0, 0, 0, 1⟩]

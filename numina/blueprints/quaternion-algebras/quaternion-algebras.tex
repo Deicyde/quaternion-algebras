@@ -236,6 +236,25 @@ $\bar\alpha = \alpha$).
     (2); and $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (3).
 \end{proof}
 
+\begin{definition}[Adjoint representation]
+    \label{def:adjoint}
+    \lean{QuaternionAlgebras.adjoint}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{lem:pure-properties}
+    \leanok
+    The \emph{adjoint representation} (Voight~(2.4.13)) of a nonzero quaternion
+    $\alpha$ is the $\mathbb{R}$-linear endomorphism $\rho_\alpha$ of the pure
+    quaternions $\mathbb{H}^0$ given by conjugation,
+    \[
+      \rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0, \qquad
+      v \mapsto \alpha\,v\,\alpha^{-1}.
+    \]
+    The assignment $\alpha \mapsto \rho_\alpha$ is well defined because conjugation
+    preserves $\mathbb{H}^0$ (it fixes the real part); that for $\alpha \in
+    \mathbb{H}^1$ it lands in $\mathrm{SO}(3)$, giving a group homomorphism, is
+    \ref{prop:rotation} and \ref{cor:cover}.
+\end{definition}
+
 \begin{proposition}[Conjugation acts by rotations]
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so}
