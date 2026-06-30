@@ -175,49 +175,35 @@ $\mathbb{H}^0 \cong \mathbb{R}^3$ the pure quaternions. Following Voight~2.4, we
 set up conjugation, the norm, and the pure quaternions, and then use unit
 quaternions to model rotations of $\mathbb{R}^3$.
 
-\begin{definition}[Standard involution]
-    \label{def:conjugation}
-    \lean{QuaternionAlgebra.star_mk}
-    \leanfile{Mathlib/Algebra/Quaternion.lean}
-    \uses{def:quaternion-algebra}
-    \leanok
-    The \emph{conjugation} (standard involution) on $\left(\frac{a,b}{F}\right)$ is
-    Mathlib's \texttt{star} operation,
-    $\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$.
-\end{definition}
-
+The \emph{conjugation} (standard involution) on $\left(\frac{a,b}{F}\right)$ is
+Mathlib's \texttt{star} operation,
+$\alpha = t + xi + yj + zk \mapsto \bar\alpha = t - xi - yj - zk$.
 One computes $\alpha + \bar\alpha = 2t$ and the norm
 $\alpha\bar\alpha = \bar\alpha\alpha = t^2 + x^2 + y^2 + z^2 =: \lVert\alpha\rVert^2$,
 which agrees with the Euclidean square norm on $\mathbb{H} \cong \mathbb{R}^4$ and
 is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\rVert^2$.
 
-\begin{definition}[Pure (imaginary) quaternion]
-    \label{def:pure}
-    \lean{skewAdjoint.submodule}
-    \leanfile{Mathlib/Algebra/Star/Module.lean}
-    \uses{def:conjugation}
-    \leanok
-    A quaternion $\alpha$ is \emph{pure} (imaginary) if its real part vanishes,
-    equivalently $\bar\alpha = -\alpha$, i.e. $\alpha$ is \emph{skew-adjoint} for the
-    standard involution. The pure quaternions are the skew-adjoint submodule
-    $\mathbb{H}^0 = \operatorname{skewAdjoint}(\mathbb{H})
-    = \mathbb{R}i + \mathbb{R}j + \mathbb{R}k \cong \mathbb{R}^3$; dually the
-    \emph{real} quaternions are the self-adjoint submodule
-    $\operatorname{selfAdjoint}(\mathbb{H}) = \mathbb{R} \cong \mathbb{R}$ (those with
-    $\bar\alpha = \alpha$).
-\end{definition}
+A quaternion $\alpha$ is \emph{pure} (imaginary) if its real part vanishes,
+equivalently $\bar\alpha = -\alpha$, i.e. $\alpha$ is \emph{skew-adjoint} for the
+standard involution. We do not introduce a bespoke definition: the pure
+quaternions are Mathlib's skew-adjoint submodule
+\texttt{skewAdjoint.submodule}~$\mathbb{R}\,\mathbb{H}$,
+$\mathbb{H}^0 = \operatorname{skewAdjoint}(\mathbb{H})
+= \mathbb{R}i + \mathbb{R}j + \mathbb{R}k \cong \mathbb{R}^3$; dually the
+\emph{real} quaternions are the self-adjoint submodule
+\texttt{selfAdjoint.submodule}~$\mathbb{R}\,\mathbb{H}$,
+$\operatorname{selfAdjoint}(\mathbb{H}) = \mathbb{R} \cong \mathbb{R}$ (those with
+$\bar\alpha = \alpha$).
 
 \begin{lemma}[Square of a pure quaternion]
     \label{lem:pure-square}
     \lean{QuaternionAlgebras.pure_square}
     \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:pure}
     \leanok
     A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
     for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
 \end{lemma}
 \begin{proof}
-    \uses{def:pure}
     This is Mathlib's \texttt{Quaternion.sq\_eq\_neg\_normSq}:
     $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
 \end{proof}
@@ -226,7 +212,6 @@ is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\
     \label{lem:pure-product}
     \lean{QuaternionAlgebras.pure_product}
     \leanfile{QuaternionAlgebras/Conjugation.lean}
-    \uses{def:pure}
     \leanok
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
@@ -237,7 +222,6 @@ is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\
     quaternion).
 \end{lemma}
 \begin{proof}
-    \uses{def:pure}
     Expand $vw$ over the basis $i, j, k$ using $i^2 = j^2 = k^2 = -1$,
     $ij = k = -ji$, $jk = i = -kj$, $ki = j = -ik$. The diagonal terms contribute
     the real part $-(v_1 w_1 + v_2 w_2 + v_3 w_3) = -(v\cdot w)$, and the
@@ -266,7 +250,7 @@ is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    \uses{lem:pure-square, lem:pure-orthogonal}
     For $\alpha \in \mathbb{H}^1$, the conjugation map
     $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$, $v \mapsto \alpha v\alpha^{-1}$,
     is a well-defined $\mathbb{R}$-linear map lying in $\mathrm{SO}(3)$; writing
@@ -274,7 +258,7 @@ is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\
     $\rho_\alpha$ is the rotation by $2\theta$ about the axis $u$.
 \end{proposition}
 \begin{proof}
-    \uses{def:pure, lem:pure-square, lem:pure-orthogonal}
+    \uses{lem:pure-square, lem:pure-orthogonal}
     Conjugation is $\mathbb{R}$-linear and preserves $\mathbb{H}^0$ (it preserves
     the real part) and the norm, since
     $\lVert\alpha v\alpha^{-1}\rVert^2 = \lVert v\rVert^2$ for $\alpha \in \mathbb{H}^1$;
