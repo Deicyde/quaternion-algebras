@@ -336,6 +336,37 @@ noncomputable def hamiltonToComplex :
         rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).2.2,
           zero_smul, zero_sub] }
 
+/-- Explicit matrix form of the Hamiltonian embedding:
+`t + xi + yj + zk ↦ !![t+xI, -y-zI; y-zI, t-xI]`. -/
+lemma hamiltonToComplex_apply (α : ℍ[ℝ, -1, 0, -1]) :
+    hamiltonToComplex α =
+      !![(α.re : ℂ) + (α.imI : ℂ) * Complex.I, -(α.imJ : ℂ) - (α.imK : ℂ) * Complex.I;
+         (α.imJ : ℂ) - (α.imK : ℂ) * Complex.I, (α.re : ℂ) - (α.imI : ℂ) * Complex.I] := by
+  simp only [hamiltonToComplex, QuaternionAlgebra.Basis.liftHom_apply,
+    QuaternionAlgebra.Basis.lift, matI, matJ]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Algebra.algebraMap_eq_smul_one, Complex.real_smul,
+      Matrix.one_fin_two] <;>
+    ring
+
+/-- Voight (2.4.7), trace: the trace of the matrix embedding is twice the real part. -/
+lemma hamiltonToComplex_trace (α : ℍ[ℝ, -1, 0, -1]) :
+    (hamiltonToComplex α).trace = (2 * α.re : ℝ) := by
+  rw [hamiltonToComplex_apply, Matrix.trace_fin_two]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.of_apply,
+    Matrix.cons_val', Matrix.empty_val', Matrix.cons_val_fin_one]
+  push_cast
+  ring
+
+/-- Voight (2.4.7), determinant: the determinant of the matrix embedding is the
+reduced norm `normSq`. -/
+lemma hamiltonToComplex_det (α : ℍ[ℝ, -1, 0, -1]) :
+    (hamiltonToComplex α).det = (Quaternion.normSq α : ℝ) := by
+  rw [hamiltonToComplex_apply, Matrix.det_fin_two_of, Quaternion.normSq_def']
+  push_cast
+  linear_combination (-(α.imI : ℂ) ^ 2 - (α.imK : ℂ) ^ 2) * Complex.I_sq
+
 /-- The Hamiltonian embedding into `M₂(ℂ)` is injective. -/
 lemma hamiltonToComplex_injective : Function.Injective hamiltonToComplex :=
   matI_matJ_injective (-1) (-1) (by norm_num) (by norm_num) (by norm_num)

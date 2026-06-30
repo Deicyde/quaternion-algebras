@@ -167,6 +167,29 @@ over an at most quadratic extension of $F$.
     over $\mathbb{C} = \mathbb{R}(\sqrt{-1})$.
 \end{proof}
 
+\begin{lemma}[Trace and determinant of the embedding]
+    \label{lem:hamilton-matrix-trace-det}
+    \lean{QuaternionAlgebras.hamiltonToComplex_trace,
+      QuaternionAlgebras.hamiltonToComplex_det}
+    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \uses{def:hamilton-matrix}
+    \leanok
+    For $\alpha = t + xi + yj + zk \in \mathbb{H}$, the matrix embedding of
+    \ref{def:hamilton-matrix} satisfies (Voight~(2.4.7))
+    \[
+      \operatorname{tr}(\lambda(\alpha)) = 2t = 2\operatorname{Re}(\alpha),
+      \qquad
+      \det(\lambda(\alpha)) = t^2 + x^2 + y^2 + z^2 = \lVert\alpha\rVert^2.
+    \]
+\end{lemma}
+\begin{proof}
+    \uses{def:hamilton-matrix}
+    Writing $\lambda(\alpha) = \begin{pmatrix} t + xi & -y - zi \\ y - zi & t -
+    xi \end{pmatrix}$, the trace is $(t + xi) + (t - xi) = 2t$, and the
+    determinant is $(t + xi)(t - xi) - (-y - zi)(y - zi) = (t^2 + x^2) + (y^2 +
+    z^2)$, the reduced norm $\lVert\alpha\rVert^2 = \operatorname{normSq}(\alpha)$.
+\end{proof}
+
 \subsection{Rotations}
 
 We work with the real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$,
