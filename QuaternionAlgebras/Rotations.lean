@@ -17,7 +17,7 @@ not available in Mathlib, so the corresponding statements
 
 namespace QuaternionAlgebras
 
-open scoped Quaternion Matrix
+open scoped Quaternion Matrix RealInnerProductSpace
 
 /-- The real scalar action commutes with conjugation, making `Quaternion ℝ` a
 star module over `ℝ`. -/
@@ -53,14 +53,15 @@ lemma pure_square (v : Quaternion ℝ) :
   rw [isSkewAdjoint_iff_re]
   simpa using (Quaternion.sq_eq_neg_normSq (a := v)).symm
 
-/-- Real part of a product of pure quaternions: minus the dot product. -/
+/-- Real part of a product of pure quaternions: minus their inner product (the
+standard Euclidean dot product on `ℍ`). Only `w` needs to be pure. -/
 lemma pure_product_re (v w : Quaternion ℝ)
-    (hv : IsSkewAdjoint v)
+    (_hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
-    (v * w).re = -(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK) := by
-  rw [isSkewAdjoint_iff_re] at hv hw
-  rw [Quaternion.re_mul, hv, hw]
-  ring
+    (v * w).re = -⟪v, w⟫ := by
+  have hwstar : star w = -w := Quaternion.star_eq_neg.mpr ((isSkewAdjoint_iff_re w).mp hw)
+  rw [Quaternion.inner_def, hwstar, mul_neg]
+  simp
 
 /-- The imaginary part of a quaternion as a vector in `ℝ³`. -/
 def imVec (v : Quaternion ℝ) : Fin 3 → ℝ := ![v.imI, v.imJ, v.imK]
@@ -89,8 +90,7 @@ the real part and the cross product as the (pure) imaginary part. -/
 lemma pure_product (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
-    v * w =
-      -((imVec v ⬝ᵥ imVec w : ℝ) : Quaternion ℝ) + crossQuat v w := by
+    v * w = -((⟪v, w⟫ : ℝ) : Quaternion ℝ) + crossQuat v w := by
   have hre := pure_product_re v w hv hw
   have him := pure_product_im v w hv hw
   have h0 := congrFun him 0
@@ -99,7 +99,7 @@ lemma pure_product (v w : Quaternion ℝ)
   simp only [imVec, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
     Matrix.cons_val_two, Matrix.tail_cons] at h0 h1 h2
   ext <;>
-    simp [crossQuat, ofImVec, imVec, dotProduct, Fin.sum_univ_three, hre, h0, h1, h2]
+    simp [crossQuat, ofImVec, imVec, hre, h0, h1, h2]
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
