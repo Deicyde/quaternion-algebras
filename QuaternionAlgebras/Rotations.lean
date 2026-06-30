@@ -201,14 +201,88 @@ noncomputable def rotLin (α : Quaternion ℝ) (hα : α ≠ 0) :
     rw [mem_skewAdjoint_submodule_iff] at hv ⊢
     exact conj_preserves_pure α hα v ((isSkewAdjoint_iff_re v).mpr hv))
 
-/-- The *adjoint representation* (Voight (2.4.13)): a unit quaternion `α ∈ ℍ¹`
-acts on the pure quaternions `ℍ⁰` by conjugation, `v ↦ α v α⁻¹`, yielding the
-`ℝ`-linear endomorphism `ρ_α = adjoint α` of `ℍ⁰`.  The assignment
-`α ↦ adjoint α` is the representation; that it lands in `SO(3)` and is a group
-homomorphism is `rotation_mem_so` and `double_cover`. -/
-noncomputable def adjoint (α : Quaternion ℝ) (hα : α ≠ 0) :
-    skewAdjoint.submodule ℝ (Quaternion ℝ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ) :=
-  rotLin α hα
+/-- The unit quaternions `ℍ¹` are Mathlib's unitary group `unitary ℍ`, and thus
+form a group under multiplication (with `α⁻¹ = star α`). -/
+noncomputable abbrev unitQuaternionsGroup : Group (unitary (Quaternion ℝ)) := inferInstance
+
+/-- `ℍ¹` membership is exactly the norm-one condition `normSq α = 1`. -/
+lemma mem_unitary_iff_normSq (α : Quaternion ℝ) :
+    α ∈ unitary (Quaternion ℝ) ↔ Quaternion.normSq α = 1 := by
+  rw [Unitary.mem_iff]
+  constructor
+  · rintro ⟨h, -⟩
+    rw [Quaternion.star_mul_self] at h
+    have := congrArg (·.re) h
+    simpa using this
+  · intro h
+    refine ⟨?_, ?_⟩ <;>
+      simp [Quaternion.star_mul_self, Quaternion.self_mul_star, h]
+
+/-- A unit quaternion is nonzero. -/
+lemma coe_unitary_ne_zero (u : unitary (Quaternion ℝ)) : (u : Quaternion ℝ) ≠ 0 := by
+  intro h
+  have h1 : Quaternion.normSq (u : Quaternion ℝ) = 1 := (mem_unitary_iff_normSq _).mp u.2
+  rw [h, map_zero] at h1
+  exact zero_ne_one h1
+
+/-- Explicit form of conjugation: `conjEndo α v = α v α⁻¹`. -/
+lemma conjEndo_apply (α v : Quaternion ℝ) : conjEndo α v = α * v * α⁻¹ := by
+  simp [conjEndo, LinearMap.mulRight_apply, LinearMap.mulLeft_apply, mul_assoc]
+
+/-- Conjugation by `1` is the identity. -/
+lemma conjEndo_one (v : Quaternion ℝ) : conjEndo 1 v = v := by
+  simp [conjEndo_apply]
+
+/-- Conjugation is multiplicative: `ρ_{αβ} = ρ_α ∘ ρ_β`. -/
+lemma conjEndo_mul (α β v : Quaternion ℝ) :
+    conjEndo (α * β) v = conjEndo α (conjEndo β v) := by
+  simp only [conjEndo_apply, mul_inv_rev]
+  noncomm_ring
+
+/-- The underlying quaternion of `rotLin α hα x` is `conjEndo α x`. -/
+lemma rotLin_coe (α : Quaternion ℝ) (hα : α ≠ 0)
+    (x : skewAdjoint.submodule ℝ (Quaternion ℝ)) :
+    (↑(rotLin α hα x) : Quaternion ℝ) = conjEndo α ↑x := by
+  simp only [rotLin, LinearMap.coe_restrict_apply]
+
+/-- Conjugation by a unit quaternion `α`, packaged as an `ℝ`-linear *automorphism*
+of `ℍ⁰` (its inverse is conjugation by `α⁻¹`). -/
+noncomputable def rotEquiv (u : unitary (Quaternion ℝ)) :
+    skewAdjoint.submodule ℝ (Quaternion ℝ) ≃ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ) :=
+  LinearEquiv.ofLinear
+    (rotLin ↑u (coe_unitary_ne_zero u))
+    (rotLin (↑u)⁻¹ (inv_ne_zero (coe_unitary_ne_zero u)))
+    (by
+      refine LinearMap.ext fun v => Subtype.ext ?_
+      rw [LinearMap.id_apply, LinearMap.comp_apply, rotLin_coe, rotLin_coe, ← conjEndo_mul,
+        mul_inv_cancel₀ (coe_unitary_ne_zero u), conjEndo_one])
+    (by
+      refine LinearMap.ext fun v => Subtype.ext ?_
+      rw [LinearMap.id_apply, LinearMap.comp_apply, rotLin_coe, rotLin_coe, ← conjEndo_mul,
+        inv_mul_cancel₀ (coe_unitary_ne_zero u), conjEndo_one])
+
+/-- The underlying quaternion of `rotEquiv u v` is `α v α⁻¹` with `α = ↑u`. -/
+lemma rotEquiv_coe_apply (u : unitary (Quaternion ℝ))
+    (v : skewAdjoint.submodule ℝ (Quaternion ℝ)) :
+    (↑(rotEquiv u v) : Quaternion ℝ) = (↑u : Quaternion ℝ) * ↑v * (↑u)⁻¹ := by
+  simp only [rotEquiv, LinearEquiv.ofLinear_apply, rotLin_coe, conjEndo_apply]
+
+/-- The *adjoint representation* (Voight (2.4.13)): the group homomorphism
+`ℍ¹ → Aut(ℍ⁰)` sending a unit quaternion `α` to conjugation
+`ρ_α : v ↦ α v α⁻¹`, an `ℝ`-linear automorphism of the pure quaternions `ℍ⁰`. -/
+noncomputable def adjoint :
+    unitary (Quaternion ℝ) →*
+      (skewAdjoint.submodule ℝ (Quaternion ℝ) ≃ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ)) where
+  toFun := rotEquiv
+  map_one' := by
+    refine LinearEquiv.ext fun v => Subtype.ext ?_
+    show (↑(rotEquiv 1 v) : Quaternion ℝ) = ↑v
+    rw [rotEquiv_coe_apply, OneMemClass.coe_one, inv_one, mul_one, one_mul]
+  map_mul' u w := by
+    refine LinearEquiv.ext fun v => Subtype.ext ?_
+    show (↑(rotEquiv (u * w) v) : Quaternion ℝ) = ↑(rotEquiv u (rotEquiv w v))
+    simp only [rotEquiv_coe_apply, Submonoid.coe_mul, mul_inv_rev]
+    noncomm_ring
 
 /-- The standard pure-quaternion frame `i, j, k`. -/
 def frame : Fin 3 → Quaternion ℝ :=

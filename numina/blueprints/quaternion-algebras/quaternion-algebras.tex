@@ -236,23 +236,37 @@ $\bar\alpha = \alpha$).
     (2); and $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (3).
 \end{proof}
 
+\begin{lemma}[The unit quaternions form a group]
+    \label{lem:unit-group}
+    \lean{QuaternionAlgebras.unitQuaternionsGroup,
+      QuaternionAlgebras.mem_unitary_iff_normSq}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanok
+    The unit quaternions $\mathbb{H}^1 = \{\alpha : \lVert\alpha\rVert^2 = 1\}$ are
+    exactly Mathlib's unitary group $\operatorname{unitary}(\mathbb{H})$ (since
+    $\alpha\bar\alpha = \lVert\alpha\rVert^2$, the condition
+    $\bar\alpha\alpha = \alpha\bar\alpha = 1$ is $\lVert\alpha\rVert^2 = 1$), and so
+    form a group under multiplication, with $\alpha^{-1} = \bar\alpha$.
+\end{lemma}
+
 \begin{definition}[Adjoint representation]
     \label{def:adjoint}
     \lean{QuaternionAlgebras.adjoint}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:pure-properties}
+    \uses{lem:pure-properties, lem:unit-group}
     \leanok
-    The \emph{adjoint representation} (Voight~(2.4.13)) of a nonzero quaternion
-    $\alpha$ is the $\mathbb{R}$-linear endomorphism $\rho_\alpha$ of the pure
-    quaternions $\mathbb{H}^0$ given by conjugation,
+    The \emph{adjoint representation} (Voight~(2.4.13)) is the group homomorphism
     \[
-      \rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0, \qquad
-      v \mapsto \alpha\,v\,\alpha^{-1}.
+      \operatorname{adjoint} \colon \mathbb{H}^1 \to \operatorname{Aut}(\mathbb{H}^0),
+      \qquad
+      \alpha \mapsto \rho_\alpha, \qquad
+      \rho_\alpha \colon v \mapsto \alpha\,v\,\alpha^{-1},
     \]
-    The assignment $\alpha \mapsto \rho_\alpha$ is well defined because conjugation
-    preserves $\mathbb{H}^0$ (it fixes the real part); that for $\alpha \in
-    \mathbb{H}^1$ it lands in $\mathrm{SO}(3)$, giving a group homomorphism, is
-    \ref{prop:rotation} and \ref{cor:cover}.
+    sending a unit quaternion $\alpha$ to conjugation, an $\mathbb{R}$-linear
+    automorphism $\rho_\alpha$ of the pure quaternions $\mathbb{H}^0$ (with inverse
+    $\rho_{\alpha^{-1}}$). It is a homomorphism since
+    $\rho_{\alpha\beta} = \rho_\alpha \circ \rho_\beta$ and $\rho_1 = \mathrm{id}$;
+    that its image lands in $\mathrm{SO}(3)$ is \ref{prop:rotation} and \ref{cor:cover}.
 \end{definition}
 
 \begin{proposition}[Conjugation acts by rotations]
