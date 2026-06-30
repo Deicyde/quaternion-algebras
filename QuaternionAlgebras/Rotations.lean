@@ -38,20 +38,28 @@ is exactly the vanishing of the real part. -/
 /-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
 for pure `v` one has `v² = -normSq v ≤ 0`. -/
 lemma pure_square (v : Quaternion ℝ) :
-    v.re = 0 ↔ v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by
+    v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ) ↔
+      v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by
+  rw [mem_skewAdjoint_submodule_iff]
   simpa using (Quaternion.sq_eq_neg_normSq (a := v)).symm
 
 /-- Real part of a product of pure quaternions: minus the dot product. -/
-lemma pure_product_re (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+lemma pure_product_re (v w : Quaternion ℝ)
+    (hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
+    (hw : w ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) :
     (v * w).re = -(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK) := by
+  rw [mem_skewAdjoint_submodule_iff] at hv hw
   rw [Quaternion.re_mul, hv, hw]
   ring
 
 /-- Imaginary part of a product of pure quaternions: the cross product. -/
-lemma pure_product_im (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+lemma pure_product_im (v w : Quaternion ℝ)
+    (hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
+    (hw : w ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) :
     (v * w).imI = v.imJ * w.imK - v.imK * w.imJ ∧
       (v * w).imJ = v.imK * w.imI - v.imI * w.imK ∧
       (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+  rw [mem_skewAdjoint_submodule_iff] at hv hw
   have hI : (v * w).imI = v.imJ * w.imK - v.imK * w.imJ := by
     rw [Quaternion.imI_mul, hv, hw]
     ring
@@ -65,7 +73,9 @@ lemma pure_product_im (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
 
 /-- Product of pure quaternions: `vw = -(v·w) + (v×w)`, with the dot product as
 the real part and the cross product as the (pure) imaginary part. -/
-lemma pure_product (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+lemma pure_product (v w : Quaternion ℝ)
+    (hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
+    (hw : w ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) :
     v * w =
       (⟨-(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK),
         v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
@@ -76,7 +86,9 @@ lemma pure_product (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
-lemma pure_orthogonal (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+lemma pure_orthogonal (v w : Quaternion ℝ)
+    (hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
+    (hw : w ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) :
     ((v * w).re = 0 ↔ v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) ∧
       (w * v = -(v * w) ↔
         v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) := by sorry
@@ -114,7 +126,8 @@ noncomputable def conjEndo (α : Quaternion ℝ) : Quaternion ℝ →ₗ[ℝ] Qu
 
 /-- Conjugation preserves purity: for `α ≠ 0` and pure `v`, `α v α⁻¹` is pure. -/
 lemma conj_preserves_pure (α : Quaternion ℝ) (hα : α ≠ 0) (v : Quaternion ℝ)
-    (hv : v.re = 0) : (conjEndo α v).re = 0 := by
+    (hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) : (conjEndo α v).re = 0 := by
+  rw [mem_skewAdjoint_submodule_iff] at hv
   -- The real part of a quaternion product is symmetric: re (x * y) = re (y * x).
   have hcyc : ∀ x y : Quaternion ℝ, (x * y).re = (y * x).re := by
     intro x y; simp only [Quaternion.re_mul]; ring
@@ -150,7 +163,7 @@ lemma conj_preserves_norm (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
 noncomputable def rotLin (α : Quaternion ℝ) (hα : α ≠ 0) :
     skewAdjoint.submodule ℝ (Quaternion ℝ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ) :=
   (conjEndo α).restrict (fun v hv => by
-    rw [mem_skewAdjoint_submodule_iff] at hv ⊢
+    rw [mem_skewAdjoint_submodule_iff]
     exact conj_preserves_pure α hα v hv)
 
 /-- The standard pure-quaternion frame `i, j, k`. -/
@@ -166,7 +179,7 @@ noncomputable def rotMatrix (α : Quaternion ℝ) : Matrix (Fin 3) (Fin 3) ℝ :
 
 /-- `ρ_α` is orthogonal: for `normSq α = 1` it preserves the norm on `ℍ⁰`. -/
 lemma rotation_orthogonal (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
-    (v : Quaternion ℝ) (hv : v.re = 0) :
+    (v : Quaternion ℝ) (_hv : v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ)) :
     Quaternion.normSq (conjEndo α v) = Quaternion.normSq v :=
   conj_preserves_norm α hα v
 
@@ -183,7 +196,8 @@ theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
 /-- Kernel of the rotation map: if `α ∈ ℍ¹` fixes every pure quaternion under
 conjugation, then `α = ±1`. -/
 lemma rotation_kernel (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
-    (h : ∀ v : Quaternion ℝ, v.re = 0 → conjEndo α v = v) :
+    (h : ∀ v : Quaternion ℝ, v ∈ skewAdjoint.submodule ℝ (Quaternion ℝ) →
+      conjEndo α v = v) :
     α = 1 ∨ α = -1 := by sorry
 
 /-- Axis and angle of an `SO(3)` element: every `A ∈ SO(3)` has a unit axis `u`
@@ -196,7 +210,8 @@ lemma so3_axis_angle (A : Matrix (Fin 3) (Fin 3) ℝ)
 
 /-- Conjugation fixes its axis: for a unit pure quaternion `u` and `θ ∈ ℝ`, with
 `α = cos θ + (sin θ) u ∈ ℍ¹`, one has `ρ_α(u) = u`. -/
-lemma rotation_fixes_axis (u : Quaternion ℝ) (hu : u.re = 0)
+lemma rotation_fixes_axis (u : Quaternion ℝ)
+    (hu : u ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
     (hu1 : Quaternion.normSq u = 1) (θ : ℝ) :
     conjEndo (((Real.cos θ : ℝ) : Quaternion ℝ) + (Real.sin θ) • u) u = u := by sorry
 
@@ -204,7 +219,9 @@ lemma rotation_fixes_axis (u : Quaternion ℝ) (hu : u.re = 0)
 unit pure `w` orthogonal to `u`,
 `ρ_α(w) = (cos 2θ) w + (sin 2θ) (u × w)` (where `u × w = u w` for orthogonal
 pure `u, w`). -/
-lemma rotation_on_perp (u w : Quaternion ℝ) (hu : u.re = 0) (hw : w.re = 0)
+lemma rotation_on_perp (u w : Quaternion ℝ)
+    (hu : u ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
+    (hw : w ∈ skewAdjoint.submodule ℝ (Quaternion ℝ))
     (hu1 : Quaternion.normSq u = 1) (hw1 : Quaternion.normSq w = 1)
     (horth : u.imI * w.imI + u.imJ * w.imJ + u.imK * w.imK = 0) (θ : ℝ) :
     conjEndo (((Real.cos θ : ℝ) : Quaternion ℝ) + (Real.sin θ) • u) w =
