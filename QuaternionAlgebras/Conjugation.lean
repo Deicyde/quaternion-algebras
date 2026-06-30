@@ -5,7 +5,10 @@ import Mathlib
 
 We work with the real Hamiltonians `ℍ = Quaternion ℝ = ℍ[ℝ, -1, 0, -1]`.  The
 standard involution is `star`, the squared norm is `Quaternion.normSq`, and the
-pure (imaginary) quaternions form the `ℝ`-submodule `Hpure`.
+pure (imaginary) quaternions are the skew-adjoint elements
+`skewAdjoint.submodule ℝ (Quaternion ℝ)` (those with `star α = -α`), while the
+real quaternions are the self-adjoint elements `selfAdjoint.submodule ℝ
+(Quaternion ℝ)`.
 -/
 
 namespace QuaternionAlgebras
@@ -32,21 +35,12 @@ lemma normSq_mul (α β : Quaternion ℝ) :
     Quaternion.normSq (α * β) = Quaternion.normSq α * Quaternion.normSq β :=
   map_mul Quaternion.normSq α β
 
-/-- The `ℝ`-submodule `ℍ⁰ = ℝi + ℝj + ℝk ≅ ℝ³` of pure (imaginary) quaternions,
-i.e. those whose real part vanishes. -/
-def Hpure : Submodule ℝ (Quaternion ℝ) where
-  carrier := {q | q.re = 0}
-  add_mem' := by
-    intro a b ha hb
-    simp only [Set.mem_setOf_eq] at ha hb ⊢
-    simp [ha, hb]
-  zero_mem' := by
-    simp only [Set.mem_setOf_eq]
-    simp
-  smul_mem' := by
-    intro c a ha
-    simp only [Set.mem_setOf_eq] at ha ⊢
-    simp [ha]
+/-- Membership in the pure quaternions `skewAdjoint.submodule ℝ (Quaternion ℝ)`
+is exactly the vanishing of the real part. -/
+@[simp] lemma mem_skewAdjoint_submodule_iff (q : Quaternion ℝ) :
+    q ∈ skewAdjoint.submodule ℝ (Quaternion ℝ) ↔ q.re = 0 := by
+  rw [← Quaternion.star_eq_neg]
+  exact skewAdjoint.mem_iff
 
 /-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
 for pure `v` one has `v² = -normSq v ≤ 0`. -/

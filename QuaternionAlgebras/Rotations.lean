@@ -23,7 +23,8 @@ open scoped Quaternion
 `v₁ i + v₂ j + v₃ k ↦ (v₁, v₂, v₃)` is a linear isometric equivalence
 `ℍ⁰ ≃ₗᵢ EuclideanSpace ℝ (Fin 3)` (for which `i, j, k` is an orthonormal
 basis). -/
-noncomputable def pureCoord : Hpure ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 3) where
+noncomputable def pureCoord :
+    skewAdjoint.submodule ℝ (Quaternion ℝ) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 3) where
   toFun v := (WithLp.equiv 2 (Fin 3 → ℝ)).symm ![v.1.imI, v.1.imJ, v.1.imK]
   map_add' := by sorry
   map_smul' := by sorry
@@ -34,7 +35,8 @@ noncomputable def pureCoord : Hpure ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 3) where
   right_inv := by sorry
 
 /-- The coordinate map `ℍ⁰ → EuclideanSpace ℝ (Fin 3)` is a linear isometry. -/
-noncomputable def pureEuclid : Hpure ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3) where
+noncomputable def pureEuclid :
+    skewAdjoint.submodule ℝ (Quaternion ℝ) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3) where
   toLinearEquiv := pureCoord
   norm_map' := by sorry
 
@@ -83,8 +85,11 @@ lemma conj_preserves_norm (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
 
 /-- Conjugation is `ℝ`-linear on the pure quaternions: for `α ≠ 0`, the map
 `ρ_α : v ↦ α v α⁻¹` restricts to an `ℝ`-linear endomorphism of `ℍ⁰`. -/
-noncomputable def rotLin (α : Quaternion ℝ) (hα : α ≠ 0) : Hpure →ₗ[ℝ] Hpure :=
-  (conjEndo α).restrict (fun v hv => conj_preserves_pure α hα v hv)
+noncomputable def rotLin (α : Quaternion ℝ) (hα : α ≠ 0) :
+    skewAdjoint.submodule ℝ (Quaternion ℝ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Quaternion ℝ) :=
+  (conjEndo α).restrict (fun v hv => by
+    rw [mem_skewAdjoint_submodule_iff] at hv ⊢
+    exact conj_preserves_pure α hα v hv)
 
 /-- The standard pure-quaternion frame `i, j, k`. -/
 def frame : Fin 3 → Quaternion ℝ :=

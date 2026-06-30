@@ -193,13 +193,18 @@ is multiplicative: $\lVert\alpha\beta\rVert^2 = \lVert\alpha\rVert^2\lVert\beta\
 
 \begin{definition}[Pure (imaginary) quaternion]
     \label{def:pure}
-    \lean{QuaternionAlgebras.Hpure}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \lean{skewAdjoint.submodule}
+    \leanfile{Mathlib/Algebra/Star/Module.lean}
     \uses{def:conjugation}
     \leanok
     A quaternion $\alpha$ is \emph{pure} (imaginary) if its real part vanishes,
-    equivalently $\bar\alpha = -\alpha$. The pure quaternions form the subspace
-    $\mathbb{H}^0 = \mathbb{R}i + \mathbb{R}j + \mathbb{R}k \cong \mathbb{R}^3$.
+    equivalently $\bar\alpha = -\alpha$, i.e. $\alpha$ is \emph{skew-adjoint} for the
+    standard involution. The pure quaternions are the skew-adjoint submodule
+    $\mathbb{H}^0 = \operatorname{skewAdjoint}(\mathbb{H})
+    = \mathbb{R}i + \mathbb{R}j + \mathbb{R}k \cong \mathbb{R}^3$; dually the
+    \emph{real} quaternions are the self-adjoint submodule
+    $\operatorname{selfAdjoint}(\mathbb{H}) = \mathbb{R} \cong \mathbb{R}$ (those with
+    $\bar\alpha = \alpha$).
 \end{definition}
 
 \begin{lemma}[Square of a pure quaternion]
