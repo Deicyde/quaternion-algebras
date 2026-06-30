@@ -62,6 +62,12 @@ lemma pure_product_re (v w : Quaternion ℝ)
   rw [Quaternion.re_mul, hv, hw]
   ring
 
+/-- The cross product `v × w` of two quaternions, packaged as a pure quaternion
+(real part zero) built from their imaginary parts. -/
+def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
+  ⟨0, v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
+    v.imI * w.imJ - v.imJ * w.imI⟩
+
 /-- Imaginary part of a product of pure quaternions: the cross product. -/
 lemma pure_product_im (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
@@ -87,12 +93,11 @@ lemma pure_product (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
     v * w =
-      (⟨-(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK),
-        v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
-        v.imI * w.imJ - v.imJ * w.imI⟩ : Quaternion ℝ) := by
+      -((v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK : ℝ) : Quaternion ℝ)
+        + crossQuat v w := by
   have hre := pure_product_re v w hv hw
-  have ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
-  ext <;> simp [hre, hI, hJ, hK]
+  obtain ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
+  ext <;> simp [crossQuat, hre, hI, hJ, hK]
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
