@@ -73,24 +73,16 @@ reusing Mathlib's `crossProduct` on their imaginary parts. -/
 def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
   ofImVec (imVec v ⨯₃ imVec w)
 
-/-- Imaginary part of a product of pure quaternions: the cross product. -/
+/-- Imaginary part of a product of pure quaternions is their cross product. -/
 lemma pure_product_im (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
-    (v * w).imI = v.imJ * w.imK - v.imK * w.imJ ∧
-      (v * w).imJ = v.imK * w.imI - v.imI * w.imK ∧
-      (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+    imVec (v * w) = imVec v ⨯₃ imVec w := by
   rw [isSkewAdjoint_iff_re] at hv hw
-  have hI : (v * w).imI = v.imJ * w.imK - v.imK * w.imJ := by
-    rw [Quaternion.imI_mul, hv, hw]
-    ring
-  have hJ : (v * w).imJ = v.imK * w.imI - v.imI * w.imK := by
-    rw [Quaternion.imJ_mul, hv, hw]
-    ring
-  have hK : (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
-    rw [Quaternion.imK_mul, hv, hw]
-    ring
-  exact ⟨hI, hJ, hK⟩
+  funext i
+  fin_cases i <;>
+    simp [imVec, cross_apply, Quaternion.imI_mul, Quaternion.imJ_mul, Quaternion.imK_mul, hv, hw]
+  all_goals ring
 
 /-- Product of pure quaternions: `vw = -(v·w) + (v×w)`, with the dot product as
 the real part and the cross product as the (pure) imaginary part. -/
@@ -100,10 +92,14 @@ lemma pure_product (v w : Quaternion ℝ)
     v * w =
       -((imVec v ⬝ᵥ imVec w : ℝ) : Quaternion ℝ) + crossQuat v w := by
   have hre := pure_product_re v w hv hw
-  obtain ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
+  have him := pure_product_im v w hv hw
+  have h0 := congrFun him 0
+  have h1 := congrFun him 1
+  have h2 := congrFun him 2
+  simp only [imVec, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+    Matrix.cons_val_two, Matrix.tail_cons] at h0 h1 h2
   ext <;>
-    simp [crossQuat, ofImVec, imVec, cross_apply, dotProduct, Fin.sum_univ_three,
-      hre, hI, hJ, hK]
+    simp [crossQuat, ofImVec, imVec, dotProduct, Fin.sum_univ_three, hre, h0, h1, h2]
 
 /-- Orthogonality criteria for pure quaternions:
 (a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
