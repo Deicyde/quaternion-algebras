@@ -1,4 +1,4 @@
-import QuaternionAlgebras.Conjugation
+import Mathlib
 
 /-!
 # Rotations: the double cover `ℍ¹ → SO(3)`
@@ -18,6 +18,68 @@ not available in Mathlib, so the corresponding statements
 namespace QuaternionAlgebras
 
 open scoped Quaternion
+
+/-- The real scalar action commutes with conjugation, making `Quaternion ℝ` a
+star module over `ℝ`. -/
+instance : StarModule ℝ (Quaternion ℝ) := ⟨fun r x => by ext <;> simp⟩
+
+/-- Multiplicativity of the norm: `normSq (α β) = normSq α * normSq β`. -/
+lemma normSq_mul (α β : Quaternion ℝ) :
+    Quaternion.normSq (α * β) = Quaternion.normSq α * Quaternion.normSq β :=
+  map_mul Quaternion.normSq α β
+
+/-- Membership in the pure quaternions `skewAdjoint.submodule ℝ (Quaternion ℝ)`
+is exactly the vanishing of the real part. -/
+@[simp] lemma mem_skewAdjoint_submodule_iff (q : Quaternion ℝ) :
+    q ∈ skewAdjoint.submodule ℝ (Quaternion ℝ) ↔ q.re = 0 := by
+  rw [← Quaternion.star_eq_neg]
+  exact skewAdjoint.mem_iff
+
+/-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
+for pure `v` one has `v² = -normSq v ≤ 0`. -/
+lemma pure_square (v : Quaternion ℝ) :
+    v.re = 0 ↔ v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by
+  simpa using (Quaternion.sq_eq_neg_normSq (a := v)).symm
+
+/-- Real part of a product of pure quaternions: minus the dot product. -/
+lemma pure_product_re (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+    (v * w).re = -(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK) := by
+  rw [Quaternion.re_mul, hv, hw]
+  ring
+
+/-- Imaginary part of a product of pure quaternions: the cross product. -/
+lemma pure_product_im (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+    (v * w).imI = v.imJ * w.imK - v.imK * w.imJ ∧
+      (v * w).imJ = v.imK * w.imI - v.imI * w.imK ∧
+      (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+  have hI : (v * w).imI = v.imJ * w.imK - v.imK * w.imJ := by
+    rw [Quaternion.imI_mul, hv, hw]
+    ring
+  have hJ : (v * w).imJ = v.imK * w.imI - v.imI * w.imK := by
+    rw [Quaternion.imJ_mul, hv, hw]
+    ring
+  have hK : (v * w).imK = v.imI * w.imJ - v.imJ * w.imI := by
+    rw [Quaternion.imK_mul, hv, hw]
+    ring
+  exact ⟨hI, hJ, hK⟩
+
+/-- Product of pure quaternions: `vw = -(v·w) + (v×w)`, with the dot product as
+the real part and the cross product as the (pure) imaginary part. -/
+lemma pure_product (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+    v * w =
+      (⟨-(v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK),
+        v.imJ * w.imK - v.imK * w.imJ, v.imK * w.imI - v.imI * w.imK,
+        v.imI * w.imJ - v.imJ * w.imI⟩ : Quaternion ℝ) := by
+  have hre := pure_product_re v w hv hw
+  have ⟨hI, hJ, hK⟩ := pure_product_im v w hv hw
+  ext <;> simp [hre, hI, hJ, hK]
+
+/-- Orthogonality criteria for pure quaternions:
+(a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
+lemma pure_orthogonal (v w : Quaternion ℝ) (hv : v.re = 0) (hw : w.re = 0) :
+    ((v * w).re = 0 ↔ v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) ∧
+      (w * v = -(v * w) ↔
+        v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) := by sorry
 
 /-- Euclidean structure on the pure quaternions: the coordinate map
 `v₁ i + v₂ j + v₃ k ↦ (v₁, v₂, v₃)` is a linear isometric equivalence

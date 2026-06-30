@@ -198,7 +198,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Square of a pure quaternion]
     \label{lem:pure-square}
     \lean{QuaternionAlgebras.pure_square}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \leanok
     A quaternion $v$ is pure if and only if $v^2 = -\lVert v\rVert^2$. In particular
     for pure $v$, $v^2 = -\lVert v\rVert^2 \in \mathbb{R}_{\le 0}$.
@@ -211,7 +211,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Product of pure quaternions]
     \label{lem:pure-product}
     \lean{QuaternionAlgebras.pure_product}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \leanok
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
@@ -232,7 +232,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Orthogonality criteria for pure quaternions]
     \label{lem:pure-orthogonal}
     \lean{QuaternionAlgebras.pure_orthogonal}
-    \leanfile{QuaternionAlgebras/Conjugation.lean}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:pure-product}
     For pure quaternions $v, w$:
     (a) $vw$ is pure if and only if $v, w$ are orthogonal;

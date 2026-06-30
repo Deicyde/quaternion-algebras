@@ -1,5 +1,4 @@
 import QuaternionAlgebras.Basic
 import QuaternionAlgebras.Beginnings
 import QuaternionAlgebras.Matrix
-import QuaternionAlgebras.Conjugation
 import QuaternionAlgebras.Rotations
