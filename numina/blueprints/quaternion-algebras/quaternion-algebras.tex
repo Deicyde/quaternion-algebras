@@ -236,6 +236,25 @@ $\bar\alpha = \alpha$).
     (2); and $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (3).
 \end{proof}
 
+\begin{definition}[Axis of a unit quaternion]
+    \label{def:axis}
+    \lean{QuaternionAlgebras.axis}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{lem:pure-properties}
+    \leanok
+    The \emph{axis} $I(\alpha)$ of a quaternion (Voight~(2.4.16)) is the normalized
+    pure part
+    \[
+      I(\alpha) := \frac{xi + yj + zk}{\lVert xi + yj + zk\rVert}, \qquad
+      \alpha = t + xi + yj + zk.
+    \]
+    For $\alpha \in \mathbb{H}^1 \setminus \{\pm 1\}$ there is a unique
+    $\theta \in (0, \pi)$ with $\cos\theta = t$ and
+    $\alpha = \cos\theta + (\sin\theta)\,I(\alpha)$; then $I(\alpha)$ is pure with
+    $\lVert I(\alpha)\rVert = 1$ and $I(\alpha)^2 = -1$, the axis about which
+    $\rho_\alpha$ rotates.
+\end{definition}
+
 \begin{definition}[Adjoint representation]
     \label{def:adjoint}
     \lean{QuaternionAlgebras.adjoint}

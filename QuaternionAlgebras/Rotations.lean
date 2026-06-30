@@ -128,6 +128,27 @@ lemma pure_anticomm_iff (v w : Quaternion ℝ)
   · rintro ⟨h, -, -, -⟩; linear_combination (-1 / 2 : ℝ) * h
   · intro h; exact ⟨by linear_combination -2 * h, by ring, by ring, by ring⟩
 
+/-- The *axis* `I(α)` of a quaternion (Voight (2.4.16)): the normalized pure part
+`(xi + yj + zk)/‖xi + yj + zk‖`.  For `α ∈ ℍ¹ \ {±1}`, writing
+`α = cos θ + (sin θ) I(α)` with `θ ∈ (0, π)` and `cos θ = α.re`, this is the unit
+pure quaternion (`‖I(α)‖ = 1`, `I(α)² = -1`) about which `ρ_α` rotates. -/
+noncomputable def axis (α : Quaternion ℝ) : Quaternion ℝ :=
+  ‖ofImVec (imVec α)‖⁻¹ • ofImVec (imVec α)
+
+/-- The axis is a pure quaternion: its real part vanishes. -/
+@[simp] lemma axis_re (α : Quaternion ℝ) : (axis α).re = 0 := by
+  simp [axis, ofImVec]
+
+/-- The axis is skew-adjoint, i.e. lies in `ℍ⁰`. -/
+lemma axis_isSkewAdjoint (α : Quaternion ℝ) : (axis α).IsSkewAdjoint := by
+  rw [isSkewAdjoint_iff_re, axis_re]
+
+/-- For `α` with nonzero pure part (e.g. `α ∈ ℍ¹ \ {±1}`), the axis is a unit
+vector: `‖I(α)‖ = 1`. -/
+lemma axis_norm (α : Quaternion ℝ) (h : ofImVec (imVec α) ≠ 0) :
+    ‖axis α‖ = 1 := by
+  simpa [axis] using norm_smul_inv_norm (𝕜 := ℝ) h
+
 /-- Euclidean structure on the pure quaternions: the coordinate map
 `v₁ i + v₂ j + v₃ k ↦ (v₁, v₂, v₃)` is a linear isometric equivalence
 `ℍ⁰ ≃ₗᵢ EuclideanSpace ℝ (Fin 3)` (for which `i, j, k` is an orthonormal
