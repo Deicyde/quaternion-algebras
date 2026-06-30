@@ -23,15 +23,15 @@ open scoped Quaternion Matrix RealInnerProductSpace
 star module over `ℝ`. -/
 instance : StarModule ℝ (Quaternion ℝ) := ⟨fun r x => by ext <;> simp⟩
 
-/-- An element of a star additive group is *skew-adjoint* when `star x = -x`.
-Mathlib ships `IsSelfAdjoint` but leaves `IsSkewAdjoint` as a TODO, so we
-introduce it here, mirroring `IsSelfAdjoint`. -/
-def IsSkewAdjoint {R : Type*} [Neg R] [Star R] (x : R) : Prop := star x = -x
+/-- A quaternion is *skew-adjoint* when `star q = -q`. Mathlib ships
+`IsSelfAdjoint` but leaves `IsSkewAdjoint` as a TODO, so we introduce it here, in
+the `Quaternion` namespace so that dot notation `q.IsSkewAdjoint` is available. -/
+def _root_.Quaternion.IsSkewAdjoint (q : Quaternion ℝ) : Prop := star q = -q
 
 /-- For real quaternions, skew-adjointness is exactly the vanishing of the real
 part. -/
 @[simp] lemma isSkewAdjoint_iff_re (q : Quaternion ℝ) :
-    IsSkewAdjoint q ↔ q.re = 0 := Quaternion.star_eq_neg
+    q.IsSkewAdjoint ↔ q.re = 0 := Quaternion.star_eq_neg
 
 /-- Multiplicativity of the norm: `normSq (α β) = normSq α * normSq β`. -/
 lemma normSq_mul (α β : Quaternion ℝ) :
@@ -48,7 +48,7 @@ is exactly the vanishing of the real part. -/
 /-- Square of a pure quaternion: `v` is pure iff `v² = -normSq v`.  In particular
 for pure `v` one has `v² = -normSq v ≤ 0`. -/
 lemma pure_square (v : Quaternion ℝ) :
-    IsSkewAdjoint v ↔
+    v.IsSkewAdjoint ↔
       v ^ 2 = -((Quaternion.normSq v : ℝ) : Quaternion ℝ) := by
   rw [isSkewAdjoint_iff_re]
   simpa using (Quaternion.sq_eq_neg_normSq (a := v)).symm
@@ -56,8 +56,8 @@ lemma pure_square (v : Quaternion ℝ) :
 /-- Real part of a product of pure quaternions: minus their inner product (the
 standard Euclidean dot product on `ℍ`). Only `w` needs to be pure. -/
 lemma pure_product_re (v w : Quaternion ℝ)
-    (_hv : IsSkewAdjoint v)
-    (hw : IsSkewAdjoint w) :
+    (_hv : v.IsSkewAdjoint)
+    (hw : w.IsSkewAdjoint) :
     (v * w).re = -⟪v, w⟫ := by
   have hwstar : star w = -w := Quaternion.star_eq_neg.mpr ((isSkewAdjoint_iff_re w).mp hw)
   rw [Quaternion.inner_def, hwstar, mul_neg]
@@ -76,8 +76,8 @@ def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
 
 /-- Imaginary part of a product of pure quaternions is their cross product. -/
 lemma pure_product_im (v w : Quaternion ℝ)
-    (hv : IsSkewAdjoint v)
-    (hw : IsSkewAdjoint w) :
+    (hv : v.IsSkewAdjoint)
+    (hw : w.IsSkewAdjoint) :
     imVec (v * w) = imVec v ⨯₃ imVec w := by
   rw [isSkewAdjoint_iff_re] at hv hw
   funext i
@@ -88,8 +88,8 @@ lemma pure_product_im (v w : Quaternion ℝ)
 /-- Product of pure quaternions: `vw = -(v·w) + (v×w)`, with the dot product as
 the real part and the cross product as the (pure) imaginary part. -/
 lemma pure_product (v w : Quaternion ℝ)
-    (hv : IsSkewAdjoint v)
-    (hw : IsSkewAdjoint w) :
+    (hv : v.IsSkewAdjoint)
+    (hw : w.IsSkewAdjoint) :
     v * w = -((⟪v, w⟫ : ℝ) : Quaternion ℝ) + crossQuat v w := by
   have hre := pure_product_re v w hv hw
   have him := pure_product_im v w hv hw
@@ -101,30 +101,32 @@ lemma pure_product (v w : Quaternion ℝ)
   ext <;>
     simp [crossQuat, ofImVec, imVec, hre, h0, h1, h2]
 
-/-- Orthogonality criteria for pure quaternions:
-(a) `vw` is pure iff `v ⟂ w`; (b) `wv = -vw` iff `v ⟂ w`. -/
-lemma pure_orthogonal (v w : Quaternion ℝ)
-    (hv : IsSkewAdjoint v)
-    (hw : IsSkewAdjoint w) :
-    ((v * w).re = 0 ↔ ⟪v, w⟫ = 0) ∧ (w * v = -(v * w) ↔ ⟪v, w⟫ = 0) := by
+/-- Orthogonality criterion (a): the product of two pure quaternions is again
+pure (skew-adjoint) iff they are orthogonal. -/
+lemma pure_mul_isSkewAdjoint_iff (v w : Quaternion ℝ)
+    (hv : v.IsSkewAdjoint) (hw : w.IsSkewAdjoint) :
+    (v * w).IsSkewAdjoint ↔ ⟪v, w⟫ = 0 := by
+  rw [isSkewAdjoint_iff_re, pure_product_re v w hv hw, neg_eq_zero]
+
+/-- Orthogonality criterion (b): two pure quaternions anticommute
+(`wv = -vw`) iff they are orthogonal. -/
+lemma pure_anticomm_iff (v w : Quaternion ℝ)
+    (hv : v.IsSkewAdjoint) (hw : w.IsSkewAdjoint) :
+    w * v = -(v * w) ↔ ⟪v, w⟫ = 0 := by
   have hvre : v.re = 0 := (isSkewAdjoint_iff_re v).mp hv
   have hwre : w.re = 0 := (isSkewAdjoint_iff_re w).mp hw
-  have hre := pure_product_re v w hv hw
   have hdot : (⟪v, w⟫ : ℝ) = v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK := by
-    have h := hre
+    have h := pure_product_re v w hv hw
     rw [Quaternion.re_mul, hvre, hwre, zero_mul] at h
     linarith
-  refine ⟨?_, ?_⟩
-  · -- (a) the real part of `vw` vanishes iff `⟪v, w⟫ = 0`
-    rw [hre, neg_eq_zero]
-  · -- (b) `wv = -vw` iff `⟪v, w⟫ = 0`: the imaginary (cross) parts always cancel,
-    -- so the equation reduces to the real-part (dot-product) condition.
-    rw [hdot, eq_neg_iff_add_eq_zero, Quaternion.ext_iff]
-    simp [Quaternion.re_mul, Quaternion.imI_mul, Quaternion.imJ_mul, Quaternion.imK_mul,
-      hvre, hwre]
-    constructor
-    · rintro ⟨h, -, -, -⟩; linear_combination (-1 / 2 : ℝ) * h
-    · intro h; exact ⟨by linear_combination -2 * h, by ring, by ring, by ring⟩
+  -- The imaginary (cross) parts always cancel, so the equation reduces to the
+  -- real-part (dot-product) condition.
+  rw [hdot, eq_neg_iff_add_eq_zero, Quaternion.ext_iff]
+  simp [Quaternion.re_mul, Quaternion.imI_mul, Quaternion.imJ_mul, Quaternion.imK_mul,
+    hvre, hwre]
+  constructor
+  · rintro ⟨h, -, -, -⟩; linear_combination (-1 / 2 : ℝ) * h
+  · intro h; exact ⟨by linear_combination -2 * h, by ring, by ring, by ring⟩
 
 /-- Euclidean structure on the pure quaternions: the coordinate map
 `v₁ i + v₂ j + v₃ k ↦ (v₁, v₂, v₃)` is a linear isometric equivalence
@@ -159,7 +161,7 @@ noncomputable def conjEndo (α : Quaternion ℝ) : Quaternion ℝ →ₗ[ℝ] Qu
 
 /-- Conjugation preserves purity: for `α ≠ 0` and pure `v`, `α v α⁻¹` is pure. -/
 lemma conj_preserves_pure (α : Quaternion ℝ) (hα : α ≠ 0) (v : Quaternion ℝ)
-    (hv : IsSkewAdjoint v) : (conjEndo α v).re = 0 := by
+    (hv : v.IsSkewAdjoint) : (conjEndo α v).re = 0 := by
   rw [isSkewAdjoint_iff_re] at hv
   -- The real part of a quaternion product is symmetric: re (x * y) = re (y * x).
   have hcyc : ∀ x y : Quaternion ℝ, (x * y).re = (y * x).re := by
@@ -212,7 +214,7 @@ noncomputable def rotMatrix (α : Quaternion ℝ) : Matrix (Fin 3) (Fin 3) ℝ :
 
 /-- `ρ_α` is orthogonal: for `normSq α = 1` it preserves the norm on `ℍ⁰`. -/
 lemma rotation_orthogonal (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
-    (v : Quaternion ℝ) (_hv : IsSkewAdjoint v) :
+    (v : Quaternion ℝ) (_hv : v.IsSkewAdjoint) :
     Quaternion.normSq (conjEndo α v) = Quaternion.normSq v :=
   conj_preserves_norm α hα v
 
@@ -229,7 +231,7 @@ theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
 /-- Kernel of the rotation map: if `α ∈ ℍ¹` fixes every pure quaternion under
 conjugation, then `α = ±1`. -/
 lemma rotation_kernel (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
-    (h : ∀ v : Quaternion ℝ, IsSkewAdjoint v → conjEndo α v = v) :
+    (h : ∀ v : Quaternion ℝ, v.IsSkewAdjoint → conjEndo α v = v) :
     α = 1 ∨ α = -1 := by sorry
 
 /-- Axis and angle of an `SO(3)` element: every `A ∈ SO(3)` has a unit axis `u`
@@ -243,7 +245,7 @@ lemma so3_axis_angle (A : Matrix (Fin 3) (Fin 3) ℝ)
 /-- Conjugation fixes its axis: for a unit pure quaternion `u` and `θ ∈ ℝ`, with
 `α = cos θ + (sin θ) u ∈ ℍ¹`, one has `ρ_α(u) = u`. -/
 lemma rotation_fixes_axis (u : Quaternion ℝ)
-    (hu : IsSkewAdjoint u)
+    (hu : u.IsSkewAdjoint)
     (hu1 : Quaternion.normSq u = 1) (θ : ℝ) :
     conjEndo (((Real.cos θ : ℝ) : Quaternion ℝ) + (Real.sin θ) • u) u = u := by sorry
 
@@ -252,8 +254,8 @@ unit pure `w` orthogonal to `u`,
 `ρ_α(w) = (cos 2θ) w + (sin 2θ) (u × w)` (where `u × w = u w` for orthogonal
 pure `u, w`). -/
 lemma rotation_on_perp (u w : Quaternion ℝ)
-    (hu : IsSkewAdjoint u)
-    (hw : IsSkewAdjoint w)
+    (hu : u.IsSkewAdjoint)
+    (hw : w.IsSkewAdjoint)
     (hu1 : Quaternion.normSq u = 1) (hw1 : Quaternion.normSq w = 1)
     (horth : u.imI * w.imI + u.imJ * w.imJ + u.imK * w.imK = 0) (θ : ℝ) :
     conjEndo (((Real.cos θ : ℝ) : Quaternion ℝ) + (Real.sin θ) • u) w =

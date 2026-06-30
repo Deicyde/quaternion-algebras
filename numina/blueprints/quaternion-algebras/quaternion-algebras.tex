@@ -229,29 +229,42 @@ $\bar\alpha = \alpha$).
     $v^2 = -\operatorname{normSq} v \iff v.\mathrm{re} = 0$.
 \end{proof}
 
-\begin{lemma}[Orthogonality criteria for pure quaternions]
+\begin{lemma}[Orthogonality criterion: product of pure quaternions]
     \label{lem:pure-orthogonal}
-    \lean{QuaternionAlgebras.pure_orthogonal}
+    \lean{QuaternionAlgebras.pure_mul_isSkewAdjoint_iff}
     \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{lem:pure-product}
     \leanok
-    For pure quaternions $v, w$:
-    (a) $vw$ is pure if and only if $v, w$ are orthogonal;
-    (b) $wv = -vw$ if and only if $v, w$ are orthogonal.
+    For pure quaternions $v, w$, the product $vw$ is pure if and only if $v, w$
+    are orthogonal.
+\end{lemma}
+\begin{proof}
+    \uses{lem:pure-product}
+    By \ref{lem:pure-product}, $vw = -(v\cdot w) + v\times w$, so the real part of
+    $vw$ is $-(v\cdot w)$, which vanishes iff $v\cdot w = 0$.
+\end{proof}
+
+\begin{lemma}[Orthogonality criterion: anticommutation of pure quaternions]
+    \label{lem:pure-anticomm}
+    \lean{QuaternionAlgebras.pure_anticomm_iff}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{lem:pure-product}
+    \leanok
+    For pure quaternions $v, w$, one has $wv = -vw$ if and only if $v, w$ are
+    orthogonal.
 \end{lemma}
 \begin{proof}
     \uses{lem:pure-product}
     By \ref{lem:pure-product}, $vw = -(v\cdot w) + v\times w$ and
-    $wv = -(v\cdot w) - v\times w$ (the cross product is antisymmetric). Thus the
-    real part of $vw$ is $-(v\cdot w)$, vanishing iff $v\cdot w = 0$, giving (a); and
-    $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (b).
+    $wv = -(v\cdot w) - v\times w$ (the cross product is antisymmetric), so
+    $wv + vw = -2(v\cdot w)$; hence $wv = -vw$ iff $v\cdot w = 0$.
 \end{proof}
 
 \begin{proposition}[Conjugation acts by rotations]
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:pure-square, lem:pure-orthogonal}
+    \uses{lem:pure-square, lem:pure-orthogonal, lem:pure-anticomm}
     For $\alpha \in \mathbb{H}^1$, the conjugation map
     $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$, $v \mapsto \alpha v\alpha^{-1}$,
     is a well-defined $\mathbb{R}$-linear map lying in $\mathrm{SO}(3)$; writing
@@ -259,14 +272,14 @@ $\bar\alpha = \alpha$).
     $\rho_\alpha$ is the rotation by $2\theta$ about the axis $u$.
 \end{proposition}
 \begin{proof}
-    \uses{lem:pure-square, lem:pure-orthogonal}
+    \uses{lem:pure-square, lem:pure-orthogonal, lem:pure-anticomm}
     Conjugation is $\mathbb{R}$-linear and preserves $\mathbb{H}^0$ (it preserves
     the real part) and the norm, since
     $\lVert\alpha v\alpha^{-1}\rVert^2 = \lVert v\rVert^2$ for $\alpha \in \mathbb{H}^1$;
     thus its matrix in the orthonormal basis $i, j, k$ is orthogonal. Writing
     $\alpha = \cos\theta + (\sin\theta)u$ with $u^2 = -1$ (\ref{lem:pure-square}) and
     choosing a unit pure $w \perp u$ (so $uw = u\times w$ and $wu = -uw$ by
-    \ref{lem:pure-orthogonal}), the double-angle formulas give $\rho_\alpha(u) = u$
+    \ref{lem:pure-anticomm}), the double-angle formulas give $\rho_\alpha(u) = u$
     and $\rho_\alpha(w) = (\cos 2\theta)w + (\sin 2\theta)(u\times w)$, the rotation
     by $2\theta$ about $u$. In particular $\det\rho_\alpha = 1$, so
     $\rho_\alpha \in \mathrm{SO}(3)$.
