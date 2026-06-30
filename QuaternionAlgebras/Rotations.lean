@@ -106,9 +106,25 @@ lemma pure_product (v w : Quaternion ℝ)
 lemma pure_orthogonal (v w : Quaternion ℝ)
     (hv : IsSkewAdjoint v)
     (hw : IsSkewAdjoint w) :
-    ((v * w).re = 0 ↔ v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) ∧
-      (w * v = -(v * w) ↔
-        v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK = 0) := by sorry
+    ((v * w).re = 0 ↔ ⟪v, w⟫ = 0) ∧ (w * v = -(v * w) ↔ ⟪v, w⟫ = 0) := by
+  have hvre : v.re = 0 := (isSkewAdjoint_iff_re v).mp hv
+  have hwre : w.re = 0 := (isSkewAdjoint_iff_re w).mp hw
+  have hre := pure_product_re v w hv hw
+  have hdot : (⟪v, w⟫ : ℝ) = v.imI * w.imI + v.imJ * w.imJ + v.imK * w.imK := by
+    have h := hre
+    rw [Quaternion.re_mul, hvre, hwre, zero_mul] at h
+    linarith
+  refine ⟨?_, ?_⟩
+  · -- (a) the real part of `vw` vanishes iff `⟪v, w⟫ = 0`
+    rw [hre, neg_eq_zero]
+  · -- (b) `wv = -vw` iff `⟪v, w⟫ = 0`: the imaginary (cross) parts always cancel,
+    -- so the equation reduces to the real-part (dot-product) condition.
+    rw [hdot, eq_neg_iff_add_eq_zero, Quaternion.ext_iff]
+    simp [Quaternion.re_mul, Quaternion.imI_mul, Quaternion.imJ_mul, Quaternion.imK_mul,
+      hvre, hwre]
+    constructor
+    · rintro ⟨h, -, -, -⟩; linear_combination (-1 / 2 : ℝ) * h
+    · intro h; exact ⟨by linear_combination -2 * h, by ring, by ring, by ring⟩
 
 /-- Euclidean structure on the pure quaternions: the coordinate map
 `v₁ i + v₂ j + v₃ k ↦ (v₁, v₂, v₃)` is a linear isometric equivalence
