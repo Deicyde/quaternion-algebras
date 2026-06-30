@@ -74,12 +74,14 @@ reusing Mathlib's `crossProduct` on their imaginary parts. -/
 def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
   ofImVec (imVec v ⨯₃ imVec w)
 
-/-- Imaginary part of a product of pure quaternions is their cross product. -/
+/-- Pure part of a product of pure quaternions is their cross product, packaged
+as a pure quaternion. -/
 lemma pure_product_im (v w : Quaternion ℝ)
     (hv : v.IsSkewAdjoint)
     (hw : w.IsSkewAdjoint) :
-    imVec (v * w) = imVec v ⨯₃ imVec w := by
+    ofImVec (imVec (v * w)) = ofImVec (imVec v ⨯₃ imVec w) := by
   rw [isSkewAdjoint_iff_re] at hv hw
+  congr 1
   funext i
   fin_cases i <;>
     simp [imVec, cross_apply, Quaternion.imI_mul, Quaternion.imJ_mul, Quaternion.imK_mul, hv, hw]
@@ -93,13 +95,9 @@ lemma pure_product (v w : Quaternion ℝ)
     v * w = -((⟪v, w⟫ : ℝ) : Quaternion ℝ) + crossQuat v w := by
   have hre := pure_product_re v w hv hw
   have him := pure_product_im v w hv hw
-  have h0 := congrFun him 0
-  have h1 := congrFun him 1
-  have h2 := congrFun him 2
-  simp only [imVec, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-    Matrix.cons_val_two, Matrix.tail_cons] at h0 h1 h2
-  ext <;>
-    simp [crossQuat, ofImVec, imVec, hre, h0, h1, h2]
+  unfold crossQuat
+  rw [← him]
+  ext <;> simp [ofImVec, imVec, hre]
 
 /-- Orthogonality criterion (a): the product of two pure quaternions is again
 pure (skew-adjoint) iff they are orthogonal. -/
