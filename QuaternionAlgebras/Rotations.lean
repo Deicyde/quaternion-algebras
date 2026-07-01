@@ -316,9 +316,39 @@ noncomputable def adjoint :
     simp only [rotEquiv_coe_apply, Submonoid.coe_mul, mul_inv_rev]
     noncomm_ring
 
+/-- Coordinate isomorphism `ℍ⁰ ≃ₗ ℝ³` sending a pure quaternion to its imaginary
+part `(v₁, v₂, v₃)`. -/
+def pureFin : skewAdjoint.submodule ℝ (Quaternion ℝ) ≃ₗ[ℝ] (Fin 3 → ℝ) where
+  toFun v := imVec ↑v
+  map_add' v w := by funext i; fin_cases i <;> simp [imVec]
+  map_smul' r v := by funext i; fin_cases i <;> simp [imVec]
+  invFun u := ⟨ofImVec u, by rw [mem_skewAdjoint_submodule_iff]; simp [ofImVec]⟩
+  left_inv v := by
+    apply Subtype.ext
+    have hv : (v : Quaternion ℝ).re = 0 := (mem_skewAdjoint_submodule_iff _).mp v.2
+    ext <;> simp [imVec, ofImVec, hv]
+  right_inv u := by funext i; fin_cases i <;> simp [imVec, ofImVec]
+
+/-- The coordinate basis `i, j, k` of `ℍ⁰`, as `Basis.ofEquivFun pureFin`. -/
+noncomputable def pureBasis : Module.Basis (Fin 3) ℝ (skewAdjoint.submodule ℝ (Quaternion ℝ)) :=
+  Module.Basis.ofEquivFun pureFin
+
 /-- The standard pure-quaternion frame `i, j, k`. -/
 def frame : Fin 3 → Quaternion ℝ :=
   ![⟨0, 1, 0, 0⟩, ⟨0, 0, 1, 0⟩, ⟨0, 0, 0, 1⟩]
+
+/-- The `j`-th coordinate basis vector of `ℍ⁰` is the `j`-th frame quaternion. -/
+lemma pureBasis_coe (j : Fin 3) : (pureBasis j : Quaternion ℝ) = frame j := by
+  have key : pureFin (pureBasis j) = imVec (frame j) := by
+    funext i
+    simp only [pureBasis]
+    rw [← Module.Basis.ofEquivFun_repr_apply, Module.Basis.repr_self]
+    fin_cases j <;> fin_cases i <;> simp [imVec, frame]
+  have h2 : pureBasis j = pureFin.symm (imVec (frame j)) := by
+    rw [← key, LinearEquiv.symm_apply_apply]
+  rw [h2]
+  show ofImVec (imVec (frame j)) = frame j
+  fin_cases j <;> simp [ofImVec, imVec, frame]
 
 /-- The `3 × 3` matrix of `ρ_α : v ↦ α v α⁻¹` in the orthonormal basis
 `i, j, k` of `ℍ⁰`. -/
@@ -356,9 +386,9 @@ lemma rotMatrix_eq (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
       Quaternion.imK_star] <;>
     ring
 
-/-- Conjugation acts by rotations (Voight 2.4.18): for `α ∈ ℍ¹`, the matrix of
-`ρ_α : v ↦ α v α⁻¹` in the orthonormal frame `i, j, k` lies in `SO(3)`. -/
-theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
+/-- Computational core of Voight 2.4.18: the explicit rotation matrix of a unit
+quaternion lies in `SO(3)`. -/
+lemma rotMatrix_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
     rotMatrix α ∈ Matrix.specialOrthogonalGroup (Fin 3) ℝ := by
   have hn : α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2 = 1 := by
     rw [← Quaternion.normSq_def']; exact hα
@@ -377,6 +407,32 @@ theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
       Matrix.cons_val_fin_one, Matrix.head_fin_const]
     linear_combination ((α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2) ^ 2 +
       (α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2) + 1) * hn
+
+/-- The natural isomorphism `(ℍ⁰ →ₗ ℍ⁰) ≃ M₃(ℝ)` (the matrix in the `i, j, k`
+basis) carries the adjoint action `adjoint u` of a unit `u` to the rotation matrix
+of `↑u`. -/
+lemma adjoint_toMatrix (u : unitary (Quaternion ℝ)) :
+    LinearMap.toMatrix pureBasis pureBasis (adjoint u).toLinearMap = rotMatrix ↑u := by
+  have hrepr : ∀ (x : skewAdjoint.submodule ℝ (Quaternion ℝ)) (i : Fin 3),
+      (pureBasis.repr x) i = imVec (↑x) i := by
+    intro x i; simp only [pureBasis, Module.Basis.ofEquivFun_repr_apply]; rfl
+  ext i j
+  rw [LinearMap.toMatrix_apply, hrepr]
+  have hx : (↑((adjoint u).toLinearMap (pureBasis j)) : Quaternion ℝ)
+      = conjEndo ↑u (frame j) := by
+    show (↑(rotEquiv u (pureBasis j)) : Quaternion ℝ) = conjEndo ↑u (frame j)
+    rw [rotEquiv_coe_apply, pureBasis_coe, conjEndo_apply]
+  rw [hx]
+  simp [rotMatrix, imVec]
+
+/-- Conjugation acts by rotations (Voight 2.4.18): for a unit quaternion
+`u ∈ ℍ¹ = unitary ℍ`, the matrix of the adjoint action `adjoint u` in the
+orthonormal frame `i, j, k` lies in `SO(3)`. -/
+theorem rotation_mem_so (u : unitary (Quaternion ℝ)) :
+    LinearMap.toMatrix pureBasis pureBasis (adjoint u).toLinearMap ∈
+      Matrix.specialOrthogonalGroup (Fin 3) ℝ := by
+  rw [adjoint_toMatrix]
+  exact rotMatrix_mem_so ↑u ((mem_unitary_iff_normSq _).mp u.2)
 
 /-- Kernel of the rotation map: if `α ∈ ℍ¹` fixes every pure quaternion under
 conjugation, then `α = ±1`. -/
