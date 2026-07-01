@@ -236,6 +236,16 @@ $\bar\alpha = \alpha$).
     (2); and $wv + vw = -2(v\cdot w)$, so $wv = -vw$ iff $v\cdot w = 0$, giving (3).
 \end{proof}
 
+\begin{definition}[Rotation angle]
+    \label{def:rot-angle}
+    \lean{QuaternionAlgebras.rotAngle}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanok
+    The \emph{rotation angle} of a unit quaternion $\alpha \in \mathbb{H}^1$ is
+    $\theta := \arccos(\operatorname{Re}\alpha) \in [0, \pi]$ (Voight~(2.4.16)), so
+    that $\alpha = \cos\theta + (\sin\theta)I(\alpha)$.
+\end{definition}
+
 \begin{definition}[Axis of a unit quaternion]
     \label{def:axis}
     \lean{QuaternionAlgebras.axis}
@@ -278,10 +288,9 @@ $\bar\alpha = \alpha$).
 \begin{proposition}[Conjugation acts by rotations]
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so,
-      QuaternionAlgebras.rotAngle,
       QuaternionAlgebras.rotation_trace}
     \leanfile{QuaternionAlgebras/Rotations.lean}
-    \uses{lem:pure-properties, def:axis}
+    \uses{lem:pure-properties, def:axis, def:rot-angle}
     \leanok
     For $\alpha \in \mathbb{H}^1$, the conjugation map
     $\rho_\alpha \colon \mathbb{H}^0 \to \mathbb{H}^0$, $v \mapsto \alpha v\alpha^{-1}$,
