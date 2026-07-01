@@ -301,6 +301,28 @@ $\bar\alpha = \alpha$).
     $\rho_\alpha \in \mathrm{SO}(3)$.
 \end{proof}
 
+\begin{lemma}[Rotation angle]
+    \label{lem:rotation-angle}
+    \lean{QuaternionAlgebras.rotAngle, QuaternionAlgebras.rotation_trace}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{prop:rotation, def:axis}
+    \leanok
+    For $\alpha \in \mathbb{H}^1$ set $\theta := \arccos(\operatorname{Re}\alpha)
+    \in [0, \pi]$ (Voight~(2.4.16)). Then $\rho_\alpha$ is the rotation by the angle
+    $2\theta$ about $I(\alpha)$; concretely its $\mathrm{SO}(3)$ matrix has trace
+    \[
+      \operatorname{tr}(\rho_\alpha) = 1 + 2\cos 2\theta = 4(\operatorname{Re}\alpha)^2 - 1,
+    \]
+    which determines the rotation angle $2\theta$.
+\end{lemma}
+\begin{proof}
+    \uses{prop:rotation}
+    In the $i, j, k$ basis the diagonal of the rotation matrix
+    (\ref{prop:rotation}) sums to $3t^2 - x^2 - y^2 - z^2 = 4t^2 - 1$ using
+    $t^2 + x^2 + y^2 + z^2 = 1$; and $1 + 2\cos 2\theta = 1 + 2(2t^2 - 1) = 4t^2 - 1$
+    since $\cos\theta = t = \operatorname{Re}\alpha$.
+\end{proof}
+
 \begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
     \label{cor:cover}
     \lean{QuaternionAlgebras.double_cover}

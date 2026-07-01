@@ -434,6 +434,33 @@ theorem rotation_mem_so (u : unitary (Quaternion ℝ)) :
   rw [adjoint_toMatrix]
   exact rotMatrix_mem_so ↑u ((mem_unitary_iff_normSq _).mp u.2)
 
+/-- The rotation angle of a unit quaternion: `θ = arccos(Re α)` (Voight (2.4.16),
+so that `α = cos θ + (sin θ) I(α)` with `θ ∈ [0, π]`). -/
+noncomputable def rotAngle (α : Quaternion ℝ) : ℝ := Real.arccos α.re
+
+/-- The adjoint action of `u ∈ ℍ¹` rotates `ℍ⁰ ≅ ℝ³` by the angle `2θ`, where
+`θ = arccos(Re u)` (Voight 2.4.18): its `SO(3)` matrix has trace
+`1 + 2 cos 2θ`, which pins down the rotation angle. -/
+theorem rotation_trace (u : unitary (Quaternion ℝ)) :
+    Matrix.trace (LinearMap.toMatrix pureBasis pureBasis (adjoint u).toLinearMap) =
+      1 + 2 * Real.cos (2 * rotAngle ↑u) := by
+  have hα : Quaternion.normSq (↑u : Quaternion ℝ) = 1 := (mem_unitary_iff_normSq _).mp u.2
+  have hn : (↑u : Quaternion ℝ).re ^ 2 + (↑u : Quaternion ℝ).imI ^ 2
+      + (↑u : Quaternion ℝ).imJ ^ 2 + (↑u : Quaternion ℝ).imK ^ 2 = 1 := by
+    rw [← Quaternion.normSq_def']; exact hα
+  have hle1 : -1 ≤ (↑u : Quaternion ℝ).re := by
+    nlinarith [sq_nonneg (↑u : Quaternion ℝ).imI, sq_nonneg (↑u : Quaternion ℝ).imJ,
+      sq_nonneg (↑u : Quaternion ℝ).imK, sq_nonneg ((↑u : Quaternion ℝ).re + 1)]
+  have hle2 : (↑u : Quaternion ℝ).re ≤ 1 := by
+    nlinarith [sq_nonneg (↑u : Quaternion ℝ).imI, sq_nonneg (↑u : Quaternion ℝ).imJ,
+      sq_nonneg (↑u : Quaternion ℝ).imK, sq_nonneg ((↑u : Quaternion ℝ).re - 1)]
+  rw [adjoint_toMatrix, rotMatrix_eq ↑u hα, Matrix.trace_fin_three, rotAngle,
+    Real.cos_two_mul, Real.cos_arccos hle1 hle2]
+  simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons, Matrix.empty_val',
+    Matrix.cons_val_fin_one, Matrix.head_fin_const]
+  linear_combination -hn
+
 /-- Kernel of the rotation map: if `α ∈ ℍ¹` fixes every pure quaternion under
 conjugation, then `α = ±1`. -/
 lemma rotation_kernel (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1)
