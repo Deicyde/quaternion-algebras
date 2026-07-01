@@ -442,8 +442,9 @@ noncomputable def rotAngle (α : Quaternion ℝ) : ℝ := Real.arccos α.re
 `θ = arccos(Re u)` (Voight 2.4.18): its `SO(3)` matrix has trace
 `1 + 2 cos 2θ`, which pins down the rotation angle. -/
 theorem rotation_trace (u : unitary (Quaternion ℝ)) :
-    Matrix.trace (LinearMap.toMatrix pureBasis pureBasis (adjoint u).toLinearMap) =
+    LinearMap.trace ℝ _ (adjoint u).toLinearMap =
       1 + 2 * Real.cos (2 * rotAngle ↑u) := by
+  rw [LinearMap.trace_eq_matrix_trace ℝ pureBasis]
   have hα : Quaternion.normSq (↑u : Quaternion ℝ) = 1 := (mem_unitary_iff_normSq _).mp u.2
   have hn : (↑u : Quaternion ℝ).re ^ 2 + (↑u : Quaternion ℝ).imI ^ 2
       + (↑u : Quaternion ℝ).imJ ^ 2 + (↑u : Quaternion ℝ).imK ^ 2 = 1 := by
