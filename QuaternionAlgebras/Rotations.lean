@@ -264,6 +264,13 @@ lemma conjEndo_mul (α β v : Quaternion ℝ) :
   simp only [conjEndo_apply, mul_inv_rev]
   noncomm_ring
 
+/-- For a unit quaternion `α⁻¹ = star α`, so conjugation is `v ↦ α v \barα`. -/
+lemma conjEndo_star (α v : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
+    conjEndo α v = α * v * star α := by
+  have hinv : α⁻¹ = star α :=
+    inv_eq_of_mul_eq_one_right (by rw [Quaternion.self_mul_star, hα, Quaternion.coe_one])
+  rw [conjEndo_apply, hinv]
+
 /-- The underlying quaternion of `rotLin α hα x` is `conjEndo α x`. -/
 lemma rotLin_coe (α : Quaternion ℝ) (hα : α ≠ 0)
     (x : skewAdjoint.submodule ℝ (Quaternion ℝ)) :
@@ -331,10 +338,47 @@ is `1` for `α ∈ ℍ¹`. -/
 lemma rotation_det (α : Quaternion ℝ) :
     (rotMatrix α).det = (Quaternion.normSq α) ^ 3 := by sorry
 
-/-- Conjugation acts by rotations: for `α ∈ ℍ¹`, the matrix of `ρ_α` lies in
-`SO(3)`. -/
+set_option maxHeartbeats 1600000 in
+/-- Explicit matrix of `ρ_α` for a unit quaternion `α = t + xi + yj + zk`
+(Voight (2.4.20), general form): the standard quaternion rotation matrix. -/
+lemma rotMatrix_eq (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
+    rotMatrix α = !![
+      α.re ^ 2 + α.imI ^ 2 - α.imJ ^ 2 - α.imK ^ 2,
+        2 * (α.imI * α.imJ - α.re * α.imK), 2 * (α.imI * α.imK + α.re * α.imJ);
+      2 * (α.imI * α.imJ + α.re * α.imK),
+        α.re ^ 2 - α.imI ^ 2 + α.imJ ^ 2 - α.imK ^ 2, 2 * (α.imJ * α.imK - α.re * α.imI);
+      2 * (α.imI * α.imK - α.re * α.imJ),
+        2 * (α.imJ * α.imK + α.re * α.imI), α.re ^ 2 - α.imI ^ 2 - α.imJ ^ 2 + α.imK ^ 2] := by
+  have hc : ∀ v, conjEndo α v = α * v * star α := fun v => conjEndo_star α v hα
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [rotMatrix, frame, hc, Quaternion.re_mul, Quaternion.imI_mul, Quaternion.imJ_mul,
+      Quaternion.imK_mul, Quaternion.re_star, Quaternion.imI_star, Quaternion.imJ_star,
+      Quaternion.imK_star] <;>
+    ring
+
+set_option maxHeartbeats 1600000 in
+/-- Conjugation acts by rotations (Voight 2.4.18): for `α ∈ ℍ¹`, the matrix of
+`ρ_α : v ↦ α v α⁻¹` in the orthonormal frame `i, j, k` lies in `SO(3)`. -/
 theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
-    rotMatrix α ∈ Matrix.specialOrthogonalGroup (Fin 3) ℝ := by sorry
+    rotMatrix α ∈ Matrix.specialOrthogonalGroup (Fin 3) ℝ := by
+  have hn : α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2 = 1 := by
+    rw [← Quaternion.normSq_def']; exact hα
+  rw [Matrix.mem_specialOrthogonalGroup_iff, rotMatrix_eq α hα]
+  refine ⟨?_, ?_⟩
+  · rw [Matrix.mem_orthogonalGroup_iff]
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [Matrix.mul_apply, Matrix.transpose_apply, Fin.sum_univ_three] <;>
+      (first
+        | linear_combination (α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2 + 1) * hn
+        | ring)
+  · rw [Matrix.det_fin_three]
+    simp only [Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons, Matrix.empty_val',
+      Matrix.cons_val_fin_one, Matrix.head_fin_const]
+    linear_combination ((α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2) ^ 2 +
+      (α.re ^ 2 + α.imI ^ 2 + α.imJ ^ 2 + α.imK ^ 2) + 1) * hn
 
 /-- Kernel of the rotation map: if `α ∈ ℍ¹` fixes every pure quaternion under
 conjugation, then `α = ±1`. -/
