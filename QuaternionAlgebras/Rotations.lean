@@ -69,6 +69,10 @@ def imVec (v : Quaternion ℝ) : Fin 3 → ℝ := ![v.imI, v.imJ, v.imK]
 /-- The pure quaternion whose imaginary part is a given vector of `ℝ³`. -/
 def ofImVec (u : Fin 3 → ℝ) : Quaternion ℝ := ⟨0, u 0, u 1, u 2⟩
 
+/-- The *pure part* `xi + yj + zk` of a quaternion `α = t + xi + yj + zk`, i.e. the
+projection onto `ℍ⁰` obtained by discarding the real part. -/
+def purePart (α : Quaternion ℝ) : Quaternion ℝ := ofImVec (imVec α)
+
 /-- The cross product `v × w` of two quaternions, packaged as a pure quaternion,
 reusing Mathlib's `crossProduct` on their imaginary parts. -/
 def crossQuat (v w : Quaternion ℝ) : Quaternion ℝ :=
@@ -133,11 +137,11 @@ lemma pure_anticomm_iff (v w : Quaternion ℝ)
 `α = cos θ + (sin θ) I(α)` with `θ ∈ (0, π)` and `cos θ = α.re`, this is the unit
 pure quaternion (`‖I(α)‖ = 1`, `I(α)² = -1`) about which `ρ_α` rotates. -/
 noncomputable def axis (α : Quaternion ℝ) : Quaternion ℝ :=
-  ‖ofImVec (imVec α)‖⁻¹ • ofImVec (imVec α)
+  ‖purePart α‖⁻¹ • purePart α
 
 /-- The axis is a pure quaternion: its real part vanishes. -/
 @[simp] lemma axis_re (α : Quaternion ℝ) : (axis α).re = 0 := by
-  simp [axis, ofImVec]
+  simp [axis, purePart, ofImVec]
 
 /-- The axis is skew-adjoint, i.e. lies in `ℍ⁰`. -/
 lemma axis_isSkewAdjoint (α : Quaternion ℝ) : (axis α).IsSkewAdjoint := by
@@ -145,7 +149,7 @@ lemma axis_isSkewAdjoint (α : Quaternion ℝ) : (axis α).IsSkewAdjoint := by
 
 /-- For `α` with nonzero pure part (e.g. `α ∈ ℍ¹ \ {±1}`), the axis is a unit
 vector: `‖I(α)‖ = 1`. -/
-lemma axis_norm (α : Quaternion ℝ) (h : ofImVec (imVec α) ≠ 0) :
+lemma axis_norm (α : Quaternion ℝ) (h : purePart α ≠ 0) :
     ‖axis α‖ = 1 := by
   simpa [axis] using norm_smul_inv_norm (𝕜 := ℝ) h
 
