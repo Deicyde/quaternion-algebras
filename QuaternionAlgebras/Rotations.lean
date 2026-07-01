@@ -338,7 +338,6 @@ is `1` for `α ∈ ℍ¹`. -/
 lemma rotation_det (α : Quaternion ℝ) :
     (rotMatrix α).det = (Quaternion.normSq α) ^ 3 := by sorry
 
-set_option maxHeartbeats 1600000 in
 /-- Explicit matrix of `ρ_α` for a unit quaternion `α = t + xi + yj + zk`
 (Voight (2.4.20), general form): the standard quaternion rotation matrix. -/
 lemma rotMatrix_eq (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
@@ -357,7 +356,6 @@ lemma rotMatrix_eq (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
       Quaternion.imK_star] <;>
     ring
 
-set_option maxHeartbeats 1600000 in
 /-- Conjugation acts by rotations (Voight 2.4.18): for `α ∈ ℍ¹`, the matrix of
 `ρ_α : v ↦ α v α⁻¹` in the orthonormal frame `i, j, k` lies in `SO(3)`. -/
 theorem rotation_mem_so (α : Quaternion ℝ) (hα : Quaternion.normSq α = 1) :
