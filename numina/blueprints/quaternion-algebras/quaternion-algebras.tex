@@ -318,20 +318,64 @@ $\bar\alpha = \alpha$).
     $2\theta$ about $I(\alpha)$.
 \end{proof}
 
-\begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
-    \label{cor:cover}
-    \lean{QuaternionAlgebras.double_cover}
+\begin{lemma}[Surjectivity of the rotation map]
+    \label{lem:rotation-surjective}
+    \lean{QuaternionAlgebras.rotation_surjective}
     \leanfile{QuaternionAlgebras/Rotations.lean}
     \uses{prop:rotation}
-    The map $\alpha \mapsto \rho_\alpha$ is a surjective group homomorphism
-    $\mathbb{H}^1 \to \mathrm{SO}(3)$ with kernel $\{\pm 1\}$, giving the exact
+    \leanok
+    Every $A \in \mathrm{SO}(3)$ is realized by conjugation: there is a unit
+    quaternion $\alpha$, $\lVert\alpha\rVert^2 = 1$, whose rotation matrix equals
+    $A$. Hence the rotation map $\mathbb{H}^1 \to \mathrm{SO}(3)$ is surjective.
+\end{lemma}
+\begin{proof}
+    \uses{prop:rotation}
+    Following Voight's Exercise~2.15, $A$ fixes a unit axis $u$ (an eigenvector for
+    eigenvalue $1$, since $\det(A - I) = 0$ in odd dimension). Choose a unit
+    $w \perp u$ and write $Aw = a\,w + b\,(u \times w)$ with $a^2 + b^2 = 1$; take
+    $\theta$ with $\cos\theta = a$ and $\sin\theta = b$, and set
+    $\alpha = \cos(\theta/2) + \sin(\theta/2)\,u$. Then $\rho_\alpha$ agrees with
+    $A$ on the orthonormal frame $\{u, w, u\times w\}$ --- on $u$ both fix it, on
+    $w$ by the choice of $\theta$, and on $u\times w$ because both $A$ and
+    $\rho_\alpha$ preserve cross products --- so $\rho_\alpha = A$.
+\end{proof}
+
+\begin{lemma}[Kernel of the rotation map]
+    \label{lem:rotation-kernel}
+    \lean{QuaternionAlgebras.rotation_kernel}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{lem:pure-properties}
+    \leanok
+    If a unit quaternion $\alpha \in \mathbb{H}^1$ fixes every pure quaternion
+    under conjugation (i.e. $\rho_\alpha = \mathrm{id}$ on $\mathbb{H}^0$), then
+    $\alpha = \pm 1$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:pure-properties}
+    If $\alpha$ fixes every pure quaternion under conjugation then $\alpha$
+    commutes with every pure quaternion, hence with all of $\mathbb{H}$; so
+    $\alpha$ is central and therefore real. A real quaternion with
+    $\lVert\alpha\rVert^2 = \alpha^2 = 1$ satisfies $\alpha = \pm 1$.
+\end{proof}
+
+\begin{corollary}[The double cover $\mathbb{H}^1 \to \mathrm{SO}(3)$]
+    \label{cor:cover}
+    \lean{QuaternionAlgebras.rotationHom,
+      QuaternionAlgebras.rotationHom_surjective,
+      QuaternionAlgebras.rotationHom_ker}
+    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \uses{prop:rotation}
+    \leanok
+    The rotation map is a group homomorphism
+    $\rho \colon \mathbb{H}^1 \to \mathrm{SO}(3)$, $\alpha \mapsto \rho_\alpha$,
+    which is surjective and has kernel $\ker\rho = \{\pm 1\}$, giving the exact
     sequence
     \[
       1 \to \{\pm 1\} \to \mathbb{H}^1 \to \mathrm{SO}(3) \to 1.
     \]
 \end{corollary}
 \begin{proof}
-    \uses{prop:rotation}
+    \uses{prop:rotation, lem:rotation-surjective, lem:rotation-kernel}
     The assignment is a homomorphism since
     $\rho_{\alpha\beta} = \rho_\alpha \circ \rho_\beta$, and it lands in
     $\mathrm{SO}(3)$ by \ref{prop:rotation}. It is surjective because every element

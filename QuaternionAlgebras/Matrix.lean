@@ -25,8 +25,7 @@ theorem exists_sqrt (a : F) :
   have hdeg : ((X ^ 2 - C a).map
       (algebraMap F (X ^ 2 - C a).SplittingField)).degree ≠ 0 := by
     rw [degree_map_eq_of_injective (algebraMap F _).injective,
-      degree_X_pow_sub_C (by norm_num) a]
-    norm_num
+      degree_X_pow_sub_C (by norm_num) a]; norm_num
   obtain ⟨s, hs⟩ := hsplit.exists_eval_eq_zero hdeg
   refine ⟨s, ?_⟩
   have h0 : s ^ 2 - algebraMap F (X ^ 2 - C a).SplittingField a = 0 := by
@@ -41,12 +40,10 @@ lemma sqrtA_mul_self :
   (exists_sqrt a).choose_spec
 
 /-- The matrix `I = !![s, 0; 0, -s]` over a ring `K`. -/
-def matI {K : Type*} [Ring K] (s : K) : Matrix (Fin 2) (Fin 2) K :=
-  !![s, 0; 0, -s]
+def matI {K : Type*} [Ring K] (s : K) : Matrix (Fin 2) (Fin 2) K := !![s, 0; 0, -s]
 
 /-- The matrix `J = !![0, b; 1, 0]` over a ring `K`. -/
-def matJ {K : Type*} [Ring K] (b : K) : Matrix (Fin 2) (Fin 2) K :=
-  !![0, b; 1, 0]
+def matJ {K : Type*} [Ring K] (b : K) : Matrix (Fin 2) (Fin 2) K := !![0, b; 1, 0]
 
 /-- Matrix basis relations: with `s² = a`, the matrices `I, J` satisfy
 `I² = a • 1`, `J² = b • 1` and `J I = -(I J)`. -/
@@ -54,46 +51,13 @@ lemma matrix_basis_relations {K : Type*} [CommRing K] (s a b : K) (hs : s * s = 
     matI s * matI s = a • (1 : Matrix (Fin 2) (Fin 2) K) ∧
       matJ b * matJ b = b • (1 : Matrix (Fin 2) (Fin 2) K) ∧
       matJ b * matI s = -(matI s * matJ b) := by
-  have hI : matI s * matI s = a • (1 : Matrix (Fin 2) (Fin 2) K) := by
-    calc
-      matI s * matI s = !![s, 0; 0, -s] * !![s, 0; 0, -s] := rfl
-      _ = !![s*s + 0*0, s*0 + 0*(-s); 0*s + (-s)*0, 0*0 + (-s)*(-s)] := by
-        rw [Matrix.mul_fin_two]
-      _ = !![s*s, 0; 0, s*s] := by
-        simp
-      _ = !![a, 0; 0, a] := by rw [hs]
-      _ = a • !![1, 0; 0, 1] := by
-        ext i j; fin_cases i <;> fin_cases j <;> simp
-      _ = a • (1 : Matrix (Fin 2) (Fin 2) K) := by rw [Matrix.one_fin_two]
-  have hJ : matJ b * matJ b = b • (1 : Matrix (Fin 2) (Fin 2) K) := by
-    calc
-      matJ b * matJ b = !![0, b; 1, 0] * !![0, b; 1, 0] := rfl
-      _ = !![0*0 + b*1, 0*b + b*0; 1*0 + 0*1, 1*b + 0*0] := by
-        rw [Matrix.mul_fin_two]
-      _ = !![b, 0; 0, b] := by
-        simp
-      _ = b • !![1, 0; 0, 1] := by
-        ext i j; fin_cases i <;> fin_cases j <;> simp
-      _ = b • (1 : Matrix (Fin 2) (Fin 2) K) := by rw [Matrix.one_fin_two]
-  have hJI : matJ b * matI s = -(matI s * matJ b) := by
-    calc
-      matJ b * matI s = !![0, b; 1, 0] * !![s, 0; 0, -s] := rfl
-      _ = !![0*s + b*0, 0*0 + b*(-s); 1*s + 0*0, 1*0 + 0*(-s)] := by
-        rw [Matrix.mul_fin_two]
-      _ = !![0, -(b * s); s, 0] := by
-        simp
-      _ = -(!![0, s*b; -s, 0]) := by
-        ext i j; fin_cases i <;> fin_cases j <;> simp [mul_comm b s]
-      _ = -(!![s, 0; 0, -s] * !![0, b; 1, 0]) := by
-        rw [Matrix.mul_fin_two]
-        simp
-      _ = -(matI s * matJ b) := rfl
-  exact ⟨hI, hJ, hJI⟩
+  refine ⟨?_, ?_, ?_⟩ <;>
+    · ext i j
+      fin_cases i <;> fin_cases j <;>
+        simp [matI, matJ, Matrix.one_fin_two, hs, mul_comm s b]
 
-/-- The matrix embedding (Voight 2.3.1), stated constructively: over a field
-extension `K/F` containing a square root `s` of `a`, the explicit `F`-algebra
-homomorphism `(a,b/F) → M₂(K)` sending `i ↦ I`, `j ↦ J`, `k ↦ IJ`, built as the
-lift of the quaternion basis `(I, J, IJ)`. -/
+/-- The matrix embedding (Voight 2.3.1): the `F`-algebra map `(a,b/F) → M₂(K)`,
+`i ↦ I`, `j ↦ J`, `k ↦ IJ`, as the lift of the basis `(I, J, IJ)`. -/
 noncomputable def matrixHom :
     ℍ[F, a, 0, b] →ₐ[F] Matrix (Fin 2) (Fin 2) (X ^ 2 - C a).SplittingField :=
   QuaternionAlgebra.Basis.liftHom
@@ -103,27 +67,16 @@ noncomputable def matrixHom :
       i_mul_i := by
         obtain ⟨hI, _, _⟩ := matrix_basis_relations (sqrtA a)
           (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
-        calc
-          matI (sqrtA a) * matI (sqrtA a)
-              = (algebraMap F _ a) • (1 : Matrix (Fin 2) (Fin 2) _) := hI
-          _ = a • (1 : Matrix (Fin 2) (Fin 2) _) := by simp
-          _ = a • (1 : Matrix (Fin 2) (Fin 2) _) + (0 : F) • matI (sqrtA a) := by simp
+        rw [hI]; simp [algebraMap_smul]
       j_mul_j := by
         obtain ⟨_, hJ, _⟩ := matrix_basis_relations (sqrtA a)
           (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
-        calc
-          matJ (algebraMap F _ b) * matJ (algebraMap F _ b)
-              = (algebraMap F _ b) • (1 : Matrix (Fin 2) (Fin 2) _) := hJ
-          _ = b • (1 : Matrix (Fin 2) (Fin 2) _) := by simp
+        rw [hJ]; simp [algebraMap_smul]
       i_mul_j := rfl
       j_mul_i := by
         obtain ⟨_, _, hJI⟩ := matrix_basis_relations (sqrtA a)
           (algebraMap F _ a) (algebraMap F _ b) (sqrtA_mul_self a)
-        calc
-          matJ (algebraMap F _ b) * matI (sqrtA a)
-              = -(matI (sqrtA a) * matJ (algebraMap F _ b)) := hJI
-          _ = (0 : F) • matJ (algebraMap F _ b)
-              - (matI (sqrtA a) * matJ (algebraMap F _ b)) := by simp }
+        rw [hJI]; simp }
 
 @[simp] lemma matrixHom_gi : matrixHom a b (gi a b) = matI (sqrtA a) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gi]
@@ -132,14 +85,9 @@ noncomputable def matrixHom :
     matrixHom a b (gj a b) = matJ (algebraMap F (X ^ 2 - C a).SplittingField b) := by
   simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gj]
 
-@[simp] lemma matrixHom_gk :
-    matrixHom a b (gk a b)
-      = matI (sqrtA a) * matJ (algebraMap F (X ^ 2 - C a).SplittingField b) := by
-  simp [matrixHom, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gk]
-
-/-- The key injectivity argument: over any field extension `K/F` with a square
-root `s` of `a` (and `a, b ≠ 0`, `char F ≠ 2`), an `F`-algebra map
-`(a,b/F) → M₂(K)` sending the generators to `I` and `J` is injective. -/
+/-- Key injectivity: over a field extension `K/F` with a square root `s` of `a`
+(`a, b ≠ 0`, `char F ≠ 2`), an `F`-algebra map `(a,b/F) → M₂(K)` sending the
+generators to `I`, `J` is injective. -/
 lemma matI_matJ_injective {K : Type*} [Field K] [Algebra F K]
     (ha : a ≠ 0) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) (s : K)
     (hs : s * s = algebraMap F K a)
@@ -149,11 +97,7 @@ lemma matI_matJ_injective {K : Type*} [Field K] [Algebra F K]
   have ρinj : Function.Injective (algebraMap F K) := (algebraMap F K).injective
   have hsne : s ≠ 0 := fun h => ha (ρinj (by rw [map_zero, ← hs, h, mul_zero]))
   have hbne : algebraMap F K b ≠ 0 := by simpa using ρinj.ne hb
-  have h2K : (2 : K) ≠ 0 := by
-    intro h
-    apply htwo
-    apply ρinj
-    rw [map_ofNat, map_zero]; exact h
+  have h2K : (2 : K) ≠ 0 := fun h => htwo (ρinj (by rw [map_ofNat, map_zero]; exact h))
   refine (injective_iff_map_eq_zero φ).2 fun α hα => ?_
   have hk : φ (gk a b) = matI s * matJ (algebraMap F K b) := by
     rw [gk_eq_gi_mul_gj, map_mul, h1, h2]
@@ -172,31 +116,25 @@ lemma matI_matJ_injective {K : Type*} [Field K] [Algebra F K]
     Matrix.cons_val_fin_one, Matrix.zero_apply, smul_zero,
     mul_zero, mul_one, zero_mul, add_zero, zero_add] at h00 h01 h10 h11
   simp only [Algebra.smul_def, mul_one, mul_neg] at h00 h01 h10 h11
-  -- h00 : ρre + ρimI*s = 0 ; h11 : ρre - ρimI*s = 0
-  -- h10 : ρimJ - ρimK*s = 0 ; h01 : ρimJ*ρb + ρimK*(s*ρb) = 0
   have hre : algebraMap F K α.re = 0 := by
     have e : (2 : K) * algebraMap F K α.re = 0 := by linear_combination h00 + h11
     exact (mul_eq_zero.mp e).resolve_left h2K
   have himI : algebraMap F K α.imI = 0 := by
     have e : (2 : K) * (algebraMap F K α.imI * s) = 0 := by linear_combination h00 - h11
-    have e' : algebraMap F K α.imI * s = 0 := (mul_eq_zero.mp e).resolve_left h2K
-    exact (mul_eq_zero.mp e').resolve_right hsne
-  have hsum : algebraMap F K α.imJ + algebraMap F K α.imK * s = 0 := by
-    have e : algebraMap F K b * (algebraMap F K α.imJ + algebraMap F K α.imK * s) = 0 := by
-      linear_combination h01
-    exact (mul_eq_zero.mp e).resolve_left hbne
+    exact (mul_eq_zero.mp ((mul_eq_zero.mp e).resolve_left h2K)).resolve_right hsne
+  have hsum : algebraMap F K α.imJ + algebraMap F K α.imK * s = 0 :=
+    (mul_eq_zero.mp (by linear_combination h01 :
+      algebraMap F K b * (algebraMap F K α.imJ + algebraMap F K α.imK * s) = 0)).resolve_left hbne
   have himJ : algebraMap F K α.imJ = 0 := by
     have e : (2 : K) * algebraMap F K α.imJ = 0 := by linear_combination hsum + h10
     exact (mul_eq_zero.mp e).resolve_left h2K
   have himK : algebraMap F K α.imK = 0 := by
     have e : (2 : K) * (algebraMap F K α.imK * s) = 0 := by linear_combination hsum - h10
-    have e' : algebraMap F K α.imK * s = 0 := (mul_eq_zero.mp e).resolve_left h2K
-    exact (mul_eq_zero.mp e').resolve_right hsne
-  have e1 : α.re = 0 := ρinj (by rw [map_zero]; exact hre)
-  have e2 : α.imI = 0 := ρinj (by rw [map_zero]; exact himI)
-  have e3 : α.imJ = 0 := ρinj (by rw [map_zero]; exact himJ)
-  have e4 : α.imK = 0 := ρinj (by rw [map_zero]; exact himK)
-  apply QuaternionAlgebra.ext <;> simp [e1, e2, e3, e4]
+    exact (mul_eq_zero.mp ((mul_eq_zero.mp e).resolve_left h2K)).resolve_right hsne
+  have mz : (0 : K) = algebraMap F K 0 := (map_zero _).symm
+  apply QuaternionAlgebra.ext <;>
+    simp [ρinj (hre.trans mz), ρinj (himI.trans mz),
+      ρinj (himJ.trans mz), ρinj (himK.trans mz)]
 
 /-- Matrix embedding (Voight 2.3.1): for `a, b ≠ 0` and `char F ≠ 2`, the matrix
 homomorphism `matrixHom` into `M₂(F(√a))` is injective, hence an isomorphism onto
@@ -216,14 +154,10 @@ noncomputable def split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
     { i := matI 1
       j := matJ b
       k := matI 1 * matJ b
-      i_mul_i := by
-        calc matI 1 * matI 1 = (1 : F) • (1 : Matrix (Fin 2) (Fin 2) F) := hI
-          _ = (1 : F) • (1 : Matrix (Fin 2) (Fin 2) F) + (0 : F) • matI 1 := by simp
+      i_mul_i := by rw [hI]; simp
       j_mul_j := hJ
       i_mul_j := rfl
-      j_mul_i := by
-        calc matJ b * matI 1 = -(matI 1 * matJ b) := hJI
-          _ = (0 : F) • matJ b - matI 1 * matJ b := by simp }
+      j_mul_i := by rw [hJI]; simp }
   have h1 : qb.liftHom (gi 1 b) = matI 1 := by
     simp [qb, QuaternionAlgebra.Basis.liftHom_apply, QuaternionAlgebra.Basis.lift, gi]
   have h2 : qb.liftHom (gj 1 b) = matJ (algebraMap F F b) := by
@@ -233,10 +167,9 @@ noncomputable def split_matrix (b : F) (hb : b ≠ 0) (htwo : (2 : F) ≠ 0) :
   have hfin : Module.finrank F ℍ[F, 1, 0, b]
       = Module.finrank F (Matrix (Fin 2) (Fin 2) F) := by
     rw [dim_four, Module.finrank_matrix]; simp
-  have hsurj : Function.Surjective qb.liftHom :=
+  exact AlgEquiv.ofBijective qb.liftHom ⟨hinj,
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-      (f := qb.liftHom.toLinearMap) hfin).mp hinj
-  exact AlgEquiv.ofBijective qb.liftHom ⟨hinj, hsurj⟩
+      (f := qb.liftHom.toLinearMap) hfin).mp hinj⟩
 
 /-! ### The left regular representation over `K = F[i]`
 
@@ -325,12 +258,10 @@ noncomputable def hamiltonToComplex :
       k := matI Complex.I * matJ (-1 : ℂ)
       i_mul_i := by
         rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).1,
-          zero_smul, add_zero, ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]
-        simp
+          zero_smul, add_zero, ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]; simp
       j_mul_j := by
         rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).2.1,
-          ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]
-        simp
+          ← algebraMap_smul ℂ (-1 : ℝ) (1 : Matrix (Fin 2) (Fin 2) ℂ)]; simp
       i_mul_j := rfl
       j_mul_i := by
         rw [(matrix_basis_relations Complex.I (-1 : ℂ) (-1 : ℂ) Complex.I_mul_I).2.2,
@@ -356,8 +287,7 @@ lemma hamiltonToComplex_trace (α : ℍ[ℝ, -1, 0, -1]) :
   rw [hamiltonToComplex_apply, Matrix.trace_fin_two]
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.of_apply,
     Matrix.cons_val', Matrix.empty_val', Matrix.cons_val_fin_one]
-  push_cast
-  ring
+  push_cast; ring
 
 /-- Voight (2.4.7), determinant: the determinant of the matrix embedding is the
 reduced norm `normSq`. -/

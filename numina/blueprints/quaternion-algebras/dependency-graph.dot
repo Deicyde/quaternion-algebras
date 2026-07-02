@@ -1,0 +1,46 @@
+// Dependency graph of the quaternion-algebras blueprint
+// (quaternion-algebras.tex). Nodes are blueprint results; solid edges are
+// statement-level \uses, dashed edges are proof-only \uses.
+// Render: dot -Tsvg dependency-graph.dot -o dependency-graph.svg
+digraph blueprint {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, margin="0.18,0.10"];
+  edge [color="#5f5e5a", arrowsize=0.8];
+
+  // definitions: purple; lemmas: teal; propositions/corollaries: coral
+  qa      [label="Quaternion algebra\nℍ[F, a, 0, b]",                          fillcolor="#eeedfe", color="#534ab7", fontcolor="#26215c"];
+  sgp     [label="Standard generators presentation\nstandard_generators_presentation", fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  membed  [label="Matrix embedding\nmatrixHom_injective",                      fillcolor="#faece7", color="#993c1d", fontcolor="#4a1b0c"];
+  split   [label="Split algebra is M₂(F)\nsplit_matrix",                       fillcolor="#faece7", color="#993c1d", fontcolor="#4a1b0c"];
+  leftreg [label="Left regular representation\nleftRegRepK, leftRegRepK_faithful", fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  hamilton[label="Hamiltonians into M₂(ℂ)\nhamiltonToComplex (+3)",            fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  pprod   [label="Product of pure quaternions\npure_product",                  fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  pprops  [label="Pure quaternion properties\npure_square (+2)",               fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  rotangle[label="Rotation angle\nrotAngle",                                   fillcolor="#eeedfe", color="#534ab7", fontcolor="#26215c"];
+  axis    [label="Axis I(α)\naxis",                                            fillcolor="#eeedfe", color="#534ab7", fontcolor="#26215c"];
+  adjoint [label="Adjoint representation\nadjoint",                            fillcolor="#eeedfe", color="#534ab7", fontcolor="#26215c"];
+  rotation[label="Conjugation acts by rotations\nrotation_mem_so, rotation_trace", fillcolor="#faece7", color="#993c1d", fontcolor="#4a1b0c"];
+  surj    [label="Rotation map is surjective\nrotation_surjective",            fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  kernel  [label="Kernel is {-1, 1}\nrotation_kernel",                         fillcolor="#e1f5ee", color="#0f6e56", fontcolor="#04342c"];
+  cover   [label="Double cover ℍ¹ → SO(3)\nrotationHom, rotationHom_surjective, rotationHom_ker", fillcolor="#faece7", color="#993c1d", fontcolor="#4a1b0c"];
+
+  // Beginnings and matrix representations
+  qa -> sgp;
+  qa -> membed;
+  qa -> leftreg;
+  membed -> split;
+  membed -> hamilton;
+
+  // Rotations
+  pprod -> pprops;
+  pprops -> axis;
+  pprops -> adjoint;
+  pprops -> kernel;
+  pprops -> rotation;
+  axis -> rotation;
+  rotangle -> rotation;
+  rotation -> surj;
+  rotation -> cover;
+  surj -> cover [style=dashed];
+  kernel -> cover [style=dashed];
+}
