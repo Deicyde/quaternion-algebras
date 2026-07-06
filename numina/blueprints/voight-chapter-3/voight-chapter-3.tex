@@ -1,8 +1,895 @@
-% Blueprint: Voight, Chapter 3
+% Blueprint: Involutions (Voight, Quaternion Algebras, Chapter 3)
 % Created by Numina
 
 \begin{document}
 
-% Your blueprint will go here.
+\section{Involutions}
+
+Throughout, $F$ is a (commutative) field and $B$ is an associative $F$-algebra
+with $1 \neq 0$. We follow Voight, \emph{Quaternion Algebras}, Chapter~3. An
+involution is modelled on a \emph{star} operation $\alpha \mapsto \bar\alpha$;
+Voight's conjugation on the quaternion algebra $\left(\frac{a,b}{F}\right) =
+\mathbb{H}[F,a,0,b]$ is Mathlib's \texttt{star}. We write $\iota_F = \mathtt{algebraMap}\,F\,B \colon F \to B$
+for the structure map. In the Lean model the predicate ``$\alpha \in F$'' is
+encoded as the membership $\alpha \in \mathtt{Set.range}\,(\mathtt{algebraMap}\,F\,B)$,
+i.e. $\alpha$ lies in the image of the structure map; we write ``$\alpha \in F$''
+as shorthand for this throughout.
+
+\subsection{Involutions}
+
+\begin{definition}[Involution]
+    \label{def:involution}
+    An \textbf{involution} on $B$ is an $F$-linear map
+    $\overline{\phantom{a}} \colon B \to B$ such that
+    (i) $\overline{1} = 1$;
+    (ii) $\overline{\overline{\alpha}} = \alpha$ for all $\alpha \in B$; and
+    (iii) $\overline{\alpha\beta} = \overline{\beta}\,\overline{\alpha}$ for all
+    $\alpha, \beta \in B$ (it is an anti-automorphism).
+    In the Lean model this is a \texttt{StarRing} structure on $B$ whose
+    \texttt{star} is in addition $F$-linear, i.e. a \texttt{StarModule F B}
+    (equivalently $\overline{\lambda\alpha} = \lambda\overline{\alpha}$ for
+    $\lambda \in F$, $\alpha \in B$); the $F$-linearity of \texttt{star} is part of
+    the data, not something derived from (i)--(iii).
+\end{definition}
+
+\begin{definition}[Standard involution]
+    \label{def:standard-involution}
+    \uses{def:involution}
+    An involution $\overline{\phantom{a}}$ on $B$ is \textbf{standard} if
+    $\alpha\overline{\alpha} \in F$ for all $\alpha \in B$.
+\end{definition}
+
+\begin{lemma}[Trace lands in the base field]
+    \label{lem:trace-in-base}
+    \uses{def:standard-involution}
+    Let $\overline{\phantom{a}}$ be a standard involution on $B$. Then
+    $\alpha + \overline{\alpha} \in F$ for all $\alpha \in B$.
+\end{lemma}
+\begin{proof}
+    \uses{def:standard-involution}
+    Expanding, $(\alpha+1)\overline{(\alpha+1)} = (\alpha+1)(\overline{\alpha}+1)
+    = \alpha\overline{\alpha} + (\alpha + \overline{\alpha}) + 1$. The left side
+    lies in $F$ (standardness applied to $\alpha + 1$), and $\alpha\overline\alpha
+    + 1 \in F$, so the difference $\alpha + \overline{\alpha} \in F$.
+\end{proof}
+
+\begin{lemma}[Conjugate commutes with element]
+    \label{lem:norm-comm}
+    \uses{lem:trace-in-base}
+    Let $\overline{\phantom{a}}$ be a standard involution on $B$. Then
+    $\alpha\overline{\alpha} = \overline{\alpha}\alpha$ for all $\alpha \in B$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:trace-in-base}
+    By \ref{lem:trace-in-base}, $s := \alpha + \overline{\alpha} \in F$ is central,
+    so $s\alpha = \alpha s$, i.e. $(\alpha + \overline{\alpha})\alpha =
+    \alpha(\alpha + \overline{\alpha})$. Cancelling $\alpha^2$ from both sides
+    gives $\overline{\alpha}\alpha = \alpha\overline{\alpha}$.
+\end{proof}
+
+\begin{lemma}[Norm form of a quaternion algebra]
+    \label{lem:quaternion-norm-form}
+    Let $B = \left(\frac{a,b}{F}\right) = \mathbb{H}[F,a,0,b]$ and let
+    $\alpha = t + xi + yj + zij$. Then $\alpha\,\texttt{star}(\alpha) =
+    t^2 - ax^2 - by^2 + abz^2 \in F$, a scalar.
+\end{lemma}
+\begin{proof}
+    Expand $\alpha\,\texttt{star}(\alpha)$ in the standard basis $1, i, j, ij$
+    using $i^2 = a$, $j^2 = b$, $ij = -ji$; the off-diagonal terms cancel and the
+    result is the scalar $t^2 - ax^2 - by^2 + abz^2$ (Mathlib's
+    \texttt{QuaternionAlgebra.self\_mul\_star} normalization of the norm form).
+\end{proof}
+
+\begin{lemma}[Conjugation is a standard involution on a quaternion algebra]
+    \label{lem:quaternion-standard-involution}
+    \uses{def:standard-involution, lem:quaternion-norm-form}
+    Suppose $\operatorname{char} F \neq 2$ and let
+    $B = \left(\frac{a,b}{F}\right) = \mathbb{H}[F,a,0,b]$. The quaternion
+    conjugation $\overline{\phantom{a}} = \texttt{star}$, sending
+    $\alpha = t + xi + yj + zij$ to $t - xi - yj - zij$, is a standard involution.
+\end{lemma}
+\begin{proof}
+    \uses{def:standard-involution, lem:quaternion-norm-form}
+    The map \texttt{star} on $\mathbb{H}[F,a,0,b]$ is $F$-linear, fixes $1$, and is
+    an order-2 anti-automorphism, hence an involution. It is standard because
+    $\alpha\,\overline\alpha \in F$ by \ref{lem:quaternion-norm-form}.
+\end{proof}
+
+\subsection{Reduced trace and reduced norm}
+
+\begin{definition}[Reduced trace]
+    \label{def:reduced-trace}
+    \uses{lem:trace-in-base}
+    For a standard involution on $B$, the \textbf{reduced trace} is the map
+    $\operatorname{trd} \colon B \to F$, $\operatorname{trd}(\alpha) =
+    \alpha + \overline{\alpha}$ (which lands in $F$ by \ref{lem:trace-in-base}).
+\end{definition}
+
+\begin{definition}[Reduced norm]
+    \label{def:reduced-norm}
+    \uses{def:standard-involution}
+    For a standard involution on $B$, the \textbf{reduced norm} is the map
+    $\operatorname{nrd} \colon B \to F$, $\operatorname{nrd}(\alpha) =
+    \alpha\overline{\alpha}$ (which lands in $F$ by standardness).
+\end{definition}
+
+\begin{lemma}[Reduced trace is $F$-linear]
+    \label{lem:trace-linear}
+    \uses{def:reduced-trace}
+    The reduced trace $\operatorname{trd} \colon B \to F$ is $F$-linear.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-trace}
+    The involution $\overline{\phantom{a}}$ is $F$-linear and the identity map is
+    $F$-linear, so their sum $\alpha \mapsto \alpha + \overline{\alpha}$ is
+    $F$-linear; the codomain restricts to $F$ by \ref{lem:trace-in-base}.
+\end{proof}
+
+\begin{lemma}[Reduced norm is multiplicative]
+    \label{lem:norm-mult}
+    \uses{def:reduced-norm, lem:norm-comm}
+    For all $\alpha, \beta \in B$, $\operatorname{nrd}(\alpha\beta) =
+    \operatorname{nrd}(\alpha)\operatorname{nrd}(\beta)$, and
+    $\operatorname{nrd}(1) = 1$.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-norm, lem:norm-comm}
+    Using property (iii), $\operatorname{nrd}(\alpha\beta) =
+    (\alpha\beta)\overline{(\alpha\beta)} = \alpha\beta\,\overline\beta\,
+    \overline\alpha = \alpha\operatorname{nrd}(\beta)\overline\alpha$. Since
+    $\operatorname{nrd}(\beta) \in F$ is central, this equals
+    $\operatorname{nrd}(\beta)\,\alpha\overline\alpha =
+    \operatorname{nrd}(\alpha)\operatorname{nrd}(\beta)$. Also
+    $\operatorname{nrd}(1) = 1\cdot\overline 1 = 1$.
+\end{proof}
+
+\begin{lemma}[Nonzero norm gives a unit]
+    \label{lem:norm-nonzero-imp-unit}
+    \uses{def:reduced-norm, lem:norm-comm}
+    If $n := \operatorname{nrd}(\alpha) \neq 0$, then $\alpha$ is a (two-sided) unit
+    with inverse $n^{-1}\overline{\alpha}$.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-norm, lem:norm-comm}
+    We have $\alpha(n^{-1}\overline\alpha) = n^{-1}(\alpha\overline\alpha) = 1$ and,
+    by \ref{lem:norm-comm}, $(n^{-1}\overline\alpha)\alpha =
+    n^{-1}\overline\alpha\alpha = 1$, so $n^{-1}\overline\alpha$ is a two-sided
+    inverse of $\alpha$.
+\end{proof}
+
+\begin{lemma}[A unit has nonzero norm]
+    \label{lem:unit-imp-norm-nonzero}
+    \uses{def:reduced-norm, lem:norm-mult}
+    If $\alpha \in B$ is a (two-sided) unit then $\operatorname{nrd}(\alpha) \neq 0$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:norm-mult}
+    By \ref{lem:norm-mult}, $\operatorname{nrd}(\alpha)\operatorname{nrd}(\alpha^{-1})
+    = \operatorname{nrd}(\alpha\alpha^{-1}) = \operatorname{nrd}(1) = 1 \neq 0$, so
+    $\operatorname{nrd}(\alpha) \neq 0$.
+\end{proof}
+
+\begin{lemma}[Units are exactly the elements of nonzero reduced norm]
+    \label{lem:unit-iff-norm}
+    \uses{lem:norm-nonzero-imp-unit, lem:unit-imp-norm-nonzero}
+    Suppose $B \neq 0$. Then $\alpha \in B$ is a (two-sided) unit if and only if
+    $\operatorname{nrd}(\alpha) \neq 0$; when $\operatorname{nrd}(\alpha) \neq 0$
+    the inverse is $\operatorname{nrd}(\alpha)^{-1}\overline{\alpha}$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:norm-nonzero-imp-unit, lem:unit-imp-norm-nonzero}
+    The forward direction (and the explicit inverse) is
+    \ref{lem:norm-nonzero-imp-unit}; the converse is
+    \ref{lem:unit-imp-norm-nonzero}.
+\end{proof}
+
+\begin{lemma}[Reduced trace is symmetric on products]
+    \label{lem:trace-comm}
+    \uses{def:reduced-trace, lem:trace-linear}
+    For all $\alpha, \beta \in B$, $\operatorname{trd}(\beta\alpha) =
+    \operatorname{trd}(\alpha\beta)$.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-trace, lem:trace-linear}
+    Since $\overline\beta = \operatorname{trd}(\beta) - \beta$ and
+    $\operatorname{trd}$ is $F$-linear, $\operatorname{trd}(\alpha\overline\beta) =
+    \operatorname{trd}(\alpha)\operatorname{trd}(\beta) -
+    \operatorname{trd}(\alpha\beta)$. Applying the involution and (iii),
+    $\operatorname{trd}(\alpha\overline\beta) =
+    \operatorname{trd}(\overline{\alpha\overline\beta}) =
+    \operatorname{trd}(\beta\overline\alpha) =
+    \operatorname{trd}(\alpha)\operatorname{trd}(\beta) -
+    \operatorname{trd}(\beta\alpha)$. Comparing the two expressions gives
+    $\operatorname{trd}(\alpha\beta) = \operatorname{trd}(\beta\alpha)$.
+\end{proof}
+
+\begin{lemma}[Reduced characteristic polynomial / Cayley--Hamilton]
+    \label{lem:reduced-char-poly}
+    \uses{def:reduced-trace, def:reduced-norm, lem:norm-comm}
+    Every $\alpha \in B$ satisfies
+    $\alpha^2 - \operatorname{trd}(\alpha)\,\alpha + \operatorname{nrd}(\alpha) = 0$.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-trace, def:reduced-norm, lem:norm-comm}
+    Substituting the definitions,
+    $\alpha^2 - (\alpha+\overline\alpha)\alpha + \alpha\overline\alpha =
+    \alpha^2 - \alpha^2 - \overline\alpha\alpha + \alpha\overline\alpha =
+    \alpha\overline\alpha - \overline\alpha\alpha$, which is $0$ by
+    \ref{lem:norm-comm}.
+\end{proof}
+
+\subsection{Uniqueness and degree}
+
+\begin{definition}[Quadratic algebra]
+    \label{def:quadratic-algebra}
+    An $F$-algebra $K$ is a \textbf{quadratic algebra} if $\dim_F K = 2$.
+    In the Lean model this is the abstract condition
+    $\mathtt{Module.finrank}\,F\,K = 2$; it is \emph{not} the concrete type
+    \texttt{QuadraticAlgebra R a b}. Where a concrete quadratic algebra is needed we
+    supply an explicit $F$-algebra isomorphism as a bridge, and all lemmas below are
+    stated for the abstract finrank condition rather than for the concrete type.
+\end{definition}
+
+\begin{lemma}[Basis decomposition of a quadratic algebra]
+    \label{lem:quadratic-basis}
+    \uses{def:quadratic-algebra}
+    Let $K$ be a quadratic $F$-algebra and $\alpha \in K \setminus F$. Then
+    $\{1, \alpha\}$ is an $F$-basis of $K$, so $K = F \oplus F\alpha = F[\alpha]$.
+\end{lemma}
+\begin{proof}
+    \uses{def:quadratic-algebra}
+    Since $\alpha \notin F$, the elements $1$ and $\alpha$ are $F$-linearly
+    independent; as $\dim_F K = 2$ they are a basis, giving
+    $K = F \oplus F\alpha = F[\alpha]$.
+\end{proof}
+
+\begin{lemma}[Quadratic relation in a quadratic algebra]
+    \label{lem:quadratic-min-rel}
+    \uses{def:quadratic-algebra, lem:quadratic-basis}
+    Let $K$ be a quadratic $F$-algebra and $\alpha \in K \setminus F$. Then there
+    are unique $t, n \in F$ with $\alpha^2 = t\alpha - n$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-basis}
+    By \ref{lem:quadratic-basis}, $\{1,\alpha\}$ is an $F$-basis of $K$; expanding
+    $\alpha^2$ in this basis yields unique coordinates, i.e. unique $t, n \in F$
+    with $\alpha^2 = t\alpha - n$.
+\end{proof}
+
+\begin{lemma}[A quadratic algebra is commutative]
+    \label{lem:quadratic-comm}
+    \uses{def:quadratic-algebra, lem:quadratic-basis}
+    Let $K$ be a quadratic $F$-algebra. Then $K$ is commutative.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-basis}
+    If $K = F$ it is commutative. Otherwise fix $\alpha \in K \setminus F$; by
+    \ref{lem:quadratic-basis}, $K = F[\alpha]$, so every element is a polynomial in
+    the single element $\alpha$, and such polynomials commute. Hence $K$ is
+    commutative.
+\end{proof}
+
+\begin{lemma}[The conjugation map on a quadratic algebra is an involution]
+    \label{lem:quadratic-conjugation-involution}
+    \uses{def:involution, lem:quadratic-basis, lem:quadratic-min-rel, lem:quadratic-comm}
+    Let $K$ be a quadratic $F$-algebra with $\alpha \in K \setminus F$ and
+    $\alpha^2 = t\alpha - n$ ($t,n \in F$). The $F$-linear map fixing $F$ with
+    $\overline{\alpha} = t - \alpha$ is an involution on $K$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-basis, lem:quadratic-min-rel, lem:quadratic-comm}
+    On the basis $\{1,\alpha\}$ (\ref{lem:quadratic-basis}) the $F$-linear map with
+    $\overline 1 = 1$, $\overline\alpha = t-\alpha$ is well defined and squares to
+    the identity. Since $K$ is commutative (\ref{lem:quadratic-comm}), the
+    anti-multiplicativity (iii) reduces to multiplicativity, which holds because
+    $\overline{\alpha^2} = \overline{t\alpha - n} = t(t-\alpha) - n = (t-\alpha)^2
+    = \overline\alpha^2$ (using $\alpha^2 = t\alpha - n$).
+\end{proof}
+
+\begin{lemma}[The conjugation map on a quadratic algebra is standard]
+    \label{lem:quadratic-conjugation-standard}
+    \uses{def:standard-involution, lem:quadratic-conjugation-involution, lem:quadratic-min-rel}
+    In the situation of \ref{lem:quadratic-conjugation-involution}, the involution
+    $\overline{\alpha} = t - \alpha$ is standard.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-conjugation-involution, lem:quadratic-min-rel}
+    On $\alpha$ we compute $\alpha\overline\alpha = \alpha(t-\alpha) = t\alpha -
+    \alpha^2 = n \in F$ (using $\alpha^2 = t\alpha - n$), and on $F$ the map is the
+    identity; by $F$-linearity $\gamma\overline\gamma \in F$ for every
+    $\gamma \in F \oplus F\alpha = K$.
+\end{proof}
+
+\begin{lemma}[Existence of a standard involution on a quadratic algebra]
+    \label{lem:quadratic-involution-exists}
+    \uses{def:standard-involution, lem:quadratic-conjugation-involution, lem:quadratic-conjugation-standard}
+    Let $K$ be a quadratic $F$-algebra with $\alpha \in K \setminus F$ and
+    $\alpha^2 = t\alpha - n$ ($t,n \in F$). The $F$-linear map fixing $F$ with
+    $\overline{\alpha} = t - \alpha$ is a standard involution on $K$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-conjugation-involution, lem:quadratic-conjugation-standard}
+    It is an involution by \ref{lem:quadratic-conjugation-involution} and standard
+    by \ref{lem:quadratic-conjugation-standard}.
+\end{proof}
+
+\begin{lemma}[Uniqueness of a standard involution on a quadratic algebra]
+    \label{lem:quadratic-involution-unique}
+    \uses{def:standard-involution, lem:quadratic-basis, lem:quadratic-min-rel, lem:reduced-char-poly}
+    Let $K$ be a quadratic $F$-algebra with $\alpha \in K \setminus F$ and
+    $\alpha^2 = t\alpha - n$. Any standard involution on $K$ satisfies
+    $\overline{\alpha} = t - \alpha$, and hence is uniquely determined.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-basis, lem:quadratic-min-rel, lem:reduced-char-poly}
+    A standard involution satisfies \ref{lem:reduced-char-poly}, so
+    $\alpha^2 - \operatorname{trd}(\alpha)\alpha + \operatorname{nrd}(\alpha) = 0$;
+    comparing with $\alpha^2 = t\alpha - n$ and the uniqueness of $t,n$
+    (\ref{lem:quadratic-min-rel}) forces $\operatorname{trd}(\alpha) = t$, i.e.
+    $\overline\alpha = t - \alpha$. As $\overline 1 = 1$ and $\{1,\alpha\}$ is a
+    basis, the involution is determined on all of $K$.
+\end{proof}
+
+\begin{lemma}[Unique standard involution on a quadratic algebra]
+    \label{lem:quadratic-unique-involution}
+    \uses{def:standard-involution, lem:quadratic-involution-exists, lem:quadratic-involution-unique}
+    Let $K$ be a quadratic $F$-algebra with $\alpha \in K \setminus F$ and
+    $\alpha^2 = t\alpha - n$. There is exactly one standard involution on $K$; it
+    is the $F$-linear map fixing $F$ with $\overline{\alpha} = t - \alpha$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-involution-exists, lem:quadratic-involution-unique}
+    Existence of this map as a standard involution is
+    \ref{lem:quadratic-involution-exists}, and that every standard involution equals
+    it is \ref{lem:quadratic-involution-unique}.
+\end{proof}
+
+\begin{lemma}[A standard involution is determined outside the base field]
+    \label{lem:involution-determined-outside-base}
+    \uses{def:standard-involution, lem:reduced-char-poly, lem:quadratic-unique-involution}
+    Suppose $B$ has a standard involution and $\alpha \in B \setminus F$. Then
+    $\overline\alpha$ is determined: any standard involution assigns the same value
+    to $\alpha$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:reduced-char-poly, lem:quadratic-unique-involution}
+    By \ref{lem:reduced-char-poly} the element $\alpha$ satisfies a monic quadratic,
+    so $F[\alpha]$ is a quadratic $F$-algebra, and the restriction of any standard
+    involution to $F[\alpha]$ is unique by \ref{lem:quadratic-unique-involution};
+    in particular $\overline\alpha$ is determined.
+\end{proof}
+
+\begin{corollary}[A standard involution is unique]
+    \label{cor:involution-unique}
+    \uses{def:standard-involution, lem:involution-determined-outside-base}
+    If $B$ has a standard involution, then it is the only one.
+\end{corollary}
+\begin{proof}
+    \uses{lem:involution-determined-outside-base}
+    Fix $\alpha \in B$. If $\alpha \in F$ then $\overline\alpha = \alpha$ is forced
+    by $F$-linearity and $\overline 1 = 1$. If $\alpha \notin F$, then
+    $\overline\alpha$ is determined by
+    \ref{lem:involution-determined-outside-base}. Hence the involution is unique on
+    all of $B$.
+\end{proof}
+
+\begin{definition}[Bounded degree]
+    \label{def:degree}
+    We say $B$ \textbf{has degree at most $m$} (for $m \in \mathbb{Z}_{\geq 0}$) if
+    every $\alpha \in B$ is a root of some monic $f \in F[x]$ of degree $\leq m$.
+    In the Lean model this is a predicate $\mathtt{HasDegreeLE}\,B\,m$ rather than an
+    exact least-$m$ ``degree''; all statements below quantify over this predicate,
+    so ``$B$ has degree at most $2$'' means $\mathtt{HasDegreeLE}\,B\,2$. We say $B$
+    ``has degree $2$'' as shorthand for $\mathtt{HasDegreeLE}\,B\,2$ together with
+    $B \neq F$ (equivalently, not $\mathtt{HasDegreeLE}\,B\,1$).
+\end{definition}
+
+\begin{lemma}[Finite-dimensional algebras have finite degree]
+    \label{lem:findim-degree}
+    \uses{def:degree}
+    If $\dim_F B = n < \infty$, then every $\alpha \in B$ is a root of a monic
+    polynomial of degree $\leq n$; consequently $B$ has degree at most $n$.
+\end{lemma}
+\begin{proof}
+    \uses{def:degree}
+    For $\alpha \in B$ the $n+1$ powers $1, \alpha, \dots, \alpha^n$ are
+    $F$-linearly dependent, giving a nonzero polynomial of degree $\leq n$
+    vanishing at $\alpha$; equivalently $\alpha$ is integral over $F$ with minimal
+    polynomial of degree $\leq n$, which is monic and vanishes at $\alpha$.
+\end{proof}
+
+\begin{lemma}[Degree one means the base field]
+    \label{lem:degree-one-eq-base}
+    \uses{def:degree}
+    If $B$ has degree $\leq 1$, then $B = F$. Equivalently, if $B \neq F$ then any
+    element outside $F$ needs a monic polynomial of degree $\geq 2$.
+\end{lemma}
+\begin{proof}
+    \uses{def:degree}
+    A monic degree-1 polynomial $x - c$ ($c \in F$) has $\alpha$ as a root iff
+    $\alpha = c \in F$. So degree $\leq 1$ forces every $\alpha \in B$ to lie in
+    $F$, i.e. $B = F$.
+\end{proof}
+
+\begin{lemma}[A standard involution forces degree at most two]
+    \label{lem:standard-involution-degree-two}
+    \uses{def:standard-involution, lem:reduced-char-poly, def:degree, lem:degree-one-eq-base}
+    If $B$ has a standard involution, then $B = F$ or $B$ has degree $2$; in
+    particular $B$ has degree at most $2$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:reduced-char-poly, lem:degree-one-eq-base}
+    By \ref{lem:reduced-char-poly} every $\alpha \in B$ satisfies the monic
+    quadratic $x^2 - \operatorname{trd}(\alpha)x + \operatorname{nrd}(\alpha)$, so
+    $B$ has degree at most $2$. If the degree is $\leq 1$ then $B = F$ by
+    \ref{lem:degree-one-eq-base}; otherwise it equals $2$.
+\end{proof}
+
+\subsection{Classification of division algebras of degree two}
+
+Throughout this subsection $\operatorname{char} F \neq 2$ and $B$ is a division
+$F$-algebra of degree $2$ with $B \neq F$. Fix $i \in B \setminus F$; completing
+the square, we assume $i^2 = a \in F^\times$, and set $K = F[i]$.
+
+\begin{lemma}[A commutative subring of a division ring is a field]
+    \label{lem:comm-subring-division-field}
+    Let $S$ be a commutative subring of a division ring $D$ such that $x^{-1} \in S$
+    for every nonzero $x \in S$. Then $S$ is a field.
+\end{lemma}
+\begin{proof}
+    Every nonzero $x \in S$ is invertible in the division ring $D$ with inverse
+    $x^{-1} \in S$ by hypothesis, so $S$ is closed under inverses; being a
+    commutative subring closed under inverses (Mathlib's
+    \texttt{Subring.toSubfield}), $S$ is a field.
+\end{proof}
+
+\begin{lemma}[A generated quadratic subalgebra is a field]
+    \label{lem:quadratic-subfield}
+    \uses{lem:reduced-char-poly, def:quadratic-algebra, lem:quadratic-comm, lem:comm-subring-division-field}
+    For $i \in B \setminus F$ in a division $F$-algebra $B$ of degree $2$, the
+    subalgebra $K = F[i]$ is a commutative quadratic $F$-algebra, and being a
+    subring of a division ring it is a field with $\dim_F K = 2$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:reduced-char-poly, lem:quadratic-comm, lem:comm-subring-division-field}
+    Since $B$ has degree $2$, $i$ satisfies a monic quadratic, so $1, i$ span
+    $F[i]$ and (as $i \notin F$) are independent: $\dim_F F[i] = 2$, a quadratic
+    algebra, commutative by \ref{lem:quadratic-comm}. A nonzero $x \in F[i]$ is
+    invertible in $B$, and $x^{-1} \in F[i]$ since $x$ is algebraic over $F$; hence
+    $F[i]$ is a field by \ref{lem:comm-subring-division-field}.
+\end{proof}
+
+\begin{lemma}[Conjugation by $i$ is a ring automorphism of order two]
+    \label{lem:conjugation-ring-auto}
+    The map $\varphi \colon B \to B$, $\varphi(\alpha) = i^{-1}\alpha i$, is a ring
+    automorphism with $\varphi^2 = \mathrm{id}$.
+\end{lemma}
+\begin{proof}
+    Conjugation by the unit $i$ is a ring automorphism, and $\varphi^2(\alpha) =
+    i^{-2}\alpha i^2 = \alpha$ since $i^2 = a$ is central.
+\end{proof}
+
+\begin{lemma}[Conjugation by $i$ is a $K$-linear involution of order two]
+    \label{lem:conjugation-involution}
+    \uses{lem:quadratic-subfield, lem:conjugation-ring-auto}
+    Regard $B$ as a left $K$-vector space. The map
+    $\varphi \colon B \to B$, $\varphi(\alpha) = i^{-1}\alpha i$, is a $K$-linear
+    ring automorphism with $\varphi^2 = \mathrm{id}$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-subfield, lem:conjugation-ring-auto}
+    By \ref{lem:conjugation-ring-auto}, $\varphi$ is a ring automorphism with
+    $\varphi^2 = \mathrm{id}$. It commutes with left multiplication by $K = F[i]$
+    because $i$ commutes with itself and with $F$, so $\varphi$ is $K$-linear.
+\end{proof}
+
+\begin{lemma}[Complementary idempotents from the conjugation]
+    \label{lem:conjugation-idempotents}
+    \uses{lem:conjugation-involution}
+    With $\operatorname{char} F \neq 2$, the $K$-linear operators $e^{+} =
+    \tfrac12(\mathrm{id} + \varphi)$ and $e^{-} = \tfrac12(\mathrm{id} - \varphi)$
+    satisfy $e^{+} + e^{-} = \mathrm{id}$, $(e^{\pm})^2 = e^{\pm}$ and
+    $e^{+}e^{-} = e^{-}e^{+} = 0$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:conjugation-involution}
+    Since $\varphi^2 = \mathrm{id}$ (\ref{lem:conjugation-involution}) and $2$ is
+    invertible, direct computation gives $e^{+} + e^{-} = \mathrm{id}$,
+    $(e^{\pm})^2 = e^{\pm}$, and $e^{+}e^{-} = e^{-}e^{+} = 0$.
+\end{proof}
+
+\begin{lemma}[Eigenspace decomposition of the conjugation]
+    \label{lem:eigenspace-decomp}
+    \uses{lem:conjugation-involution, lem:conjugation-idempotents}
+    With $\operatorname{char} F \neq 2$, let $B^{+} = \{\alpha : \varphi(\alpha)
+    = \alpha\}$ and $B^{-} = \{\alpha : \varphi(\alpha) = -\alpha\}$. Then $B =
+    B^{+} \oplus B^{-}$ as $K$-vector spaces, via $\alpha = \tfrac{\alpha +
+    \varphi(\alpha)}{2} + \tfrac{\alpha - \varphi(\alpha)}{2}$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:conjugation-idempotents}
+    By \ref{lem:conjugation-idempotents}, $e^{+}, e^{-}$ are complementary
+    idempotents whose images are the $+1$- and $-1$-eigenspaces $B^{+}$ and $B^{-}$
+    of $\varphi$; hence $B = \operatorname{im} e^{+} \oplus \operatorname{im} e^{-}
+    = B^{+} \oplus B^{-}$.
+\end{proof}
+
+\begin{lemma}[The fixed space is the centralizer of $i$]
+    \label{lem:Bplus-eq-centralizer}
+    \uses{lem:conjugation-involution, lem:eigenspace-decomp}
+    An element $\alpha \in B$ lies in $B^{+}$ if and only if it commutes with $i$;
+    that is, $B^{+} = \{\alpha \in B : \alpha i = i\alpha\}$, the centralizer of $i$
+    (equivalently of $K = F[i]$) in $B$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:conjugation-involution}
+    By definition $\alpha \in B^{+}$ iff $\varphi(\alpha) = i^{-1}\alpha i = \alpha$,
+    i.e. iff $\alpha i = i\alpha$. Since $i$ generates $K = F[i]$ over $F$ and
+    scalars are central, commuting with $i$ is equivalent to commuting with all of
+    $K$, so $B^{+}$ is the centralizer of $i$ (and of $K$).
+\end{proof}
+
+\begin{lemma}[A commuting element generates a subfield]
+    \label{lem:commuting-subring-field}
+    \uses{lem:comm-subring-division-field}
+    Suppose $\alpha \in B$ commutes with $i$. Then $L = F[i,\alpha]$ is a field with
+    $K = F[i] \subseteq L$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:comm-subring-division-field}
+    As $\alpha$ commutes with $i$ and with $F$, the subring $L = F[i,\alpha]$ is
+    commutative; each nonzero element is algebraic over $F$, so its inverse in $B$
+    lies in $L$. By \ref{lem:comm-subring-division-field}, $L$ is a field, and
+    plainly $K = F[i] \subseteq L$.
+\end{proof}
+
+\begin{lemma}[The generated field is finite and separable]
+    \label{lem:commuting-finite-separable}
+    \uses{lem:commuting-subring-field}
+    Suppose $\operatorname{char} F \neq 2$ and $\alpha \in B$ commutes with $i$, and
+    let $L = F[i,\alpha]$. Then $L/F$ is finite-dimensional and separable.
+\end{lemma}
+\begin{proof}
+    \uses{lem:commuting-subring-field}
+    Every element of $B$ satisfies a monic polynomial of degree $\leq 2$, so
+    $L = F[i,\alpha]$ is generated by finitely many elements each algebraic over
+    $F$, hence $L/F$ is finite-dimensional. Each minimal polynomial is a quadratic,
+    which is separable since $\operatorname{char} F \neq 2$; thus $L/F$ is separable.
+\end{proof}
+
+\begin{lemma}[A commuting element lies in $K$]
+    \label{lem:commuting-quadratic-field}
+    \uses{lem:quadratic-subfield, lem:commuting-subring-field, lem:commuting-finite-separable}
+    Suppose $\operatorname{char} F \neq 2$ and $\alpha \in B$ commutes with $i$.
+    Then $L = F[i,\alpha]$ has $\dim_F L = 2$, so $L = K$ and $\alpha \in K$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quadratic-subfield, lem:commuting-subring-field, lem:commuting-finite-separable}
+    By \ref{lem:commuting-subring-field}, $L$ is a field with $K \subseteq L$, and
+    by \ref{lem:commuting-finite-separable} $L/F$ is finite and separable, so
+    $\texttt{Field.exists\_primitive\_element}$ gives $L = F(\beta)$. As $\beta$ has
+    degree $\leq 2$ over $F$, $\dim_F L = 2 = \dim_F K$, whence $L = K$
+    (\ref{lem:quadratic-subfield}) and $\alpha \in K$.
+\end{proof}
+
+\begin{lemma}[The fixed space equals $K$]
+    \label{lem:Bplus-eq-K}
+    \uses{lem:Bplus-eq-centralizer, lem:commuting-quadratic-field, lem:quadratic-subfield}
+    $B^{+} = K$; equivalently $\dim_K B^{+} = 1$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:Bplus-eq-centralizer, lem:commuting-quadratic-field}
+    Since $i$ commutes with $K$, we have $K \subseteq B^{+}$. Conversely, if
+    $\alpha \in B^{+}$ then $\alpha$ commutes with $i$
+    (\ref{lem:Bplus-eq-centralizer}), so $\alpha \in K$ by
+    \ref{lem:commuting-quadratic-field}. Hence $B^{+} = K$ and $\dim_K B^{+} = 1$.
+\end{proof}
+
+\begin{lemma}[The anti-fixed space is at most one-dimensional]
+    \label{lem:Bminus-dim-one}
+    \uses{lem:eigenspace-decomp, lem:Bplus-eq-K}
+    Any two nonzero elements of $B^{-}$ are $K$-multiples of each other; hence
+    $\dim_K B^{-} \leq 1$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:eigenspace-decomp, lem:Bplus-eq-K}
+    If $0 \neq j \in B^{-}$ then $i^{-1}ji = -j$, so $j$ conjugates $i$ to $-i$.
+    Hence for nonzero $j_1, j_2 \in B^{-}$ the product $j_1 j_2$ fixes $i$ under
+    conjugation, i.e. $j_1 j_2 \in B^{+} = K$ (\ref{lem:Bplus-eq-K}). Since $B$ is
+    a division ring, $j_1 = (j_1 j_2) j_2^{-1} \in K j_2$, so $j_1, j_2$ are
+    $K$-multiples.
+\end{proof}
+
+\begin{lemma}[Conjugate of a standard involution is standard]
+    \label{lem:conjugate-involution-standard}
+    \uses{def:standard-involution}
+    Suppose $B$ has a standard involution $\overline{\phantom{a}}$ and $u \in B$ is
+    a unit, with $\psi(\alpha) = u^{-1}\alpha u$. Then
+    $\alpha \mapsto \psi^{-1}(\overline{\psi(\alpha)})$ is again a standard involution
+    on $B$.
+\end{lemma}
+\begin{proof}
+    \uses{def:standard-involution}
+    Conjugation $\psi$ is an $F$-algebra automorphism, so
+    $\psi^{-1} \circ \overline{\phantom{a}} \circ \psi$ is $F$-linear, fixes $1$,
+    squares to the identity, and is anti-multiplicative (all three transport along
+    the automorphism $\psi$). It is standard because $\alpha\,
+    \psi^{-1}(\overline{\psi\alpha}) = \psi^{-1}(\psi\alpha\,\overline{\psi\alpha})
+    \in \psi^{-1}(F) = F$.
+\end{proof}
+
+\begin{lemma}[Reduced trace is invariant under conjugation]
+    \label{lem:trd-conjugation-invariant}
+    \uses{def:reduced-trace, cor:involution-unique, lem:conjugate-involution-standard}
+    Suppose $B$ has a standard involution and $u \in B$ is a unit. Then for all
+    $\alpha \in B$, $\operatorname{trd}(u^{-1}\alpha u) = \operatorname{trd}(\alpha)$.
+\end{lemma}
+\begin{proof}
+    \uses{def:reduced-trace, cor:involution-unique, lem:conjugate-involution-standard}
+    Write $\psi(\alpha) = u^{-1}\alpha u$. The map
+    $\alpha \mapsto \psi^{-1}(\overline{\psi(\alpha)})$ is a standard involution
+    (\ref{lem:conjugate-involution-standard}), so by uniqueness
+    (\ref{cor:involution-unique}) it equals $\overline{\phantom{a}}$; thus
+    $\psi(\overline\alpha) = \overline{\psi(\alpha)}$. Hence
+    $\operatorname{trd}(\psi\alpha) = \psi\alpha + \overline{\psi\alpha} =
+    \psi(\alpha + \overline\alpha) = \psi(\operatorname{trd}\alpha) =
+    \operatorname{trd}(\alpha)$, since $\operatorname{trd}(\alpha) \in F$ is fixed
+    by $\psi$.
+\end{proof}
+
+\begin{lemma}[An anti-fixed element has reduced trace zero]
+    \label{lem:Bminus-trace-zero}
+    \uses{lem:eigenspace-decomp, lem:trd-conjugation-invariant, lem:reduced-char-poly, lem:trace-linear}
+    Suppose $B$ has a standard involution. If $j \in B^{-}$ then
+    $\operatorname{trd}(j) = 0$, and consequently $j^2 = -\operatorname{nrd}(j) \in
+    F$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:trd-conjugation-invariant, lem:reduced-char-poly, lem:trace-linear}
+    Since $j \in B^{-}$ we have $i^{-1}ji = -j$, so by
+    \ref{lem:trd-conjugation-invariant} $\operatorname{trd}(-j) =
+    \operatorname{trd}(i^{-1}ji) = \operatorname{trd}(j)$. As $\operatorname{trd}$
+    is $F$-linear (\ref{lem:trace-linear}), $\operatorname{trd}(-j) =
+    -\operatorname{trd}(j)$, whence $2\operatorname{trd}(j) = 0$ and
+    $\operatorname{trd}(j) = 0$. Then \ref{lem:reduced-char-poly} gives $j^2 =
+    -\operatorname{nrd}(j) \in F$.
+\end{proof}
+
+\begin{lemma}[Decomposition $B = K \oplus Kj$]
+    \label{lem:B-decomp-K-Kj}
+    \uses{lem:eigenspace-decomp, lem:Bplus-eq-K, lem:Bminus-dim-one}
+    Suppose $B^{-} \neq 0$ and fix $0 \neq j \in B^{-}$. Then $B = K \oplus Kj$ as a
+    left $K$-vector space, and $1, i, j, ij$ is an $F$-basis of $B$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:eigenspace-decomp, lem:Bplus-eq-K, lem:Bminus-dim-one}
+    By \ref{lem:eigenspace-decomp}, $B = B^{+} \oplus B^{-}$; by
+    \ref{lem:Bplus-eq-K} $B^{+} = K$, and by \ref{lem:Bminus-dim-one} $B^{-} = Kj$.
+    Hence $B = K \oplus Kj$. Since $\{1, i\}$ is an $F$-basis of $K$, the four
+    elements $1, i, j, ij$ form an $F$-basis of $B$.
+\end{proof}
+
+\begin{lemma}[Quaternion multiplication relations]
+    \label{lem:quaternion-relations}
+    \uses{lem:B-decomp-K-Kj, lem:Bminus-trace-zero}
+    In the situation of \ref{lem:B-decomp-K-Kj}, with $i^2 = a \in F^\times$, we
+    have $ji = -ij$ and $j^2 = b \in F^\times$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:B-decomp-K-Kj, lem:Bminus-trace-zero}
+    Since $j \in B^{-}$, $i^{-1}ji = -j$, i.e. $ji = -ij$. By
+    \ref{lem:Bminus-trace-zero}, $j^2 = -\operatorname{nrd}(j) =: b \in F$; as $B$
+    is a division algebra and $j \neq 0$, $b \neq 0$, so $b \in F^\times$.
+\end{proof}
+
+\begin{lemma}[The quaternion lift homomorphism]
+    \label{lem:quaternion-lift-hom}
+    \uses{lem:quaternion-relations}
+    In the situation of \ref{lem:quaternion-relations}, applying
+    $\texttt{QuaternionAlgebra.Basis.liftHom}$ to $i, j, ij$ yields an $F$-algebra
+    homomorphism $\Phi \colon \left(\frac{a,b}{F}\right) \to B$ sending the standard
+    generators of $\left(\frac{a,b}{F}\right)$ to $i, j, ij$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quaternion-relations}
+    The relations $i^2 = a$, $j^2 = b$, $ji = -ij$ (\ref{lem:quaternion-relations})
+    are exactly the compatibility conditions for a
+    $\texttt{QuaternionAlgebra.Basis}$ on $B$ with generators $i, j, ij$; feeding
+    this datum to $\texttt{QuaternionAlgebra.Basis.liftHom}$ produces the $F$-algebra
+    homomorphism $\Phi$.
+\end{proof}
+
+\begin{lemma}[Construction of the quaternion isomorphism]
+    \label{lem:build-quaternion-iso}
+    \uses{lem:B-decomp-K-Kj, lem:quaternion-lift-hom}
+    In the situation of \ref{lem:quaternion-relations}, the homomorphism $\Phi$ of
+    \ref{lem:quaternion-lift-hom} is an $F$-algebra isomorphism
+    $\left(\frac{a,b}{F}\right) \cong B$ carrying the standard generators to the
+    basis $1, i, j, ij$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:B-decomp-K-Kj, lem:quaternion-lift-hom}
+    The homomorphism $\Phi$ (\ref{lem:quaternion-lift-hom}) sends the standard
+    $F$-basis of $\left(\frac{a,b}{F}\right)$ to $1, i, j, ij$, which is an
+    $F$-basis of $B$ (\ref{lem:B-decomp-K-Kj}); a linear map carrying a basis to a
+    basis is bijective, so $\Phi$ is an $F$-algebra isomorphism.
+\end{proof}
+
+\begin{lemma}[Each classification case has degree at most two]
+    \label{lem:classification-forward}
+    \uses{def:degree, lem:findim-degree, lem:standard-involution-degree-two, lem:quaternion-standard-involution}
+    Suppose $\operatorname{char} F \neq 2$ and $B$ is a division $F$-algebra of one
+    of the forms (i) $B = F$; (ii) $B$ a quadratic field extension of $F$; or
+    (iii) $B$ a division quaternion algebra $\left(\frac{a,b}{F}\right)$. Then $B$
+    has degree at most $2$.
+\end{lemma}
+\begin{proof}
+    \uses{lem:findim-degree, lem:standard-involution-degree-two, lem:quaternion-standard-involution}
+    In case (i), $\dim_F B = 1$, and in case (ii), $\dim_F B = 2$; either way
+    \ref{lem:findim-degree} gives degree $\leq 2$. In case (iii), quaternion
+    conjugation is a standard involution (\ref{lem:quaternion-standard-involution}),
+    so \ref{lem:standard-involution-degree-two} gives degree $\leq 2$.
+\end{proof}
+
+\begin{theorem}[Classification of degree-two division algebras]
+    \label{thm:degree-two-classification}
+    \uses{lem:classification-forward, lem:quadratic-subfield, lem:build-quaternion-iso, lem:degree-one-eq-base}
+    Suppose $\operatorname{char} F \neq 2$ and let $B$ be a division $F$-algebra.
+    Then $B$ has degree at most $2$ if and only if one of the following holds:
+    (i) $B = F$; (ii) $B = K$ is a quadratic field extension of $F$; or
+    (iii) $B$ is a division quaternion algebra $\left(\frac{a,b}{F}\right)$ over
+    $F$.
+\end{theorem}
+\begin{proof}
+    \uses{lem:classification-forward, lem:degree-one-eq-base, lem:quadratic-subfield, lem:eigenspace-decomp, lem:Bplus-eq-K, lem:B-decomp-K-Kj, lem:quaternion-relations, lem:build-quaternion-iso}
+    Each of (i)--(iii) has degree $\leq 2$ by \ref{lem:classification-forward}.
+    Conversely assume degree $\leq 2$; by
+    \ref{lem:degree-one-eq-base} either $B = F$ (case (i)) or $B$ has degree $2$.
+    Fix $i \in B\setminus F$ with $i^2 = a \in F^\times$ and $K = F[i]$, a quadratic
+    field (\ref{lem:quadratic-subfield}). By \ref{lem:eigenspace-decomp} and
+    \ref{lem:Bplus-eq-K}, $B = K \oplus B^{-}$. If $B^{-} = 0$ then $B = K$ is a
+    quadratic field extension (case (ii)). Otherwise \ref{lem:B-decomp-K-Kj} gives
+    $B = K \oplus Kj$ with $F$-basis $1, i, j, ij$, \ref{lem:quaternion-relations}
+    supplies the relations $ji = -ij$, $j^2 = b \in F^\times$, and
+    \ref{lem:build-quaternion-iso} yields $B \cong \left(\frac{a,b}{F}\right)$, a
+    division quaternion algebra (case (iii)).
+\end{proof}
+
+\begin{corollary}[Degree two versus standard involution]
+    \label{cor:degree-two-iff-involution}
+    \uses{thm:degree-two-classification, lem:standard-involution-degree-two, lem:quaternion-standard-involution, lem:quadratic-unique-involution}
+    Let $B$ be a division $F$-algebra with $\operatorname{char} F \neq 2$. Then
+    $B$ has degree at most $2$ if and only if $B$ has a standard involution.
+\end{corollary}
+\begin{proof}
+    \uses{thm:degree-two-classification, lem:standard-involution-degree-two, lem:quaternion-standard-involution, lem:quadratic-unique-involution}
+    If $B$ has a standard involution then it has degree $\leq 2$ by
+    \ref{lem:standard-involution-degree-two}. Conversely, by
+    \ref{thm:degree-two-classification} $B$ is $F$, a quadratic field extension,
+    or a division quaternion algebra; each carries a standard involution (the
+    identity on $F$, the involution of \ref{lem:quadratic-unique-involution} on a
+    quadratic extension, and quaternion conjugation
+    \ref{lem:quaternion-standard-involution} respectively).
+\end{proof}
+
+\begin{lemma}[Noncommutativity and center of a quaternion algebra]
+    \label{lem:quaternion-center-eq-base}
+    Suppose $\operatorname{char} F \neq 2$ and $B = \left(\frac{a,b}{F}\right)$ with
+    $a, b \in F^\times$. Then $ji = -ij \neq ij$, so $B$ is noncommutative, and the
+    center of $B$ is exactly $F = \operatorname{Set.range}(\mathtt{algebraMap}\,F\,B)$.
+\end{lemma}
+\begin{proof}
+    Since $ij$ is a nonzero element (a unit) and $\operatorname{char} F \neq 2$,
+    $ij \neq -ij = ji$, so $B$ is noncommutative. For the center, scalars are
+    central. Conversely write a central $z = t + xi + yj + wij$ in the basis
+    $1, i, j, ij$; commuting with $i$ forces the $j$- and $ij$-coefficients to
+    vanish (using $ji = -ij$ and $\operatorname{char} F \neq 2$), and commuting with
+    $j$ forces the $i$- and $ij$-coefficients to vanish, leaving $z = t \in F$.
+\end{proof}
+
+\begin{corollary}[Characterizations of quaternion division algebras]
+    \label{cor:quaternion-characterization}
+    \uses{thm:degree-two-classification, lem:quaternion-center-eq-base}
+    Let $B$ be a division $F$-algebra with $\operatorname{char} F \neq 2$. The
+    following are equivalent: (i) $B$ is a quaternion algebra; (ii) $B$ is
+    noncommutative of degree $2$; (iii) $B$ is central of degree $2$.
+\end{corollary}
+\begin{proof}
+    \uses{thm:degree-two-classification, lem:quaternion-center-eq-base}
+    By \ref{thm:degree-two-classification}, a division algebra of degree $2$ is a
+    quadratic field extension or a quaternion algebra. A quadratic field extension
+    is commutative and has $F$ properly contained in its center, so it is neither
+    noncommutative nor central; a division quaternion algebra is both
+    noncommutative and central with center $F$ by
+    \ref{lem:quaternion-center-eq-base}. Hence (i), (ii), (iii) coincide.
+\end{proof}
+
+\begin{definition}[Algebraic algebra]
+    \label{def:algebraic-algebra}
+    An $F$-algebra $B$ is \textbf{algebraic} if every $\alpha \in B$ is algebraic
+    over $F$, i.e. satisfies a nonzero polynomial in $F[x]$.
+\end{definition}
+
+\begin{lemma}[A quadratic extension of $\mathbb{R}$ is $\mathbb{C}$]
+    \label{lem:real-quadratic-ext-eq-C}
+    Let $L$ be a field extension of $\mathbb{R}$ with $\dim_{\mathbb{R}} L = 2$.
+    Then $L \cong \mathbb{C}$ as $\mathbb{R}$-algebras.
+\end{lemma}
+\begin{proof}
+    A finite extension of $\mathbb{R}$ is algebraic, so by the classification of
+    algebraic extensions of $\mathbb{R}$ it is $\mathbb{R}$-isomorphic to
+    $\mathbb{R}$ or to $\mathbb{C}$; as $\dim_{\mathbb{R}} L = 2 \neq 1 =
+    \dim_{\mathbb{R}} \mathbb{R}$, we must have $L \cong \mathbb{C}$ (and indeed
+    $\dim_{\mathbb{R}} \mathbb{C} = 2$).
+\end{proof}
+
+\begin{lemma}[Square-rescaling isomorphism of quaternion algebras]
+    \label{lem:quaternion-square-rescale}
+    For $a, b \in F^\times$ and $u, v \in F^\times$, there is an $F$-algebra
+    isomorphism $\left(\frac{a,b}{F}\right) \cong \left(\frac{au^2, bv^2}{F}\right)$.
+\end{lemma}
+\begin{proof}
+    In $\left(\frac{au^2, bv^2}{F}\right)$ with generators $i', j'$ put
+    $I = u^{-1}i'$, $J = v^{-1}j'$. Then $I^2 = u^{-2}(au^2) = a$, $J^2 =
+    v^{-2}(bv^2) = b$, and $JI = -IJ$, so $I, J, IJ$ form a
+    $\texttt{QuaternionAlgebra.Basis}$; $\texttt{QuaternionAlgebra.Basis.liftHom}$
+    gives an $F$-algebra homomorphism $\left(\frac{a,b}{F}\right) \to
+    \left(\frac{au^2, bv^2}{F}\right)$ sending the standard basis to $1, I, J, IJ$,
+    which is a basis, so the map is an isomorphism.
+\end{proof}
+
+\begin{lemma}[A quaternion algebra with a square coefficient is not division]
+    \label{lem:quaternion-isotropic-not-division}
+    \uses{lem:quaternion-norm-form, lem:quaternion-standard-involution, lem:unit-imp-norm-nonzero}
+    Suppose $\operatorname{char} F \neq 2$ and $a = c^2$ with $c \in F^\times$. Then
+    $\left(\frac{a,b}{F}\right)$ is not a division $F$-algebra.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quaternion-norm-form, lem:quaternion-standard-involution, lem:unit-imp-norm-nonzero}
+    The element $\alpha = c - i \neq 0$ has $\operatorname{nrd}(\alpha) = c^2 - a
+    \cdot 1 = 0$ by \ref{lem:quaternion-norm-form}. If the algebra were division,
+    $\alpha$ would be a unit, forcing $\operatorname{nrd}(\alpha) \neq 0$ by
+    \ref{lem:unit-imp-norm-nonzero} (the algebra has the standard involution of
+    \ref{lem:quaternion-standard-involution}) --- a contradiction. Hence it is not a
+    division algebra.
+\end{proof}
+
+\begin{lemma}[The real division quaternion algebra is $\mathbb{H}$]
+    \label{lem:real-division-quaternion-eq-H}
+    \uses{lem:quaternion-square-rescale, lem:quaternion-isotropic-not-division}
+    Let $\left(\frac{a,b}{\mathbb{R}}\right)$ be a division quaternion algebra over
+    $\mathbb{R}$. Then $a, b < 0$ and $\left(\frac{a,b}{\mathbb{R}}\right) \cong
+    \left(\frac{-1,-1}{\mathbb{R}}\right) = \mathbb{H}$ as $\mathbb{R}$-algebras.
+\end{lemma}
+\begin{proof}
+    \uses{lem:quaternion-square-rescale, lem:quaternion-isotropic-not-division}
+    Over $\mathbb{R}$ each nonzero scalar is $\pm$ a square, so
+    \ref{lem:quaternion-square-rescale} (rescaling $a \mapsto a u^2$, $b \mapsto b
+    v^2$) reduces to $a, b \in \{1, -1\}$. If $a = 1$ (or $b = 1$) then the
+    coefficient is a square, so by \ref{lem:quaternion-isotropic-not-division} the
+    algebra is not division, contradicting the hypothesis. Hence $a = b = -1$, i.e.
+    $a, b < 0$, and $\left(\frac{a,b}{\mathbb{R}}\right) \cong
+    \left(\frac{-1,-1}{\mathbb{R}}\right) = \mathbb{H}$ by
+    \ref{lem:quaternion-square-rescale}.
+\end{proof}
+
+\begin{corollary}[Frobenius]
+    \label{cor:frobenius}
+    \uses{thm:degree-two-classification, def:algebraic-algebra, lem:real-quadratic-ext-eq-C, lem:real-division-quaternion-eq-H}
+    Let $B$ be an algebraic division algebra over $\mathbb{R}$. Then
+    $B = \mathbb{R}$, or $B \cong \mathbb{C}$, or $B \cong \mathbb{H}$ as
+    $\mathbb{R}$-algebras.
+\end{corollary}
+\begin{proof}
+    \uses{thm:degree-two-classification, lem:real-quadratic-ext-eq-C, lem:real-division-quaternion-eq-H}
+    If $B = \mathbb{R}$ we are done. Otherwise take $\alpha \in B \setminus
+    \mathbb{R}$; being algebraic, its minimal polynomial over $\mathbb{R}$ has
+    degree $2$ (no real root), so $\alpha$ satisfies a quadratic and $B$ has degree
+    $2$. By \ref{thm:degree-two-classification}, $B$ is a quadratic field extension
+    of $\mathbb{R}$ --- then $B \cong \mathbb{C}$ by
+    \ref{lem:real-quadratic-ext-eq-C} --- or a division quaternion algebra over
+    $\mathbb{R}$ --- then $B \cong \mathbb{H}$ by
+    \ref{lem:real-division-quaternion-eq-H}.
+\end{proof}
 
 \end{document}

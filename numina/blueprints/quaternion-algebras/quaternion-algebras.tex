@@ -18,7 +18,7 @@ $\mathbb{H}[F, a, 0, b]$, for which $i^2 = a$, $j^2 = b$, $ij = k$, $ji = -k = -
 \begin{definition}[Quaternion algebra]
     \label{def:quaternion-algebra}
     \lean{QuaternionAlgebra}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Beginnings.lean}
     \leanok
     For $a, b \in F^\times$, the \emph{quaternion algebra}
     $\left(\frac{a,b}{F}\right)$ is the $F$-algebra $\mathbb{H}[F, a, 0, b]$ with
@@ -34,7 +34,7 @@ particular $\dim_F \left(\frac{a,b}{F}\right) = 4$, with $F$-basis $1, i, j, k$.
 \begin{lemma}[Standard generators presentation]
     \label{lem:standard-generators-presentation}
     \lean{QuaternionAlgebras.standard_generators_presentation}
-    \leanfile{QuaternionAlgebras/Beginnings.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Beginnings.lean}
     \uses{def:quaternion-algebra}
     \leanok
     An $F$-algebra $B$ is a quaternion algebra if and only if there exist nonzero
@@ -63,7 +63,7 @@ over an at most quadratic extension of $F$.
 \begin{proposition}[Matrix embedding]
     \label{prop:matrix-embedding}
     \lean{QuaternionAlgebras.matrixHom_injective}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Matrix.lean}
     \uses{def:quaternion-algebra}
     \leanok
     Let $B = \left(\frac{a,b}{F}\right)$ and let $F(\sqrt a)$ be a splitting field
@@ -90,7 +90,7 @@ over an at most quadratic extension of $F$.
 \begin{corollary}[Split quaternion algebra is a matrix algebra]
     \label{cor:split-matrix}
     \lean{QuaternionAlgebras.split_matrix}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Matrix.lean}
     \uses{prop:matrix-embedding}
     \leanok
     There is an $F$-algebra isomorphism
@@ -111,7 +111,7 @@ over an at most quadratic extension of $F$.
     \label{lem:left-regular-faithful}
     \lean{QuaternionAlgebras.leftRegRepK,
       QuaternionAlgebras.leftRegRepK_faithful}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Matrix.lean}
     \uses{def:quaternion-algebra}
     \leanok
     Let $K = F[i] \cong F[x]/(x^2 - a)$, and regard $B = \left(\frac{a,b}{F}\right)$
@@ -133,7 +133,7 @@ over an at most quadratic extension of $F$.
       QuaternionAlgebras.hamiltonToComplex_injective,
       QuaternionAlgebras.hamiltonToComplex_trace,
       QuaternionAlgebras.hamiltonToComplex_det}
-    \leanfile{QuaternionAlgebras/Matrix.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Matrix.lean}
     \uses{prop:matrix-embedding}
     \leanok
     The real Hamiltonians $\mathbb{H} = \left(\frac{-1,-1}{\mathbb{R}}\right)$ embed
@@ -194,7 +194,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Product of pure quaternions]
     \label{lem:pure-product}
     \lean{QuaternionAlgebras.pure_product}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \leanok
     For pure quaternions $v = v_1 i + v_2 j + v_3 k$ and
     $w = w_1 i + w_2 j + w_3 k$ in $\mathbb{H}^0 \cong \mathbb{R}^3$,
@@ -217,7 +217,7 @@ $\bar\alpha = \alpha$).
     \lean{QuaternionAlgebras.pure_square,
       QuaternionAlgebras.pure_mul_isSkewAdjoint_iff,
       QuaternionAlgebras.pure_anticomm_iff}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{lem:pure-product}
     \leanok
     Let $v, w$ be pure quaternions.
@@ -239,7 +239,7 @@ $\bar\alpha = \alpha$).
 \begin{definition}[Rotation angle]
     \label{def:rot-angle}
     \lean{QuaternionAlgebras.rotAngle}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \leanok
     The \emph{rotation angle} of a unit quaternion $\alpha \in \mathbb{H}^1$ is
     $\theta := \arccos(\operatorname{Re}\alpha) \in [0, \pi]$ (Voight~(2.4.16)), so
@@ -249,7 +249,7 @@ $\bar\alpha = \alpha$).
 \begin{definition}[Axis of a unit quaternion]
     \label{def:axis}
     \lean{QuaternionAlgebras.axis}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{lem:pure-properties}
     \leanok
     The \emph{axis} $I(\alpha)$ of a quaternion (Voight~(2.4.16)) is the normalized
@@ -268,7 +268,7 @@ $\bar\alpha = \alpha$).
 \begin{definition}[Adjoint representation]
     \label{def:adjoint}
     \lean{QuaternionAlgebras.adjoint}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{lem:pure-properties}
     \leanok
     The \emph{adjoint representation} (Voight~(2.4.13)) is the group homomorphism
@@ -289,7 +289,7 @@ $\bar\alpha = \alpha$).
     \label{prop:rotation}
     \lean{QuaternionAlgebras.rotation_mem_so,
       QuaternionAlgebras.rotation_trace}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{lem:pure-properties, def:axis, def:rot-angle}
     \leanok
     For $\alpha \in \mathbb{H}^1$, the conjugation map
@@ -321,7 +321,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Surjectivity of the rotation map]
     \label{lem:rotation-surjective}
     \lean{QuaternionAlgebras.rotation_surjective}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{prop:rotation}
     \leanok
     Every $A \in \mathrm{SO}(3)$ is realized by conjugation: there is a unit
@@ -343,7 +343,7 @@ $\bar\alpha = \alpha$).
 \begin{lemma}[Kernel of the rotation map]
     \label{lem:rotation-kernel}
     \lean{QuaternionAlgebras.rotation_kernel}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{lem:pure-properties}
     \leanok
     If a unit quaternion $\alpha \in \mathbb{H}^1$ fixes every pure quaternion
@@ -363,7 +363,7 @@ $\bar\alpha = \alpha$).
     \lean{QuaternionAlgebras.rotationHom,
       QuaternionAlgebras.rotationHom_surjective,
       QuaternionAlgebras.rotationHom_ker}
-    \leanfile{QuaternionAlgebras/Rotations.lean}
+    \leanfile{QuaternionAlgebras/Chapter2/Rotations.lean}
     \uses{prop:rotation}
     \leanok
     The rotation map is a group homomorphism

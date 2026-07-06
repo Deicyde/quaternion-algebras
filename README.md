@@ -31,6 +31,6 @@ lake build
 
 | File | Contents |
 |---|---|
-| [`QuaternionAlgebras/Beginnings.lean`](QuaternionAlgebras/Beginnings.lean) | Quaternion algebras and the standard generators presentation (Voight 2.2) |
-| [`QuaternionAlgebras/Matrix.lean`](QuaternionAlgebras/Matrix.lean) | Matrix embeddings, the left regular representation, Hamiltonians into `M₂(ℂ)` (Voight 2.3–2.4) |
-| [`QuaternionAlgebras/Rotations.lean`](QuaternionAlgebras/Rotations.lean) | Pure quaternions, the adjoint action, and the double cover `ℍ¹ → SO(3)` (Voight 2.4) |
+| [`QuaternionAlgebras/Chapter2/Beginnings.lean`](QuaternionAlgebras/Chapter2/Beginnings.lean) | Quaternion algebras and the standard generators presentation (Voight 2.2) |
+| [`QuaternionAlgebras/Chapter2/Matrix.lean`](QuaternionAlgebras/Chapter2/Matrix.lean) | Matrix embeddings, the left regular representation, Hamiltonians into `M₂(ℂ)` (Voight 2.3–2.4) |
+| [`QuaternionAlgebras/Chapter2/Rotations.lean`](QuaternionAlgebras/Chapter2/Rotations.lean) | Pure quaternions, the adjoint action, and the double cover `ℍ¹ → SO(3)` (Voight 2.4) |

@@ -1,3 +1,3 @@
-import QuaternionAlgebras.Beginnings
-import QuaternionAlgebras.Matrix
-import QuaternionAlgebras.Rotations
+import QuaternionAlgebras.Chapter2.Beginnings
+import QuaternionAlgebras.Chapter2.Matrix
+import QuaternionAlgebras.Chapter2.Rotations

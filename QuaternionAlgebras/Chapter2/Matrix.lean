@@ -1,4 +1,4 @@
-import QuaternionAlgebras.Beginnings
+import QuaternionAlgebras.Chapter2.Beginnings
 
 /-!
 # Quaternion algebras: matrix representations

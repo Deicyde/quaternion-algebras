@@ -1,1 +1,365 @@
-% OCR pending for Voight, Chapter 3
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\begin{document}
+
+\setcounter{section}{2}
+\section{Involutions}
+
+In this chapter, we define the standard involution on a quaternion algebra. In this way, we characterize division quaternion algebras as noncommutative division rings equipped with a standard involution.
+
+\subsection{Conjugation}
+
+The quaternion conjugation map (2.4.6) defined on the Hamiltonians $\mathbb{H}$ arises naturally from the notion of real and pure (imaginary) parts, as defined by Hamilton. This involution has a natural generalization to a quaternion algebra $B = (a, b \mid F)$ over a field $F$ with $\operatorname{char} F \neq 2$: we define
+$$\bar{\phantom{a}}: B \rightarrow B$$
+$$\alpha = t + xi + yj + zij \mapsto \bar{\alpha} = t - (xi + yj + zij)$$
+Multiplying out, we then verify that
+$$\alpha\bar{\alpha} = \bar{\alpha}\alpha = t^2 - ax^2 - by^2 + abz^2 \in F.$$
+The way in which the cross terms cancel, because the basis elements $i, j, ij$ skew commute, is a calculation that never fails to enchant!
+
+But this definition seems to depend on a basis: it is not intrinsically defined. What properties characterize it? Is it unique? We are looking for a good definition of conjugation $\bar{\phantom{a}}: B \rightarrow B$ on an $F$-algebra $B$: we will call such a map a \emph{standard involution}.
+
+The involutions we consider should have basic linearity properties: they are $F$-linear (with $\bar{1} = 1$, so they act as the identity on $F$) and have order 2 as an $F$-linear map. An involution should also respect the multiplication structure on $B$, but we should not require that it be an $F$-algebra isomorphism: instead, like the inverse map (or transpose map) reverses order of multiplication, we ask that $\bar{\alpha}\bar{\beta} = \overline{\beta\alpha}$ for all $\alpha \in B$. Finally, we want the standard involution to give rise to a trace and norm (a measure of size), which is to say, we want $\alpha + \bar{\alpha} \in F$ and $\alpha\bar{\alpha} = \bar{\alpha}\alpha \in F$ for all $\alpha \in B$. The precise definition is given in Definition 3.2.1, and the defining properties are rigid: if an algebra $B$ has a standard involution, then it is necessarily unique (Corollary 3.4.4).
+
+The existence of a standard involution on $B$ implies that every element of $B$ satisfies a quadratic equation: by direct substitution, we see that $\alpha \in B$ is a root of the polynomial $x^2 - tx + n \in F[x]$ where $t := \alpha + \overline{\alpha}$ and $n := \alpha\overline{\alpha} = \overline{\alpha}\alpha$, since then
+$$\alpha^2 - (\alpha + \overline{\alpha})\alpha + \alpha\overline{\alpha} = 0$$
+identically. Accordingly, we define the \textbf{reduced trace} $\text{trd}: B \rightarrow F$ by $\text{trd}(\alpha) = \alpha + \overline{\alpha}$ and \textbf{reduced norm} $\text{nrd}: B \rightarrow F$ by $\text{nrd}(\alpha) = \alpha\overline{\alpha}$. We observe that $\text{trd}$ is $F$-linear and $\text{nrd}$ is multiplicative on $B^\times$.
+
+Motivated by this setting, we say that $B$ has \textbf{degree 2} if every element $\alpha \in B$ satisfies a (monic) polynomial in $F[x]$ of degree 2 and, to avoid trivialities, that $B \neq F$ (or equivalently, at least one element of $B$ satisfies no polynomial of degree 1). The final result of this section is the following theorem (see Theorem 3.5.1).
+
+\begin{theorem}
+\label{thm:3.1.1}
+Let $B$ be a division $F$-algebra of degree $2$ over a field $F$ with $\operatorname{char} F \neq 2$. Then either $B = K$ is a quadratic field extension of $F$ or $B$ is a division quaternion algebra over $F$.
+\end{theorem}
+
+As a consequence, division quaternion algebras are characterized as noncommutative division algebras with a standard involution, when $\operatorname{char} F \neq 2$.
+
+\subsection{Involutions}
+
+Throughout this chapter, let $B$ be an $F$-algebra. For the moment, we allow $F$ to be of arbitrary characteristic. We begin by defining involutions on $B$.
+
+\begin{definition}
+An \textbf{involution} $\overline{\phantom{B}} : B \rightarrow B$ is an $F$-linear map which satisfies:
+\begin{itemize}
+  \item[(i)] $\overline{1} = 1$;
+  \item[(ii)] $\overline{\overline{\alpha}} = \alpha$ for all $\alpha \in B$; and
+  \item[(iii)] $\overline{\alpha\beta} = \overline{\beta}\,\overline{\alpha}$ for all $\alpha, \beta \in B$ (the map $\overline{\phantom{B}}$ is an \textbf{anti-automorphism}).
+\end{itemize}
+\end{definition}
+
+\textbf{3.2.2.} We define the \textbf{opposite algebra} of $B$ by letting $B^{\text{op}} = B$ as $F$-vector spaces but with multiplication $\alpha \cdot_{\text{op}} \beta = \beta \cdot \alpha$ for $\alpha, \beta \in B$.
+
+One can then equivalently define an involution to be an $F$-algebra isomorphism $B \xrightarrow{\sim} B^{\text{op}}$ whose underlying $F$-linear map has order at most 2.
+
+\begin{remark}
+What we have defined to be an involution is known in other contexts as an \textbf{involution of the first kind}. An \textbf{involution of the second kind} is a map which acts nontrivially when restricted to $F$, and hence is not $F$-linear; although these involutions are interesting in other contexts, they will not figure in our discussion (and anyway one can consider such an algebra over the fixed field of the involution).
+\end{remark}
+
+\begin{definition}
+An involution $\overline{\phantom{B}}$ is \textbf{standard} if $\alpha\overline{\alpha} \in F$ for all $\alpha \in B$.
+\end{definition}
+
+\begin{remark}
+Standard involutions go by many other names. The terminology \emph{standard} is employed because conjugation on a quaternion algebra is the ``standard'' example of such an involution. Other authors call the standard involution the \emph{main} involution for quaternion algebras, but then find situations where the ``main'' involution is not standard by our definition. The standard involution is also called conjugation on $B$, but this can be confused with conjugation by an element in $B^\times$. We will see in Corollary 3.4.4 that a standard involution is unique, so it is also called the canonical involution; however, there are other circumstances where involutions can be defined canonically that are not standard (like the map induced by $g \mapsto g^{-1}$ on the group ring $F[G]$).
+\end{remark}
+
+\textbf{3.2.6.} If $\overline{\phantom{B}}$ is a standard involution, so that $\alpha\overline{\alpha} \in F$ for all $\alpha \in B$, then
+$$(\alpha + 1)(\overline{\alpha + 1}) = (\alpha + 1)(\overline{\alpha} + 1) = \alpha\overline{\alpha} + \alpha + \overline{\alpha} + 1 \in F$$
+and hence $\alpha + \overline{\alpha} \in F$ for all $\alpha \in B$ as well; it then also follows that $\alpha\overline{\alpha} = \overline{\alpha}\alpha$, since
+$$(\alpha + \overline{\alpha})\alpha = \alpha(\alpha + \overline{\alpha}).$$
+
+\begin{example}
+The identity map is a standard involution on $B = F$ as an $F$-algebra. The $\mathbb{R}$-algebra $\mathbb{C}$ has a standard involution, namely, complex conjugation.
+\end{example}
+
+\begin{example}
+The adjugate map
+$$A = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \mapsto A^{\dagger} = \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$$
+is a standard involution on $\mathrm{M}_2(F)$ since $AA^{\dagger} = A^{\dagger}A = ad - bc = \det A \in F$.
+
+Matrix transpose is an involution on $\mathrm{M}_n(F)$ but is a standard involution (if and) only if $n = 1$.
+\end{example}
+
+\textbf{3.2.9.} Suppose $\operatorname{char} F \neq 2$ and let $B = (a, b \mid F)$. Then the map
+$$\begin{array}{c} \overline{\phantom{B}}: B \to B \\ \alpha = t + xi + yj + zij \mapsto \overline{\alpha} = t - xi - yj - zij \end{array}$$
+defines a standard involution on $B$ and $\overline{\alpha} = 2t - \alpha$. The map is $F$-linear with $\overline{1} = 1$ and $\overline{\overline{\alpha}} = \alpha$, so properties (i) and (ii) hold. By $F$-linearity, it is enough to check property (iii) on a basis (Exercise 3.5), and we verify for instance that
+$$\overline{ij} = -ij = ji = (-j)(-i) = \overline{j}\,\overline{i}$$
+(see Exercise 3.5). Finally, the involution is standard because
+\begin{equation}
+(t + xi + yj + zij)(t - xi - yj - zij) = t^2 - ax^2 - by^2 + abz^2 \in F. \tag{3.2.10}
+\end{equation}
+
+\begin{remark}
+Algebras with involution play an important role in analysis, in particular Banach algebras with involution and $C^*$-algebras (generally of infinite dimension). A good reference is the text by Dixmier [Dix77] (or the more introductory book by Conway [Con2012]).
+\end{remark}
+
+\subsection{Reduced trace and reduced norm}
+
+Let $\overline{\phantom{B}} : B \to B$ be a standard involution on $B$. We define the \textbf{reduced trace} on $B$ by
+\begin{equation}
+\begin{array}{c} \operatorname{trd}: B \to F \\ \alpha \mapsto \alpha + \overline{\alpha} \end{array} \tag{3.3.1}
+\end{equation}
+and similarly the \textbf{reduced norm}
+\begin{equation}
+\begin{array}{c} \operatorname{nrd}: B \to F \\ \alpha \mapsto \alpha \overline{\alpha}. \end{array} \tag{3.3.2}
+\end{equation}
+
+\begin{example}
+For $B = \mathrm{M}_2(F)$, equipped with the adjugate map as a standard involution as in Example 3.2.8, the reduced trace is the usual matrix trace and the reduced norm is the determinant.
+\end{example}
+
+\textbf{3.3.4.} The reduced trace $\operatorname{trd}$ is an $F$-linear map, since this is true for the standard involution:
+$$\operatorname{trd}(\alpha + \beta) = (\alpha + \beta) + \overline{(\alpha + \beta)} = (\alpha + \overline{\alpha}) + (\beta + \overline{\beta}) = \operatorname{trd}(\alpha) + \operatorname{trd}(\beta)$$
+for $\alpha, \beta \in B$. The reduced norm $\operatorname{nrd}$ is multiplicative, since
+$$\operatorname{nrd}(\alpha\beta) = (\alpha\beta)\overline{(\alpha\beta)} = \alpha\beta\overline{\beta}\,\overline{\alpha} = \alpha\operatorname{nrd}(\beta)\overline{\alpha} = \operatorname{nrd}(\alpha)\operatorname{nrd}(\beta)$$
+for all $\alpha, \beta \in B$.
+
+It will be convenient to write
+\begin{equation}
+\begin{array}{l} B^0 := \{\alpha \in B : \operatorname{trd}(\alpha) = 0\} \\ B^1 := \{\alpha \in B^\times : \operatorname{nrd}(\alpha) = 1\} \end{array} \tag{3.3.5}
+\end{equation}
+for the $F$-subspace $B^0 \subseteq B$ of elements of reduced trace 0 and for the subgroup $B^1 \leq B^\times$ of elements of reduced norm 1. We observe that $B^1 \trianglelefteq B^\times$ is normal, by multiplicativity, indeed we have an exact sequence of groups
+$$1 \to B^1 \to B^\times \xrightarrow{\operatorname{nrd}} F^\times$$
+(noting that the reduced norm map need not be surjective).
+
+\begin{lemma}
+If $B$ is not the zero ring, then $\alpha \in B$ is a unit (has a two-sided inverse) if and only if $\operatorname{nrd}(\alpha) \neq 0$.
+\end{lemma}
+
+\begin{proof}
+Exercise 3.4.
+\end{proof}
+
+\begin{lemma}
+For all $\alpha, \beta \in B$, we have $\operatorname{trd}(\beta\alpha) = \operatorname{trd}(\alpha\beta)$.
+\end{lemma}
+
+\begin{proof}
+We have
+$$\operatorname{trd}(\alpha \overline{\beta}) = \operatorname{trd}(\alpha (\operatorname{trd}(\beta) - \beta)) = \operatorname{trd}(\alpha) \operatorname{trd}(\beta) - \operatorname{trd}(\alpha \beta)$$
+and so
+$$\operatorname{trd}(\alpha \overline{\beta}) = \operatorname{trd}(\overline{\alpha \overline{\beta}}) = \operatorname{trd}(\beta \overline{\alpha}) = \operatorname{trd}(\alpha) \operatorname{trd}(\beta) - \operatorname{trd}(\beta \alpha)$$
+therefore $\operatorname{trd}(\alpha \beta) = \operatorname{trd}(\beta \alpha)$.
+\end{proof}
+
+\begin{remark}
+The maps $\operatorname{trd}$ and $\operatorname{nrd}$ are called reduced for the following reason.
+
+Let $A$ be a finite-dimensional $F$-algebra, and consider the left regular representation $\lambda: A \hookrightarrow \operatorname{End}_F(A)$ given by left multiplication in $A$ (cf.\ Proposition 2.3.1, but over $F$). We then have a (left) trace map $\operatorname{Tr}: A \to F$ and (left) norm map $\operatorname{Nm}: A \to F$ given by mapping $\alpha \in B$ to the trace and determinant of the endomorphism $\lambda_\alpha \in \operatorname{End}_F(A)$.
+
+When $A = \mathrm{M}_2(F)$, a direct calculation (Exercise 3.12) reveals that
+$$\operatorname{Tr}(\alpha) = 2 \operatorname{trd}(\alpha) = 2 \operatorname{tr}(\alpha)$$
+(algebra trace, reduced trace, and matrix trace, respectively; there is no difference between left and right), and
+$$\operatorname{Nm}(\alpha) = \operatorname{nrd}(\alpha)^2 = \det(\alpha)^2$$
+for all $\alpha \in A$, whence the name reduced. (To preview the language of chapter 7, this calculation can be efficiently summarized: as a left $A$-module, $A$ is the sum of two simple $A$-modules---acting on the columns of a matrix---and the reduced trace and reduced norm represent `half' of this action.)
+\end{remark}
+
+\textbf{3.3.9.} Since
+\begin{equation}
+\alpha^2 - (\alpha + \overline{\alpha})\alpha + \alpha \overline{\alpha} = 0 \tag{3.3.10}
+\end{equation}
+identically we see that $\alpha \in B$ is a root of the polynomial
+\begin{equation}
+x^2 - \operatorname{trd}(\alpha)x + \operatorname{nrd}(\alpha) \in F[x] \tag{3.3.11}
+\end{equation}
+which we call the reduced characteristic polynomial of $\alpha$. The fact that $\alpha$ satisfies its reduced characteristic polynomial is the reduced Cayley--Hamilton theorem for an algebra with standard involution. When $\alpha \notin F$, the reduced characteristic polynomial of $\alpha$ is its minimal polynomial, since if $\alpha$ satisfies a polynomial of degree 1 then $\alpha \in F$.
+
+\subsection{Uniqueness and degree}
+
+\begin{definition}
+An $F$-algebra $K$ with $\dim_F K = 2$ is called a \textbf{quadratic algebra}.
+\end{definition}
+
+\begin{lemma}
+Let $K$ be a quadratic $F$-algebra. Then $K$ is commutative and has a unique standard involution.
+\end{lemma}
+
+\begin{proof}
+Let $\alpha \in K \setminus F$. Then $K = F \oplus F\alpha = F[\alpha]$, so in particular $K$ is commutative. Then $\alpha^2 = t\alpha - n$ for unique $t, n \in F$, since $1, \alpha$ is a basis for $K$.
+
+If $\overline{\phantom{K}} : K \to K$ is any standard involution, then from (3.3.10) and uniqueness we conclude $t = \alpha + \overline{\alpha}$ (and $n = \alpha\overline{\alpha}$), and so any involution must have $\overline{\alpha} = t - \alpha$. On the other hand, there is a unique standard involution $\overline{\cdot} : K \to K$ with $\overline{\alpha} = t - \alpha$: the verification is straightforward (see Exercise 3.5).
+\end{proof}
+
+\begin{example}
+The reduced trace and norm on a quadratic algebra are precisely the usual algebra trace and norm. If $\operatorname{char} F \neq 2$ and $K \supseteq F$ is a quadratic field extension of $F$, then the standard involution is just the nontrivial element of $\operatorname{Gal}(K \mid F)$.
+\end{example}
+
+\begin{corollary}
+If $B$ has a standard involution, then this involution is unique.
+\end{corollary}
+
+\begin{proof}
+For any $\alpha \in B \setminus F$, we have from (3.3.10) that $\dim_F F[\alpha] = 2$, so the restriction of the standard involution to $F[\alpha]$ is unique. Therefore the standard involution on $B$ is itself unique.
+\end{proof}
+
+We have seen that the equation (3.3.10), implying that if $B$ has a standard involution then every $\alpha \in B$ satisfies a quadratic equation, has figured prominently in the above proofs. To further clarify the relationship between these two notions, we make the following definition.
+
+\begin{definition}
+The \textbf{degree} of $B$ is the smallest $m \in \mathbb{Z}_{\geq 0}$ such that every element $\alpha \in B$ satisfies a monic polynomial $f(x) \in F[x]$ of degree $m$, if such an integer exists; otherwise, we say $B$ has degree $\infty$.
+\end{definition}
+
+\textbf{3.4.6.} If $B$ has finite dimension $n = \dim_F B < \infty$, then every element of $B$ satisfies a polynomial of degree at most $n$: if $\alpha \in B$ then the elements $1, \alpha, \dots, \alpha^n$ are linearly dependent over $F$. Consequently, every finite-dimensional $F$-algebra has a (well-defined) integer degree, at most $n$.
+
+\begin{example}
+By convention, we interpret Definition 3.4.5 as defining the degree of the zero ring to be 0 (since $1 = 0$, the element 0 satisfies the monic polynomial $0x$)---whatever!
+
+If $B$ has degree 1, then $B = F$. If $B$ has a standard involution, then either $B = F$ or $B$ has degree 2 by (3.3.11).
+\end{example}
+
+\subsection{Quaternion algebras}
+
+We are now ready to characterize division algebras of degree 2 when $\operatorname{char} F \neq 2$. (For the case $\operatorname{char} F = 2$, see Chapter 6.)
+
+\begin{theorem}
+\label{thm:3.5.1}
+Suppose $\operatorname{char} F \neq 2$ and let $B$ be a division $F$-algebra. Then $B$ has degree at most $2$ if and only if one of the following holds:
+\begin{itemize}
+  \item[(i)] $B = F$;
+  \item[(ii)] $B = K$ is a quadratic field extension of $F$; or
+  \item[(iii)] $B$ is a division quaternion algebra over $F$.
+\end{itemize}
+\end{theorem}
+
+\begin{proof}
+From Example 3.4.7, we may suppose that $B \neq F$ and $B$ has degree 2.
+
+Let $i \in B \setminus F$. Then $F[i] = K$ is a (commutative) quadratic $F$-subalgebra of the division ring $B$, so $K = F(i)$ is a field. If $K = B$, we are done. Completing the square (since $\operatorname{char} F \neq 2$), we may suppose that $i^2 = a \in F^\times$.
+
+Let $\phi: B \to B$ be the map given by conjugation by $i$, i.e., $\phi(\alpha) = i^{-1}\alpha i$. Then $\phi$ is a $K$-linear endomorphism of $B$, thought of as a (left) $K$-vector space, and $\phi^2$ is the identity on $B$. Therefore $\phi$ is diagonalizable, and we may decompose $B = B^+ \oplus B^-$ into eigenspaces for $\phi$: explicitly, we can always write
+$$\alpha = \frac{\alpha + \phi(\alpha)}{2} + \frac{\alpha - \phi(\alpha)}{2} \in B^+ \oplus B^-.$$
+
+We now prove $\dim_K B^+ = 1$. Let $\alpha \in B^+$. Then $L = F(\alpha, i)$ is a field. Since $\operatorname{char} F \neq 2$, and $L$ is a compositum of quadratic extensions of $F$, the primitive element theorem implies that $L = F(\beta)$ for some $\beta \in L$. But by hypothesis $\beta$ satisfies a quadratic equation so $\dim_F L = 2$ and hence $L = K$. (For an alternative direct proof of this claim, see Exercise 3.10.)
+
+If $B = B^+ = K$, we are done. So suppose $B^- \neq \{0\}$. We will prove that $\dim_K B^- = 1$. If $0 \neq j \in B^-$ then $i^{-1}ji = -j$, so $i = -j^{-1}ij$ and hence all elements of $B^-$ conjugate $i$ to $-i$. Thus if $0 \neq j_1, j_2 \in B^-$ then $j_1j_2$ centralizes $i$ and $j_1j_2 \in B^+ = K$. Thus any two nonzero elements of $B^-$ are $K$-multiples of each other.
+
+Finally, let $j \in B^- \setminus \{0\}$; then $B = B^+ \oplus B^- = K \oplus Kj$ so $B$ has $F$-basis $1, i, j, ij$ and $ji = -ij$. We claim that $\operatorname{trd}(j) = 0$: indeed, both $j$ and $i^{-1}ji = -j$ satisfy the same reduced characteristic (or minimal) polynomial of degree 2, so $\operatorname{trd}(j) = \operatorname{trd}(-j) = -\operatorname{trd}(j)$ so $\operatorname{trd}(j) = 0$. Thus $j^2 = b \in F^\times$, and $B$ is a quaternion algebra by definition.
+\end{proof}
+
+\begin{remark}
+We need not assume in Theorem 3.5.1 that $B$ is finite-dimensional; somehow, it is a consequence, and every division algebra over $F$ (with $\operatorname{char} F \neq 2$) of degree $\leq 2$ is finite-dimensional.
+
+There are algebras of arbitrary (finite or infinite) dimension over $F$ of degree 2: see Exercise 3.15. Also, a boolean ring (see Exercise 3.12) has degree 2 as an $\mathbb{F}_2$-algebra, and there are such rings of arbitrary dimension over $\mathbb{F}_2$. Such algebras are quite far from being division rings, of course.
+\end{remark}
+
+\begin{remark}
+The proof of Theorem 3.5.1 has quite a bit of history, discussed by van Praag [vPr2002] (along with several proofs). See Lam [Lam2005, Theorem III.5.1] for a parallel proof of Theorem 3.5.1. Moore [Moore35, Theorem 14.4] in 1915 studied algebra of matrices over skew fields and in particular the role of involutions, and gives an elementary proof of this theorem (with the assumption $\operatorname{char} F \neq 2$). Dieudonn\'{e} [Die48, Die53] gave another proof that relies on structure theory for finite-dimensional division algebras.
+\end{remark}
+
+\begin{corollary}
+Let $B$ be a division $F$-algebra with $\operatorname{char} F \neq 2$. Then $B$ has degree at most $2$ if and only if $B$ has a standard involution.
+\end{corollary}
+
+\begin{proof}
+In each of the cases (i)--(iii), $B$ has a standard involution; and conversely if $B$ has a standard involution, then $B$ has degree at most 2 (Example 3.4.7).
+\end{proof}
+
+\begin{remark}
+The statement of Corollary 3.5.4 holds more generally---even if $B$ is not necessarily a division ring---as follows. Let $B$ be an $F$-algebra with $\operatorname{char} F \neq 2$. Then $B$ has a standard involution if and only if $B$ has degree at most 2 [Voi2011b]. However, this is no longer true in characteristic 2 (Exercise 3.12).
+\end{remark}
+
+\begin{corollary}
+Let $B$ be a division $F$-algebra with $\operatorname{char} F \neq 2$. Then the following are equivalent:
+\begin{itemize}
+  \item[(i)] $B$ is a quaternion algebra;
+  \item[(ii)] $B$ is noncommutative and has degree $2$; and
+  \item[(iii)] $B$ is central and has degree $2$.
+\end{itemize}
+\end{corollary}
+
+\begin{definition}
+An $F$-algebra $B$ is \textbf{algebraic} if every $\alpha \in B$ is algebraic over $F$ (i.e., $\alpha$ satisfies a polynomial with coefficients in $F$).
+\end{definition}
+
+If $B$ has finite degree (such as when $\dim_F B = n < \infty$), then $B$ is algebraic.
+
+\begin{corollary}[Frobenius]
+Let $B$ be an algebraic division algebra over $\mathbb{R}$. Then either $B = \mathbb{R}$ or $B \cong \mathbb{C}$ or $B \cong \mathbb{H}$ as $\mathbb{R}$-algebras.
+\end{corollary}
+
+\begin{proof}
+If $\alpha \in B \setminus \mathbb{R}$ then $\mathbb{R}(\alpha) \cong \mathbb{C}$, so $\alpha$ satisfies a polynomial of degree 2. Thus if $B \neq \mathbb{R}$ then $B$ has degree 2 and either $B \cong \mathbb{C}$ or $B$ is a division quaternion algebra over $\mathbb{R}$, and hence $B \cong \mathbb{H}$ by Exercise 2.3(c).
+\end{proof}
+
+\begin{example}
+Division algebras over $\mathbb{R}$ of infinite dimension abound. Transcendental field extensions of $\mathbb{R}$, such as the function field $\mathbb{R}(x)$ or the Laurent series field $\mathbb{R}((x))$, are examples of infinite-dimensional division algebras over $\mathbb{R}$. Also, the free algebra in two (noncommuting) variables is a subring of a division ring $B$ (its ``noncommutative ring of fractions'') with center $\mathbb{R}$ and of infinite dimension over $\mathbb{R}$.
+\end{example}
+
+\begin{remark}
+The theorem of Frobenius (Corollary 3.5.8) extends directly to fields $F$ akin to $\mathbb{R}$, as follows. A field is \textbf{formally real} if $-1$ cannot be expressed in $F$ as a sum of squares and \textbf{real closed} if $F$ is formally real and has no formally real proper algebraic extension. The real numbers $\mathbb{R}$ and the field of all real algebraic numbers are real closed. A real closed field has characteristic zero, is totally ordered, and contains a square root of each nonnegative element; the field obtained from $F$ by adjoining a root of the irreducible polynomial $x^2 + 1$ is algebraically closed. For these statements, see Rajwade [Raj93, Chapter 15]. Every finite-dimensional division algebra over a real closed field $F$ is either $F$ or $K = F(\sqrt{-1})$ or $B = (-1, -1 \mid F)$.
+\end{remark}
+
+\begin{remark}
+Algebras of dimension 3, sitting somehow between quadratic extensions and quaternion algebras, can be characterized in a similar way. If $B$ is an $\mathbb{R}$-algebra of dimension 3, then either $B$ is commutative or $B$ has a standard involution and is isomorphic to the subring of upper triangular matrices in $\mathrm{M}_2(\mathbb{R})$. A similar statement holds for free $R$-algebras of rank 3 over a (commutative) domain $R$; see Levin [Lev2013].
+\end{remark}
+
+\subsection*{Exercises}
+
+Throughout these exercises, let $F$ be a field.
+
+\begin{enumerate}
+\item[\textbf{1.}] Let $B$ be an $F$-algebra and let $\overline{\cdot}: B \to B$ be an $F$-linear map with $\overline{1} = 1$. Show that $\overline{\cdot}$ is an involution if and only if (ii)--(iii) in Definition 3.2.1 hold for a basis of $B$ (as an $F$-vector space).
+
+\item[\textbf{2.}] Let $K = F[\alpha]$ be a quadratic $F$-algebra, with $\alpha^2 = t\alpha - n$ for (unique) $t, n \in F$. Extending linearly, show that there is a unique standard involution $\overline{\cdot}: K \to K$ with the property that $\overline{\alpha} = t - \alpha$, and show that
+$$\begin{array}{l} \operatorname{trd}(x + y\alpha) = 2x + ty \\ \operatorname{nrd}(x + y\alpha) = x^2 + txy + ny^2 \end{array}$$
+for all $x + y\alpha \in F[\alpha]$.
+
+\item[\textbf{3.}] Verify that the map $\overline{\cdot}$ in Example 3.2.9 is a standard involution.
+
+\item[4.] Determine the standard involution on $K = F \times F$ (with $F \hookrightarrow K$ under the diagonal map).
+
+\item[\textbf{5.}] Let $B$ be an $F$-algebra with a standard involution. Show that $0 \neq \alpha \in B$ is a left zerodivisor if and only if $\alpha$ is a right zerodivisor if and only if $\operatorname{nrd}(\alpha) = 0$. In particular, if $B$ is not the zero ring, then $\alpha \in B$ is (left and right) invertible if and only if $\operatorname{nrd}(\alpha) \neq 0$.
+
+\item[6.] Suppose $\operatorname{char} F \neq 2$, let $B$ be a division quaternion algebra over $F$, and let $K_1, K_2 \subseteq B$ be quadratic subfields (over $F$) with $K_1 \cap K_2 = F$. Show that the $F$-subalgebra of $B$ generated by $K_1$ and $K_2$ is equal to $B$. Conclude that if $1, \alpha, \beta \in B$ are $F$-linearly independent, then $1, \alpha, \beta, \alpha\beta$ are an $F$-basis for $B$. [Hint: use the involution.] By way of counterexample, show that these results need not hold for $B = \mathrm{M}_2(F)$.
+
+\item[7.] Show that $B = \mathrm{M}_n(F)$ has a standard involution if and only if $n \leq 2$.
+
+\item[8.] Let $G$ be a finite group. Show that the $F$-linear map induced by $g \mapsto g^{-1}$ for $g \in G$ is an involution on the group ring $F[G] = \bigoplus_{g \in G} Fg$. Determine necessary and sufficient conditions for this map to be a standard involution.
+
+\item[9.] Let $B$ be an $F$-algebra with a standard involution $\overline{\cdot}: B \to B$. In this exercise, we examine when $\overline{\cdot}$ is the identity map.
+\begin{itemize}
+  \item[(a)] Show that if $\operatorname{char} F \neq 2$, then $x \in B$ satisfies $\overline{x} = x$ if and only if $x \in F$.
+  \item[(b)] Suppose that $\dim_F B < \infty$. Show that the identity map is a standard involution on $B$ if and only if (i) $B = F$ or (ii) $\operatorname{char} F = 2$ and $B$ is a quotient of the commutative ring $F[x_1, \dots, x_n]/(x_1^2 - a_1, \dots, x_n^2 - a_n)$ with $a_i \in F$.
+\end{itemize}
+
+\item[10.] Let $K \supseteq F$ be a field which has degree $m$ as an $F$-algebra in the sense of Definition 3.4.5. Suppose that $\operatorname{char} F \nmid m$. Show that $[K : F] = m$, i.e., $K$ has degree $m$ in the usual sense. (What happens when $\operatorname{char} F \mid m$?)
+
+\item[11.] Let $B$ be an $F$-algebra with standard involution. Suppose that $\phi: B \xrightarrow{\sim} B$ is an $F$-algebra automorphism. Show for $\alpha \in B$ that $\phi(\overline{\alpha}) = \overline{\phi(\alpha)}$, and therefore that $\operatorname{trd}(\phi(\alpha)) = \operatorname{trd}(\alpha)$ and $\operatorname{nrd}(\phi(\alpha)) = \operatorname{nrd}(\alpha)$. [Hint: consider the map $\alpha \mapsto \phi^{-1}(\overline{\phi(\alpha)})$.]
+
+\item[12.] In this exercise, we explore further the relationship between algebras of degree 2 and those with standard involutions (Remark 3.5.5).
+\begin{itemize}
+  \item[(a)] Suppose $\operatorname{char} F \neq 2$ and let $B$ be a finite-dimensional $F$-algebra. Show that $B$ has a standard involution if and only if $\deg_F B \leq 2$.
+  \item[(b)] Let $F = \mathbb{F}_2$ and let $B$ be a Boolean ring, a ring such that $x^2 = x$ for all $x \in B$. (Verify that $2 = 0$ in $B$, so $B$ is an $\mathbb{F}_2$-algebra.) Prove that $B$ does not have a standard involution unless $B = \mathbb{F}_2$ or $B = \mathbb{F}_2 \times \mathbb{F}_2$, but nevertheless any Boolean ring has degree at most 2.
+\end{itemize}
+
+\item[\textbf{13.}] Let $B = \mathrm{M}_n(F)$, and consider the map $\lambda: B \hookrightarrow \operatorname{End}_F(B)$ by $\alpha \mapsto \lambda_\alpha$ defined by left-multiplication in $B$. Show that for all $\alpha \in \mathrm{M}_n(F)$, the characteristic polynomial of $\lambda_\alpha$ is the $n$th power of the usual characteristic polynomial of $\alpha$. Conclude when $n = 2$ that $\operatorname{tr}(\lambda_\alpha) = 2 \operatorname{trd}(\alpha)$ and $\det(\lambda_\alpha) = \operatorname{nrd}(\alpha)^2$.
+
+\item[14.] Considering a slightly different take on the previous exercise: let $B$ be a quaternion algebra over $F$. Show that the characteristic polynomial of left multiplication by $\alpha \in B$ is equal to that of right multiplication and is the square of the reduced characteristic polynomial. [Hint: if a direct approach is too cumbersome, consider applying the previous exercise and the left regular representation as in 2.3.8.]
+
+\item[15.] Let $V$ be an $F$-vector space and let $t: V \to F$ be an $F$-linear map. Let $B = F \oplus V$ and define the binary operation $x \cdot y = t(x)y$ for $x, y \in V$. Show that $\cdot$ induces a multiplication on $B$, and that the map $x \mapsto \overline{x} = t(x) - x$ for $x \in V$ induces a standard involution on $B$. [Such an algebra is called an \textbf{exceptional algebra} [GrLu2009, Voi2011b].] Conclude that there exists a central $F$-algebra $B$ with a standard involution in any dimension $n = \dim_F B \geq 3$.
+
+\item[\textbf{16.}] In this exercise, we mimic the proof of Theorem 3.5.1 to prove that a quaternion algebra over a finite field of odd cardinality is not a division ring, a special case of Wedderburn's little theorem: a finite division ring is a field. Assume for purposes of contradiction that $B$ is a division quaternion algebra over $F = \mathbb{F}_q$ with $q$ odd.
+\begin{itemize}
+  \item[(a)] Let $i \in B \setminus F$. Show that the centralizer $C_{B^\times}(i) = \{\alpha \in B^\times : i\alpha = \alpha i\}$ of $i$ in $B^\times$ satisfies $C_{B^\times}(i) = F(i)^\times$.
+  \item[(b)] Conclude that any noncentral conjugacy class in $B^\times$ has order $q^2 + 1$.
+  \item[(c)] Derive a contradiction from the class equation $q^4 - 1 = q - 1 + m(q^2 + 1)$ (where $m \in \mathbb{Z}$).
+\end{itemize}
+[For the case $q$ even, see Exercise 6.7; for fun, the eager reader may wish to prove Wedderburn's little theorem for $F = \mathbb{F}_2$ directly.]
+
+\item[17.] Derive Euler's identity (1.1.6) that the product of the sum of four squares is again the sum of four squares as follows. Let $F = \mathbb{Q}(x_1, \dots, x_4, y_1, \dots, y_4)$ be a function field over $\mathbb{Q}$ in 8 variables and consider the quaternion algebra $(-1, -1 \mid F)$. Show (by an explicit universal formula) that if $R$ is any commutative ring and $x, y \in R$ are the sum of four squares in $R$, then $xy$ is the sum of four squares in $R$.
+
+\item[18.] Suppose $\operatorname{char} F \neq 2$. For an $F$-algebra $B$, let
+$$V(B) := \{\alpha \in B \setminus F : \alpha^2 \in F\} \cup \{0\}.$$
+Let $B$ be a \emph{central} division ring. Show that $V(B)$ is a nonzero vector space if and only if $B$ is a quaternion algebra over $F$.
+
+\item[19.] Let $B$ be an $F$-algebra with $F$-basis $e_1, e_2, \dots, e_n$. Let $\overline{\cdot}: B \to B$ be an involution. Show that $\overline{\cdot}$ is standard if and only if
+$$e_i \overline{e_i} \in F \text{ and } (e_i + e_j)\overline{(e_i + e_j)} \in F \text{ for all } i, j = 1, \dots, n.$$
+\end{enumerate}
+
+\end{document}
