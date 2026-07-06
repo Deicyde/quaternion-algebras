@@ -1,3 +1,7 @@
 import QuaternionAlgebras.Chapter2.Beginnings
 import QuaternionAlgebras.Chapter2.Matrix
 import QuaternionAlgebras.Chapter2.Rotations
+import QuaternionAlgebras.Chapter3.Involutions
+import QuaternionAlgebras.Chapter3.Quadratic
+import QuaternionAlgebras.Chapter3.Classification
+import QuaternionAlgebras.Chapter3.Frobenius
