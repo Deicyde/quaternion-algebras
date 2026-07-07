@@ -41,9 +41,12 @@ statement "quaternion algebras over number fields have maximal orders".)
 * A **maximal order** is an order not properly contained in another order — a maximal element
   of the orders under inclusion (Voight, Definition 10.4.1). See `IsMaximalOrder`.
 
-## Main statement
+## Main statements
 
-* `exists_maximalOrder_and_forall_le` — Voight's Proposition 15.5.2.
+Voight's Proposition 15.5.2 splits into its two halves:
+
+* `exists_maximalOrder` — a maximal `𝓞 K`-order exists.
+* `exists_maximalOrder_ge` — every `𝓞 K`-order is contained in a maximal one.
 -/
 
 open scoped NumberField Quaternion
@@ -100,15 +103,22 @@ end Order
 
 variable (K : Type*) [Field K] [NumberField K] (a b : K)
 
-/-- **Voight, *Quaternion Algebras*, Proposition 15.5.2** (number-field case).
+/-- **Voight, *Quaternion Algebras*, Proposition 15.5.2** (number-field case), existence half.
 
-If `a, b ∈ Kˣ` for a number field `K`, then the quaternion algebra `ℍ[K, a, 0, b]` contains
-a maximal `𝓞 K`-order, and moreover every `𝓞 K`-order in it is contained in a maximal one. -/
-theorem exists_maximalOrder_and_forall_le (ha : a ≠ 0) (hb : b ≠ 0) :
-    (∃ O : Subalgebra (𝓞 K) ℍ[K, a, 0, b], IsMaximalOrder (𝓞 K) K ℍ[K, a, 0, b] O) ∧
-      (∀ O : Subalgebra (𝓞 K) ℍ[K, a, 0, b], IsOrder (𝓞 K) K ℍ[K, a, 0, b] O →
-        ∃ O' : Subalgebra (𝓞 K) ℍ[K, a, 0, b],
-          IsMaximalOrder (𝓞 K) K ℍ[K, a, 0, b] O' ∧ O ≤ O') := by
+If `a, b ∈ Kˣ` for a number field `K`, then the quaternion algebra `ℍ[K, a, 0, b]` contains a
+maximal `𝓞 K`-order. -/
+theorem exists_maximalOrder (ha : a ≠ 0) (hb : b ≠ 0) :
+    ∃ O : Subalgebra (𝓞 K) ℍ[K, a, 0, b], IsMaximalOrder (𝓞 K) K ℍ[K, a, 0, b] O := by
+  sorry
+
+/-- **Voight, *Quaternion Algebras*, Proposition 15.5.2** (number-field case), enlargement half.
+
+If `a, b ∈ Kˣ` for a number field `K`, then every `𝓞 K`-order in the quaternion algebra
+`ℍ[K, a, 0, b]` is contained in a maximal `𝓞 K`-order. -/
+theorem exists_maximalOrder_ge (ha : a ≠ 0) (hb : b ≠ 0)
+    (O : Subalgebra (𝓞 K) ℍ[K, a, 0, b]) (hO : IsOrder (𝓞 K) K ℍ[K, a, 0, b] O) :
+    ∃ O' : Subalgebra (𝓞 K) ℍ[K, a, 0, b],
+      IsMaximalOrder (𝓞 K) K ℍ[K, a, 0, b] O' ∧ O ≤ O' := by
   sorry
 
 end VoightMaximalOrder
