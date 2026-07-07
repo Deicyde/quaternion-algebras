@@ -50,16 +50,11 @@ namespace VoightMaximalOrder
 variable (K : Type*) [Field K] [NumberField K] (a b : K)
 
 /-- An **`𝓞 K`-order** in the quaternion algebra `ℍ[K, a, 0, b]`: an `𝓞 K`-subalgebra `O`
-that is a *full lattice*, i.e.
-
-* `O` is finitely generated as an `𝓞 K`-module, and
-* the `K`-span of `O` is all of `ℍ[K, a, 0, b]`.
+that is a *full lattice*, i.e. the `K`-span of `O` is all of `ℍ[K, a, 0, b]`.
 
 Since `ℍ[K, a, 0, b]` is finite-dimensional over `K = Frac(𝓞 K)`, this is exactly Voight's
 notion of an `R`-order (a subring that is simultaneously a full `R`-lattice). -/
 structure IsOrder (O : Subalgebra (𝓞 K) ℍ[K, a, 0, b]) : Prop where
-  /-- `O` is a finitely generated `𝓞 K`-module. -/
-  moduleFinite : Module.Finite (𝓞 K) O
   /-- `O` spans `ℍ[K, a, 0, b]` over `K` (it is a *full* lattice). -/
   spans : Submodule.span K (O : Set ℍ[K, a, 0, b]) = ⊤
 
