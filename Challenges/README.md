@@ -2,22 +2,29 @@
 
 Buzzard-style **challenge files** (autoformalization targets: `import Mathlib`, define
 every prerequisite, state the theorem ending in `sorry`) for two results from
-**John Voight, *Quaternion Algebras*** (GTM 288). Each file depends on Mathlib only —
-not on the surrounding `QuaternionAlgebras` library — so it is self-contained in content.
+**John Voight, *Quaternion Algebras*** (GTM 288). They depend only on Mathlib, not on the
+surrounding `QuaternionAlgebras` library.
+
+- `MaximalOrders.lean` — single self-contained file (imports only Mathlib).
+- `Ramification.lean` — the statement + core defs, with the central-simple / Brauer-group
+  prerequisites (the quaternion-CSA facts Mathlib lacks) factored into `QuaternionCSA.lean`.
+  `Ramification.lean` imports `Challenges.QuaternionCSA`, so this challenge spans two files.
 
 ## Building
 
-These compile only inside this project (Mathlib is prebuilt here); they are **not** part of
-the default `lake build` (they carry a deliberate `sorry`). From the repo root:
+Compile only inside this project (Mathlib is prebuilt here). The theorems carry a deliberate
+`sorry`, so the `Challenges` library is kept out of `defaultTargets`; build explicitly:
 
 ```bash
-lake env lean Challenges/MaximalOrders.lean   # ~2 min cold
-lake env lean Challenges/Ramification.lean    # ~3 min cold
+lake build Challenges.MaximalOrders   # self-contained; also works via `lake env lean`
+lake build Challenges.Ramification    # builds Challenges.QuaternionCSA (prerequisites) first
 ```
 
-Both currently elaborate **clean** — the only output is the expected
-`declaration uses 'sorry'` warning at the theorem — against toolchain
-`leanprover/lean4:v4.32.0-rc1` / Mathlib master `d255f67ec8`.
+Because `Ramification.lean` imports `Challenges.QuaternionCSA`, build it with `lake build` (which
+resolves the import) rather than `lake env lean`. Each elaborates **clean** — the only output is
+the expected `declaration uses 'sorry'` warning at the theorem — against toolchain
+`leanprover/lean4:v4.32.0-rc1` / Mathlib master `d255f67ec8`. (`QuaternionCSA.lean` itself builds
+fully clean; its two proofs are `sorry`-free.)
 
 ## The two targets
 
@@ -50,11 +57,19 @@ Modeling (as shipped):
 Modeling:
 - `Place K := InfinitePlace K ⊕ IsDedekindDomain.HeightOneSpectrum (𝓞 K)` (infinite ⊕ finite).
 - `Place.IsComplex := Sum.elim (·.IsComplex) (fun _ => False)`.
-- `RamifiedAt a b v` := `IsEmpty (K_v ⊗[K] ℍ[K,a,0,b] ≃ₐ[K_v] Matrix (Fin 2) (Fin 2) K_v)`
-  ("not split"), with `K_v = v.Completion` (infinite) / `v.adicCompletion K` (finite).
-- `RamificationSet a b := {v | RamifiedAt K a b v}`.
-- Statement `exists_quaternionAlgebra_ramificationSet_eq`: for `S : Finset (Place K)`, all
-  places noncomplex and `Even S.card`, `∃ a b : K, a ≠ 0 ∧ b ≠ 0 ∧ RamificationSet K a b = ↑S`.
+- **Split via the Brauer group.** `IsSplitField F a b := ⟦quatCSA⟧ = ⟦trivCSA⟧` in `BrauerGroup F`
+  — the class of `ℍ[F,a,0,b]` equals `1 = ⟦F⟧`, the class of the trivial (split) algebra. To place
+  `ℍ[F,a,0,b]` in `BrauerGroup F` we prove it is a central simple algebra: `quatCentral`
+  (`Algebra.IsCentral`) and `quatSimple` (`IsSimpleRing`, via a reduced-trace averaging argument) —
+  neither is in Mathlib, so both are proved in-file (genuine, axiom-clean). Mathlib's `BrauerGroup`
+  is only a `Quotient` (no group instance / no literal `1`), so `1` is spelled as `⟦F⟧`.
+- `IsSplitAt a b ha hb v` applies `IsSplitField` to the completion `K_v` (`= v.Completion` /
+  `v.adicCompletion K`), base-changing `a,b` via `algebraMap`; `CharZero K_v` is derived from
+  `CharZero K` along the injective `algebraMap`.
+- `IsRamifiedAt a b ha hb v := ¬ IsSplitAt …` (Voight Def 14.5.1); `RamificationSet a b ha hb :=
+  {v | IsRamifiedAt …}`. The `a ≠ 0`, `b ≠ 0` hypotheses are threaded through (needed to form the CSA).
+- Statement `exists_quaternionAlgebra_ramificationSet_eq`: for `S : Finset (Place K)`, all places
+  noncomplex and `Even S.card`, `∃ a b (ha : a ≠ 0) (hb : b ≠ 0), RamificationSet K a b ha hb = ↑S`.
 
 ## Source
 
