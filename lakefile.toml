@@ -8,3 +8,9 @@ version = "git#master"
 
 [[lean_lib]]
 name = "QuaternionAlgebras"
+
+# Buzzard-style challenge files (Voight, *Quaternion Algebras*).  Kept out of `defaultTargets`
+# (they carry a deliberate `sorry`); build explicitly with `lake build Challenges`.
+[[lean_lib]]
+name = "Challenges"
+globs = ["Challenges.*"]
